@@ -6,29 +6,30 @@
 # https://i3wm.org/docs/userguide.html
 #===============================================================================
 
+
+
+################################################################################
+## VARIABLES
+################################################################################
+
 #===============================================================================
 ## Set Super(Windows) key as the mod key.
 
 set $mod Mod4
 #===============================================================================
 
-#===============================================================================
-## Font for window titles. Will also be used by the bar unless a different font
-## is used in the bar {} block below.
 
-font pango:Noto Sans CJK KR 12
-#===============================================================================
 
-#===============================================================================
-## Use Mouse+$mod to drag floating windows to their wanted position
-
-floating_modifier $mod
-#===============================================================================
+################################################################################
+## KEYBINDINGS
+################################################################################
 
 #===============================================================================
 ## Start a terminal
 
-bindsym $mod+Return exec i3-sensible-terminal
+# TODO: Set $TERMINAL variable to use the default config
+#bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec alacritty
 #===============================================================================
 
 #===============================================================================
@@ -69,6 +70,12 @@ bindsym $mod+Shift+Right        move right
 #===============================================================================
 
 #===============================================================================
+## Use Mouse+$mod to drag floating windows to their wanted position
+
+floating_modifier $mod
+#===============================================================================
+
+#===============================================================================
 ## Splitting containers
 
 # Splitting horizontally
@@ -87,8 +94,9 @@ bindsym $mod+f fullscreen toggle
 #===============================================================================
 ## Change container layout (stacked, tabbed, toggle split)
 
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
+# Disabled stacking and tabbed layout because gaps don't like it
+#bindsym $mod+s layout stacking
+#bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 #===============================================================================
 
@@ -170,32 +178,109 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 #===============================================================================
 ## Resizing configurations
 
-# Resize mode configs
-mode "resize" {
-        # These bindings will be enabled upon entering resize mode.
+set $mode_resize        Resize Mode
+set $resize_px_size     10
+set $resize_ppt_size    1
 
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
+# Resize mode configs
+mode "$mode_resize" {
+
         # For the same reason as above, use arrow keys only.
-        bindsym Left    resize shrink width 10 px or 10 ppt
-        bindsym Down    resize grow height 10 px or 10 ppt
-        bindsym Up      resize shrink height 10 px or 10 ppt
-        bindsym Right   resize grow width 10 px or 10 ppt
+        bindsym Up      resize shrink height $resize_px_size px or $resize_ppt_size ppt
+        bindsym Down    resize grow   height $resize_px_size px or $resize_ppt_size ppt
+        bindsym Left    resize shrink width  $resize_px_size px or $resize_ppt_size ppt
+        bindsym Right   resize grow   width  $resize_px_size px or $resize_ppt_size ppt
 
         # Return back to default mode
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-        bindsym $mod+r mode "default"
+        bindsym Return  mode "default"
+        bindsym Escape  mode "default"
+        bindsym $mod+r  mode "default"
 }
 
 # Enter Resize mode
-bindsym $mod+r mode "resize"
+bindsym $mod+r mode "$mode_resize"
 #===============================================================================
 
 #===============================================================================
-## Start polybar
+## Audio control keys
 
-#exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+bindsym XF86AudioRaiseVolume    exec pamixer --increase 5
+bindsym XF86AudioLowerVolume    exec pamixer --decrease 5
+bindsym XF86AudioMute           exec pamixer --toggle-mute
+#====================================================g===========================
+
+
+
+################################################################################
+## AESTHETICS
+################################################################################
+
+#===============================================================================
+## Font for window titles. Will also be used by the bar unless a different font
+## is used in the bar {} block below.
+
+font pango:Noto Sans CJK KR 12
+#===============================================================================
+
+#===============================================================================
+## Compton compositor
+
+exec --no-startup-id compton --config ~/.config/compton.conf
+#===============================================================================
+
+#===============================================================================
+## Gaps configuration
+
+# Default gap size
+set $gap_size 15
+
+# For some obscure i3 reasons, gaps require window titlebars disabled.
+default_border          pixel 0
+default_floating_border pixel 0
+
+
+# Set default gaps
+gaps inner $gap_size
+smart_borders on
+
+# Bind some keystrokes that changes gaps
+set $mode_gaps Adjust Gaps Mode
+bindsym $mod+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+        bindsym equal   gaps inner all plus 5
+        bindsym minus   gaps inner all minus 5
+        bindsym Return  gaps inner all set 0
+
+        bindsym Escape  mode "default"
+        bindsym $mod+g  mode "default"
+}
+#===============================================================================
+
+#===============================================================================
+## Set background
+
+# TODO: allow wallpaper to be changed more easily (using env var or something)
+exec_always --no-startup-id feh --bg-scale ~/Pictures/Wallpapers/6th-destroyer-division.png
+#===============================================================================
+
+
+
+################################################################################
+## AUTOSTART PROGRAMS
+################################################################################
+
+#===============================================================================
+## Start bar
+
+bar {
+        font pango:Noto Sans Mono CJK 9
+        status_command i3status
+}
+#===============================================================================
+
+#===============================================================================
+## Start IBus for Korean input
+
+exec_always --no-startup-id ibus-daemon -drx
 #===============================================================================

@@ -3,7 +3,6 @@
 #===============================================================================
 
 # This script requires maim to be installed.
-# If it is not, it will fallback to scrot.
 
 main() {
     if ! [ -d ~/Pictures/Screenshots ]; then

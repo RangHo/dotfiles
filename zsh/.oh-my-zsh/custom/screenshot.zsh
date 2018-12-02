@@ -14,7 +14,7 @@ main() {
         | tee ~/Pictures/Screenshots/$(date +%Y%m%d%H%M%S).png \
         | xclip -selection clipboard -t image/png
 
-    notify-send --expire-time=2500 --icon=view-fullscreen,'~/Picture/Resources/hibiki-smile.png' 'Smile!' 'Screenshot is ready to go!'
+    notify-send --expire-time=2500 --icon=$HOME/Pictures/Resources/hibiki-smile.png 'Smile!' 'Your screenshot is ready!' && sleep 0.5
 }
 
 alias screenshot=main

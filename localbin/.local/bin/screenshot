@@ -16,4 +16,4 @@ main() {
     notify-send --expire-time=2500 --icon=$HOME/Pictures/Resources/hibiki-smile.png 'Smile!' 'Your screenshot is ready!' && sleep 0.5
 }
 
-alias screenshot=main
+main

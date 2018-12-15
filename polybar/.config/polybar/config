@@ -1,0 +1,265 @@
+;===============================================================================
+;  ____       _       _                
+; |  _ \ ___ | |_   _| |__   __ _ _ __ 
+; | |_) / _ \| | | | | '_ \ / _` | '__|
+; |  __/ (_) | | |_| | |_) | (_| | |   
+; |_|   \___/|_|\__, |_.__/ \__,_|_|   
+;               |___/                  
+; Created by RangHo.
+;
+; For a complete reference, visit:
+; https://github.com/jaagr/polybar/wiki
+;===============================================================================
+
+include-file = $HOME/.config/polybar/bars/top
+include-file = $HOME/.config/polybar/bars/bottom
+
+; Color Definition
+[colors]
+background = ${xrdb:background:#000000}
+foreground = ${xrdb:foreground:#ffffff}
+
+black   = ${xrdb:color0:#000}
+red     = ${xrdb:color1:#f00}
+green   = ${xrdb:color2:#0f0}
+yellow  = ${xrdb:color3:#ff0}
+blue    = ${xrdb:color4:#00f}
+magenta = ${xrdb:color5:#f0f}
+cyan    = ${xrdb:color6:#0ff}
+white   = ${xrdb.color7:#fff}
+
+darkblack   = ${xrdb:color8:#000}
+darkred     = ${xrdb:color9:#d00}
+darkgreen   = ${xrdb:color10:#0d0}
+darkyellow  = ${xrdb:color11:#dd0}
+darkblue    = ${xrdb:color12:#00d}
+darkmagenta = ${xrdb:color13:#d0d}
+darkcyan    = ${xrdb:color14:#0dd}
+darkwhite   = ${xrdb.color15:#ddd}
+
+
+
+; Aesthetics settings
+[appearances]
+padding = 1
+margin = 1
+
+
+
+; bspwm module for interacting with bspwm
+[module/bspwm]
+type = internal/bspwm
+
+enable-click = true
+
+ws-icon-0 = "web;"
+ws-icon-1 = "chat;"
+ws-icon-2 = "code;"
+ws-icon-3 = "fun;"
+ws-icon-default = ""
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format = "<label-state> <label-mode>"
+format-padding = ${appearances.padding}
+
+label-focused = "%icon%"
+label-focused-foreground = ${colors.blue}
+label-focused-underline= ${colors.blue}
+label-focused-padding = ${appearances.padding}
+
+label-occupied = "%icon%"
+label-occupied-padding = ${appearances.padding}
+
+label-urgent = "%icon%"
+label-urgent-foreground = ${colors.yellow}
+label-urgent-padding = ${appearances.padding}
+
+label-empty = "%icon%"
+label-empty-foreground = ${colors.black}
+label-empty-padding = ${appearances.padding}
+
+
+
+; CPU module to display CPU usage
+[module/cpu]
+type = internal/cpu
+
+interval = 1
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-prefix = "  "
+format-prefix-foreground = ${colors.cyan}
+format-underline = ${colors.cyan}
+format-padding = ${appearances.padding}
+
+label = "CPU %percentage:3:3%%"
+
+
+
+[module/filesystem]
+type = internal/fs
+
+mount-0 = /
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-mounted-prefix = " "
+format-mounted-prefix-foreground = ${colors.blue}
+format-mounted-underline = ${colors.blue}
+format-mounted-padding = ${appearances.padding}
+
+interval = 30
+
+label-mounted = "%percentage_used%% used"
+
+
+
+; PulseAudio module for volume adjustment
+[module/pulseaudio]
+type = internal/pulseaudio
+
+use-ui-max = false
+
+interval = 1
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-volume-prefix = " "
+format-volume-prefix-foreground = ${colors.yellow}
+format-volume = "<bar-volume>"
+format-volume-underline = ${colors.yellow}
+format-volume-padding = ${appearances.padding}
+
+format-muted-prefix = "  "
+format-muted = "<bar-volume>"
+format-muted-foreground = ${colors.black}
+format-muted-underline = ${colors.yellow}
+format-muted-padding = ${appearances.padding}
+
+bar-volume-width = 10
+bar-volume-indicator = |
+bar-volume-fill = ━
+bar-volume-empty = ─
+
+
+
+; Date module to display time10
+[module/time]
+type = internal/date
+
+interval = 5
+
+date = ""
+time = "%I:%M %p"
+
+date-alt = " %Y-%m-%d"
+time-alt = "%H:%M"
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-prefix = "  "
+format-prefix-foreground = ${colors.green}
+format-underline = ${colors.green}
+format-padding = ${appearances.padding}
+
+label = "%date% %time%"
+
+
+
+; Power menu module to graphically turn off computer
+[module/powermenu]
+type = custom/menu
+
+expand-right = false
+
+menu-0-0 = " Shutdown"
+menu-0-0-foreground = ${colors.red}
+menu-0-0-exec = "poweroff"
+menu-0-1 = " Reboot"
+menu-0-1-foreground = ${colors.yellow}
+menu-0-1-exec = "reboot"
+menu-0-2 = " Log off"
+menu-0-2-foreground = ${colors.blue}
+menu-0-2-exec = "eval $LOGOFF_COMMAND"
+menu-0-3 = " Lock"
+menu-0-3-foreground = ${colors.green}
+menu-0-3-exec = "dm-tool lock"
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-underline = ${colors.darkred}
+format-padding = ${appearances.padding}
+
+label-open = ""
+label-open-foreground = ${colors.darkred}
+label-close = ""
+label-close-foreground = ${colors.darkred}
+
+label-separator = " | "
+
+
+
+; Wireless module
+[module/wlan]
+type = internal/network
+interface = wlp2s0 
+interval = 5
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-connected-prefix = "  "
+format-connected-prefix-foreground = ${colors.magenta}
+format-connected-underline = ${colors.magenta}
+format-connected-padding = ${appearances.padding}
+
+label-connected = "%essid%"
+
+
+
+; Ethernet module
+[module/eth]
+type = internal/network
+
+interface = enp3s0
+interval = 5
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-connected-prefix = "  "
+format-connected-prefix-foreground = ${colors.magenta}
+format-connected-underline = ${colors.magenta}
+format-connected-padding = ${appearances.padding}
+
+format-disconnected = ""
+format-disconnected-foreground = ${colors.black}
+
+label-connected = "%local_ip%"
+
+
+
+; Xwindow module that displays window title
+[module/xwindow]
+type = internal/xwindow
+
+label-font = 3
+label = " %title:0:50:...% "
+
+
+
+; Music control using playerctl command line tool
+[module/music]
+type = custom/script
+
+exec = 
+
+tail = true

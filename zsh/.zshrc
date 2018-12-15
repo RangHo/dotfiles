@@ -1,3 +1,16 @@
+#===============================================================================
+#  _____    _              
+# |__  /___| |__  _ __ ___ 
+#   / // __| '_ \| '__/ __|
+#  / /_\__ \ | | | | | (__ 
+# /____|___/_| |_|_|  \___|
+#                          
+# Generated using Oh-My-Zsh, modified by RangHo.
+# 
+# For a complete reference, visit: 
+# https://github.com/robbyrussell/oh-my-zsh/wiki
+#===============================================================================
+
 # ZSH SYSTEM CONFIGURATION #
 #--------------------------#
 
@@ -35,10 +48,12 @@ HYPHEN_INSENSITIVE="true"
 # Install custom plugins in $ZSH/custom/plugins.
 plugins=(
   git
+  thefuck
+  vscode
+  web-search
+  zsh_reload
   fast-syntax-highlighting
 )
-
-
 
 # Now fire up Oh My Zsh!
 source $ZSH/oh-my-zsh.sh
@@ -47,6 +62,12 @@ source $ZSH/oh-my-zsh.sh
 
 # USER CONFIGURATION #
 #--------------------#
+
+# Append ~/.local/bin to PATH
+export PATH=$PATH:~/.local/bin
+
+# Preferred terminal emulator
+export TERMINAL=alacritty
 
 # Preferred editor for local and remote sessions
 #if [[ -n $SSH_CONNECTION ]]; then
@@ -58,5 +79,5 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-## SSH key location
+# SSH key location
 # export SSH_KEY_PATH="~/.ssh/rsa_id"

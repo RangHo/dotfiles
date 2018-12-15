@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#===============================================================================
+#              _            _             _   
+#   __ _ _   _| |_ ___  ___| |_ __ _ _ __| |_ 
+#  / _` | | | | __/ _ \/ __| __/ _` | '__| __|
+# | (_| | |_| | || (_) \__ \ || (_| | |  | |_ 
+#  \__,_|\__,_|\__\___/|___/\__\__,_|_|   \__|
+#
+# Shell scripts to execute upon initialization of bspwm, created by RangHo.
+#===============================================================================
+
+# Start compton compositor for prettier desktop.
+compton -b
+
+# Start Polybar
+$HOME/.config/polybar/launch.sh
+
+# Start ibus daemon for Korean input.
+ibus-daemon -drx
+
+# Set wallpaper image with feh.
+feh --bg-scale ~/Pictures/Wallpapers/6th-destroyer-division.png &
+
+# Start MPRIS-Proxy to control bluetooth audio using MPRIS
+mpris-proxy &

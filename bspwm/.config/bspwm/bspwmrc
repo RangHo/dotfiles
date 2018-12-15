@@ -1,0 +1,43 @@
+#!/bin/sh
+
+#===============================================================================
+#  _                                 
+# | |__  ___ _ ____      ___ __ ___  
+# | '_ \/ __| '_ \ \ /\ / / '_ ` _ \ 
+# | |_) \__ \ |_) \ V  V /| | | | | |
+# |_.__/|___/ .__/ \_/\_/ |_| |_| |_|
+#           |_|                                  
+# Created by RangHo.
+#
+# For a complete reference, run:
+# man bspwm
+#===============================================================================
+
+# Set bspwm config directory
+BSPWM_DIR=$HOME/.config/bspwm
+
+# Define logoff command for Polybar
+export LOGOFF_COMMAND="bspc quit"
+
+# Run sxhkd for hotkeys
+sxhkd &
+
+# Create workspaces
+bspc monitor -d web code chat fun misc
+
+# Set default border and gap
+bspc config border_width         0
+bspc config window_gap          10
+
+bspc config split_ratio          0.5
+bspc config borderless_monocle   true
+bspc config gapless_monocle      true
+
+# Enable mouse actions
+bspc config pointer_modifier mod4
+bspc config pointer_action1 move
+bspc config pointer_action2 focus
+bspc config pointer_action3 resize_corner
+
+# Start programs in autostart list
+$BSPWM_DIR/autostart

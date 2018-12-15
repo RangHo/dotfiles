@@ -1,3 +1,15 @@
+#===============================================================================
+#      _                 _   
+#   __| |_   _ _ __  ___| |_ 
+#  / _` | | | | '_ \/ __| __|
+# | (_| | |_| | | | \__ \ |_ 
+#  \__,_|\__,_|_| |_|___/\__|
+# Copied from default dunstrc file, modified by RangHo.
+#
+# For a complete reference, visit:
+# https://github.com/dunst-project/dunst/blob/master/dunstrc
+#===============================================================================                            
+
 [global]
     ### Display ###
 

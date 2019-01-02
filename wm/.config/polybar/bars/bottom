@@ -16,13 +16,12 @@ line-size = 2
 padding = ${appearances.padding}
 
 modules-left = music pulseaudio
-modules-right = wlan eth cpu filesystem
+modules-right = wlan eth cpu battery filesystem
 
 module-margin = ${appearances.margin}
 
 tray-position = right
 tray-maxsize = 30
-tray-transparent = false
 tray-background = ${root.background}
 tray-scale = 1.0
 

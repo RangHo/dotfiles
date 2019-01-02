@@ -91,7 +91,7 @@ interval = 1
 format-background = ${colors.background}
 format-foreground = ${colors.foreground}
 
-format-prefix = "  "
+format-prefix = " "
 format-prefix-foreground = ${colors.cyan}
 format-underline = ${colors.cyan}
 format-padding = ${appearances.padding}
@@ -155,7 +155,6 @@ type = internal/date
 
 interval = 5
 
-date = ""
 time = "%I:%M %p"
 
 date-alt = " %Y-%m-%d"
@@ -164,7 +163,7 @@ time-alt = "%H:%M"
 format-background = ${colors.background}
 format-foreground = ${colors.foreground}
 
-format-prefix = "  "
+format-prefix = " "
 format-prefix-foreground = ${colors.green}
 format-underline = ${colors.green}
 format-padding = ${appearances.padding}
@@ -256,10 +255,45 @@ label = " %title:0:50:...% "
 
 
 
-; Music control using playerctl command line tool
-[module/music]
-type = custom/script
+; Battery module to display battery usage
+[module/battery]
+type = internal/battery
 
-exec = 
+battery = BAT1
+adapter = ADP1
 
-tail = true
+poll-interval = 5
+
+ramp-capacity-0 = ""
+ramp-capacity-1 = ""
+ramp-capacity-2 = ""
+ramp-capacity-3 = ""
+ramp-capacity-4 = ""
+ramp-capacity-foreground = ${colors.darkgreen}
+
+animation-charging-0 = ""
+animation-charging-1 = ""
+animation-charging-2 = ""
+animation-charging-3 = ""
+animation-charging-4 = ""
+animation-charging-framerate = 750
+animation-charging-foreground = ${colors.darkgreen}
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-charging = "<animation-charging> <label-charging>"
+format-charging-underline = ${colors.darkgreen}
+format-charging-padding = ${appearances.padding}
+
+format-discharging = "<ramp-capacity> <label-discharging>"
+format-discharging-underline = ${colors.darkgreen}
+format-discharging-padding = ${appearances.padding}
+
+format-full = "<ramp-capacity> <label-full>"
+format-full-underline = ${colors.darkgreen}
+format-full-padding = ${appearances.padding}
+
+label-charging = "%percentage:3:3%%"
+label-discharging = "%percentage:3:3%%"
+label-full = "FULL"

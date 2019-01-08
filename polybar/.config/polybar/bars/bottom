@@ -15,14 +15,9 @@ line-size = 2
 
 padding = ${appearances.padding}
 
-modules-left = music pulseaudio
-modules-right = wlan eth cpu battery filesystem
+modules-left = powermenu music pulseaudio
+modules-right = wlan eth cpu battery filesystem time
 
 module-margin = ${appearances.margin}
-
-tray-position = right
-tray-maxsize = 30
-tray-background = ${root.background}
-tray-scale = 1.0
 
 wm-restack = bspwm

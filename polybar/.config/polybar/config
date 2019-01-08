@@ -176,7 +176,7 @@ label = "%date% %time%"
 [module/powermenu]
 type = custom/menu
 
-expand-right = false
+expand-right = true
 
 menu-0-0 = " Shutdown"
 menu-0-0-foreground = ${colors.red}

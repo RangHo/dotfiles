@@ -14,7 +14,7 @@
 systemctl --user start xfce4-notifyd
 
 # Start compton compositor for prettier desktop.
-compton -b
+compton --config ~/.config/compton/compton.conf --daemon
 
 # Start Polybar
 $HOME/.config/polybar/launch.sh
@@ -23,7 +23,7 @@ $HOME/.config/polybar/launch.sh
 ibus-daemon -drx
 
 # Set wallpaper image with feh.
-feh --bg-scale ~/Pictures/Wallpapers/6th-destroyer-division.png &
+feh --bg-fill ~/Pictures/Wallpapers/wallpaper-cropped.jpg &
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 mpris-proxy &

@@ -19,6 +19,9 @@ BSPWM_DIR=$HOME/.config/bspwm
 # Define logoff command for Polybar
 export LOGOFF_COMMAND="bspc quit"
 
+# Make sure that .local/bin is in PATH
+export PATH=$HOME/.local/bin:$PATH
+
 # Run sxhkd for hotkeys
 sxhkd &
 

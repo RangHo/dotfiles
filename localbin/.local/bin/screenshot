@@ -1,17 +1,19 @@
+#!/bin/sh
 #===============================================================================
 # Take screenshots easy!
+#
+# Requires:
+#   - xfce4-screenshooter
+#   - xclip
+#   - some sort of notification client running
 #===============================================================================
-
-# This script requires maim to be installed.
 
 main() {
     if ! [ -d ~/Pictures/Screenshots ]; then
         mkdir -p ~/Pictures/Screenshots
     fi
-
-    maim \
-        | tee ~/Pictures/Screenshots/$(date +%Y%m%d%H%M%S).png \
-        | xclip -selection clipboard -t image/png
+    
+    xfce4-screenshooter -f -s ~/Pictures/Screenshots
 
     notify-send --expire-time=2500 --icon=$HOME/Pictures/Resources/hibiki-smile.png 'Smile!' 'Your screenshot is ready!' && sleep 0.5
 }

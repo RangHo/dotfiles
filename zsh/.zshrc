@@ -63,11 +63,8 @@ source $ZSH/oh-my-zsh.sh
 # USER CONFIGURATION #
 #--------------------#
 
-# Append ~/.local/bin to PATH
-export PATH=$PATH:~/.local/bin
-
 # Preferred terminal emulator
-export TERMINAL=alacritty
+export TERMINAL=xfce4-terminal
 
 # Preferred editor for local and remote sessions
 #if [[ -n $SSH_CONNECTION ]]; then

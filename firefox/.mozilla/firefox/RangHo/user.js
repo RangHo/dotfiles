@@ -10,6 +10,7 @@
  */
 
 user_pref("browser.tabs.drawInTitlebar", true);
+user_pref("browser.display.use_system_colors", false);
 user_pref("font.name.monospace.ar", "Noto Sans Mono");
 user_pref("font.name.monospace.el", "Noto Sans Mono");
 user_pref("font.name.monospace.he", "Noto Sans Mono");

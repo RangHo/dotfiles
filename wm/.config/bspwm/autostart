@@ -10,6 +10,9 @@
 # Shell scripts to execute upon initialization of bspwm, created by RangHo.
 #===============================================================================
 
+# Start xfce4-notifyd daemon for notification stuff.
+systemctl --user start xfce4-notifyd
+
 # Start compton compositor for prettier desktop.
 compton -b
 

@@ -10,9 +10,6 @@
 # Shell scripts to execute upon initialization of bspwm, created by RangHo.
 #===============================================================================
 
-# Start xfce4-notifyd daemon for notification stuff.
-systemctl --user start xfce4-notifyd
-
 # Start compton compositor for prettier desktop.
 compton --config ~/.config/compton/compton.conf --daemon
 
@@ -23,7 +20,7 @@ $HOME/.config/polybar/launch.sh
 ibus-daemon -drx
 
 # Set wallpaper image with feh.
-feh --bg-fill ~/Pictures/Wallpapers/wallpaper-cropped.jpg &
+feh --bg-fill ~/Pictures/Wallpapers/wallpaper.jpg &
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 mpris-proxy &

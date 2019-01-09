@@ -47,23 +47,3 @@
 ! White
 *.color7:       #d3d0c8
 *.color15:      #a1a1a1
-
-!==============================================================================!
-
-!! URXVT SETTINGS !!
-!------------------!
-
-! Font settings
-URxvt.font:             xft:D2Coding:pixelsize=18
-URxvt.imFont:           xft:D2Coding:pixelsize=18
-URxvt.boldFont:         xft:D2Coding:pixelsize=18
-URxvt.italicFont:       xft:D2Coding:pixelsize=18
-URxvt.boldItalicFont:   xft:D2Coding:pixelsize=18
-
-! Disable scrollbar
-URxvt.scrollBar: false
-
-! Enable transparency
-URxvt*depth:        32
-URxvt*background:   rgba:2d00/2d00/2d00/c800
-

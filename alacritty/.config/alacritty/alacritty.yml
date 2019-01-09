@@ -1,3 +1,13 @@
+#===============================================================================
+#     _    _                 _ _   _         
+#    / \  | | __ _  ___ _ __(_) |_| |_ _   _ 
+#   / _ \ | |/ _` |/ __| '__| | __| __| | | |
+#  / ___ \| | (_| | (__| |  | | |_| |_| |_| |
+# /_/   \_\_|\__,_|\___|_|  |_|\__|\__|\__, |
+#                                      |___/ 
+# Copied from default Alacritty configuration file, modified by RangHo.
+#===============================================================================
+
 # Configuration for Alacritty, the GPU enhanced terminal emulator.
 
 # Any items in the `env` entry below will be added as
@@ -29,12 +39,18 @@ window:
     x: 2
     y: 2
 
+  # Spread additional padding evenly around the terminal content.
+  dynamic_padding: false
+
   # Window decorations
   #
   # Values for `decorations`:
   #     - full: Borders and title bar
   #     - none: Neither borders nor title bar
   decorations: full
+
+  # When true, alacritty starts maximized.
+  start_maximized: false
 
 scrolling:
   # Maximum number of lines in the scrollback buffer.
@@ -86,24 +102,24 @@ tabspaces: 8
 font:
   # Normal (roman) font face
   normal:
-    family: monospace
+    family: D2Coding
     # The `style` can be specified to pick a specific face.
     #style: Regular
 
   # Bold font face
   bold:
-    family: monospace
+    family: D2Coding
     # The `style` can be specified to pick a specific face.
     #style: Bold
 
   # Italic font face
   italic:
-    family: monospace
+    family: D2Coding
     # The `style` can be specified to pick a specific face.
     #style: Italic
 
   # Point size
-  size: 14.0
+  size: 8.0
 
   # Offset is the extra space around each character. `offset.y` can be thought of
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
@@ -118,24 +134,21 @@ font:
     x: 0
     y: 0
 
-  # Scale the font size based on the monitor's DPI. This will lead to bigger text on HiDPI
-  # screens and make reading text a little easier.
-  # On X11 it is possible to change the DPI for each instance of alacritty by using
-  # `WINIT_HIDPI_FACTOR=1.0 alacritty` to scale the font.
-  scale_with_dpi: true
-
 # Display the time it takes to redraw each frame.
 render_timer: false
+
+# Keep the log file after quitting Alacritty.
+persistent_logging: false
 
 # If `true`, bold text is drawn using the bright color variants.
 draw_bold_text_with_bright_colors: true
 
-# Colors (Tomorrow Night Bright)
+# Colors
 colors:
   # Default colors
   primary:
-    background: '0x000000'
-    foreground: '0xeaeaea'
+    background: '0x2d2d2d'
+    foreground: '0xd3d0c8'
 
     # Bright and dim foreground colors
     #
@@ -155,39 +168,41 @@ colors:
 
   # Normal colors
   normal:
-    black:   '0x000000'
-    red:     '0xd54e53'
-    green:   '0xb9ca4a'
-    yellow:  '0xe6c547'
-    blue:    '0x7aa6da'
-    magenta: '0xc397d8'
-    cyan:    '0x70c0ba'
-    white:   '0xffffff'
-
-  # Bright colors
-  bright:
-    black:   '0x666666'
-    red:     '0xff3334'
-    green:   '0x9ec400'
-    yellow:  '0xe7c547'
-    blue:    '0x7aa6da'
-    magenta: '0xb77ee0'
-    cyan:    '0x54ced6'
-    white:   '0xffffff'
-
-  # Dim colors
-  #
-  # If the dim colors are not set, they will be calculated automatically based
-  # on the `normal` colors.
-  dim:
-    black:   '0x333333'
+    black:   '0x474747'
     red:     '0xf2777a'
     green:   '0x99cc99'
     yellow:  '0xffcc66'
     blue:    '0x6699cc'
     magenta: '0xcc99cc'
     cyan:    '0x66cccc'
-    white:   '0xdddddd'
+    white:   '0xd3d0c8'
+
+  # Bright colors
+  bright:
+    black:   '0x747369'
+    red:     '0xbf6060'
+    green:   '0x709970'
+    yellow:  '0xcca352'
+    blue:    '0x517099'
+    magenta: '0x997099'
+    cyan:    '0x519999'
+    white:   '0xa1a1a1'
+
+
+
+  # Dim colors
+  #
+  # If the dim colors are not set, they will be calculated automatically based
+  # on the `normal` colors.
+  #dim:
+  #  black:   '0x333333'
+  #  red:     '0xf2777a'
+  #  green:   '0x99cc99'
+  #  yellow:  '0xffcc66'
+  #  blue:    '0x6699cc'
+  #  magenta: '0xcc99cc'
+  #  cyan:    '0x66cccc'
+  #  white:   '0xdddddd'
 
   # Indexed Colors
   #
@@ -220,12 +235,13 @@ colors:
 visual_bell:
   animation: EaseOutExpo
   duration: 0
+  color: '0xffffff'
 
 # Background opacity
 #
 # Window opacity as a floating point number from `0.0` to `1.0`.
 # The value `0.0` is completely transparent and `1.0` is opaque.
-background_opacity: 1.0
+background_opacity: 0.75
 
 # Mouse bindings
 #
@@ -315,7 +331,7 @@ live_config_reload: true
 # arguments (`command`).
 #
 # Example:
-#   `- { key: V, mods: Command, action: Paste }`
+#   `- { key: V, mods: Control|Shift, action: Paste }`
 #
 # Available fields:
 #   - key
@@ -338,7 +354,7 @@ live_config_reload: true
 #     `showkey --scancodes`
 #
 # Values for `mods`:
-#   - Command
+#   - Super
 #   - Control
 #   - Shift
 #   - Alt
@@ -369,6 +385,8 @@ live_config_reload: true
 #   - ClearHistory
 #   - Hide
 #   - Quit
+#   - ClearLogNotice
+#   - SpawnNewInstance
 #
 # Values for `command`:
 #   The `command` field must be a map containing a `program` string and
@@ -387,12 +405,12 @@ key_bindings:
   - { key: C,        mods: Control|Shift,    action: Copy                }
   - { key: Paste,                   action: Paste                        }
   - { key: Copy,                    action: Copy                         }
-  - { key: Q,        mods: Command, action: Quit                         }
-  - { key: W,        mods: Command, action: Quit                         }
   - { key: Insert,   mods: Shift,   action: PasteSelection               }
   - { key: Key0,     mods: Control, action: ResetFontSize                }
   - { key: Equals,   mods: Control, action: IncreaseFontSize             }
   - { key: Subtract, mods: Control, action: DecreaseFontSize             }
+  - { key: L,        mods: Control, action: ClearLogNotice               }
+  - { key: L,        mods: Control, chars: "\x0c"                        }
   - { key: Home,                    chars: "\x1bOH",   mode: AppCursor   }
   - { key: Home,                    chars: "\x1b[H",   mode: ~AppCursor  }
   - { key: End,                     chars: "\x1bOF",   mode: AppCursor   }

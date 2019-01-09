@@ -15,9 +15,9 @@
 # WM-INDEPENDENT HOTKEYS
 ################################################################################
 
-# Execute URxvt
+# Execute Alacritty
 super + Return
-    urxvt
+    alacritty
 
 # Execute default terminal
 super + shift + Return

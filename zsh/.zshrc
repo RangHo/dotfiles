@@ -47,12 +47,12 @@ HYPHEN_INSENSITIVE="true"
 # Specify plugins to load.
 # Install custom plugins in $ZSH/custom/plugins.
 plugins=(
-  git
-  thefuck
-  vscode
-  web-search
-  zsh_reload
-  fast-syntax-highlighting
+    git
+    thefuck
+    vscode
+    web-search
+    zsh_reload
+    fast-syntax-highlighting
 )
 
 # Now fire up Oh My Zsh!
@@ -67,14 +67,55 @@ source $ZSH/oh-my-zsh.sh
 export TERMINAL=xfce4-terminal
 
 # Preferred editor for local and remote sessions
-#if [[ -n $SSH_CONNECTION ]]; then
-#  export EDITOR='vim'
-#else
-#  export EDITOR='mvim'
-#fi
+if [[ -n $SSH_CONNECTION ]]; then
+    export EDITOR='nvim'
+else
+    export EDITOR='mvim'
+fi
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# Source Awesome Terminal Fonts scripts
+if [ -d /usr/share/fonts/awesome-terminal-fonts ]; then
+    for script in /usr/share/fonts/awesome-terminal-fonts/*.sh; do
+        source $script
+    done
+fi
 
-# SSH key location
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
+# POWERLEVEL9K THEME #
+#--------------------#
+
+code2icon() {
+    echo "\\u$1 "
+}
+
+# Tell Powerlevel9k to use fontconfig
+POWERLEVEL9K_MODE="awesome-fontconfig"
+
+# Start prompt on newline
+POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+
+# DIR settings
+POWERLEVEL9K_HOME_ICON=$(code2icon $CODEPOINT_OF_AWESOME_HOME)
+POWERLEVEL9K_HOME_SUB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_FOLDER_OPEN)
+POWERLEVEL9K_FOLDER_ICON=$(code2icon $CODEPOINT_OF_AWESOME_FOLDER)
+POWERLEVEL9K_ETC_ICON=$(code2icon $CODEPOINT_OF_AWESOME_PUZZLE_PIECE)
+POWERLEVEL9K_DIR_SHORTEN_DIR_LENGTH=1
+POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_first_and_last"
+
+# VCS settings
+POWERLEVEL9K_VCS_GIT_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GIT)
+POWERLEVEL9K_VCS_GIT_GITHUB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GITHUB)
+POWERLEVEL9K_VCS_GIT_BITBUCKET_ICON=$(code2icon $CODEPOINT_OF_AWESOME_BITBUCKET)
+POWERLEVEL9K_VCS_GIT_GITLAB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GITLAB)
+
+# TIME settings
+POWERLEVEL9K_TIME_FORMAT="%D{%H:%M $(code2icon $CODEPOINT_OF_AWESOME_CALENDAR) %y/%m/%d}"
+
+# Something else
+POWERLEVEL9K_CUSTOM_TERMINAL_ICON="echo $(code2icon $CODEPOINT_OF_AWESOME_TERMINAL)"
+
+# Elements
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_terminal_icon dir vcs)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(virtualenv time)
+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%{%B%F{yellow}%K{blue}%} $%{%b%f%k%F{blue}%} %{%f%}"

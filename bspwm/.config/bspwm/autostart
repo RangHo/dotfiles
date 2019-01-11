@@ -24,3 +24,6 @@ feh --bg-fill ~/Pictures/Wallpapers/wallpaper.jpg &
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 mpris-proxy &
+
+# xfce4-power-saver handles suspend and stuff for me
+xfce4-power-manager

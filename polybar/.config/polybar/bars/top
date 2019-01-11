@@ -17,13 +17,13 @@ fixed-center = true
 
 modules-left = i3 bspwm
 modules-center = xwindow
-modules-right = 
+modules-right = wlan eth bluetooth time
 
 module-margin = ${appearances.margin}
 
-tray-position = right
-tray-maxsize = 30
-tray-background = ${root.background}
-tray-scale = 1.0
+; tray-position = right
+; tray-maxsize = 30
+; tray-background = ${root.background}
+; tray-scale = 1.0
 
 wm-restack = bspwm

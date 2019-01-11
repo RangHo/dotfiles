@@ -24,8 +24,8 @@ super + shift + Return
     $TERMINAL
 
 # Execute program launcher
-super + d
-    dmenu_run
+super + {_,shift + } m
+    rofi -config ~/.config/rofi/config.rasi -show {run,drun}
 
 # Take screenshot (requires localbin dotfiles to be installed)
 Print
@@ -34,6 +34,26 @@ Print
 # Reload sxhkd configuration files
 super + Escape
     pkill -USR1 -x sxhkd
+
+# Volume control keys
+XF86Audio{Raise,Lower}Volume
+    pamixer --{increase,decrease} 5
+
+# Volume mute key
+XF86AudioMute
+    pamixer --toggle-mute
+
+# Brightness control key
+XF86MonBrightness{Up,Down}
+    xbacklight -{inc,dec} 10
+
+# WLAN toggle key
+XF86WLAN
+    if [ $(nmcli radio wifi) = 'enabled' ]; then \
+        nmcli radio wifi off; \
+    else \
+        nmcli radio wifi on; \
+    fi
 
 ################################################################################
 # BSPWM HOTKEYS
@@ -74,7 +94,7 @@ super + {_,shift + }{Up,Down,Left,Right}
     bspc node -{f,s} {north,south,west,east}
 
 # Focus/swap the next/previous node in the current desktop
-super + {_,shift + }c
+super + {_,shift + }Tab
     bspc node -f {next,prev}.local
 
 # Focus the next/previous desktop in the current monitor

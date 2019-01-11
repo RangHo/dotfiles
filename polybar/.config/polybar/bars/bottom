@@ -16,7 +16,7 @@ line-size = 2
 padding = ${appearances.padding}
 
 modules-left = powermenu music pulseaudio
-modules-right = wlan eth cpu battery filesystem time
+modules-right = cpu ram filesystem battery
 
 module-margin = ${appearances.margin}
 

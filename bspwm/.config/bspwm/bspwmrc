@@ -42,5 +42,8 @@ bspc config pointer_action1 move
 bspc config pointer_action2 focus
 bspc config pointer_action3 resize_corner
 
+# Some application settings
+bspc rule "Blueberry.py" state=floating
+
 # Start programs in autostart list
 $BSPWM_DIR/autostart

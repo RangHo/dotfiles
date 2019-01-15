@@ -20,7 +20,7 @@ $HOME/.config/polybar/launch.sh
 ibus-daemon -drx
 
 # Set wallpaper image with feh.
-feh --bg-fill ~/Pictures/Wallpapers/wallpaper.jpg &
+feh --randomize --bg-fill ~/Pictures/Wallpapers/wallpaper-* &
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 mpris-proxy &

@@ -8,6 +8,7 @@ foreground = ${colors.foreground}
 font-0 = "NeoDunggeunmo:size=12;2"
 font-1 = "Font Awesome:size=14;3"
 font-2 = "Noto Sans CJK KR:size=11;2"
+font-3 = "Noto Sans Mono CJK KR:size=12;2"
 
 line-size = 3
 

@@ -1,8 +1,10 @@
 configuration {
     modi: "run,drun";
     font: "Noto Sans Mono CJK KR 12";
+    show-icons: true;
     theme: "theme";
     transaprency: "true";
+
 
 /*	modi: "window,run,ssh";*/
 /*	width: 50;*/

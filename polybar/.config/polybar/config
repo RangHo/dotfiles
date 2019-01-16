@@ -153,7 +153,7 @@ content-underline = ${colors.blue}
 content-padding = ${appearances.padding}
 content = ""
 
-click-left = "blueberry"
+click-left = "blueberry &"
 
 
 
@@ -244,6 +244,29 @@ bar-volume-empty = ─
 
 
 
+; Music module to display current song info
+[module/music]
+type = custom/script
+
+;exec = "mprisctl tail --format '%{A1:mprisctl previous:}%{A} {{playing}}%{A1:mprisctl pause:}%{A}{{/playing}}{{paused}}%{A1:mprisctl play:}%{A}{{/paused}} %{A1:mprisctl next:}%{A} {{artist}} - {{title}}'"
+
+tail = true
+
+format-background = ${colors.background}
+format-foreground = ${colors.foreground}
+
+format-prefix = " "
+format-prefix-foreground = ${colors.darkyellow}
+
+format = "<label>"
+format-underline = ${colors.darkyellow}
+format-padding = ${appearances.padding}
+
+label-font = 4
+label = "%output:0:50:...%"
+
+
+
 ; CPU module to display CPU usage
 [module/cpu]
 type = internal/cpu
@@ -303,6 +326,8 @@ type = internal/battery
 
 battery = BAT1
 adapter = ADP1
+
+full-at = 99
 
 poll-interval = 5
 

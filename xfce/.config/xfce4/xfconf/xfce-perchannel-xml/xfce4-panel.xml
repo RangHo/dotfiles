@@ -35,6 +35,7 @@
     <property name="plugin-4" type="string" value="pager"/>
     <property name="plugin-6" type="string" value="systray">
       <property name="names-visible" type="array">
+        <value type="string" value="orage"/>
         <value type="string" value="networkmanager applet"/>
         <value type="string" value="xfce4-power-manager"/>
         <value type="string" value="blueman-applet"/>
@@ -45,6 +46,7 @@
     <property name="plugin-1" type="string" value="whiskermenu"/>
     <property name="plugin-2" type="string" value="pulseaudio">
       <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+      <property name="mpris-players" type="string" value="RangHo_ANDROID;RangHo_ANDROID_Bugs"/>
     </property>
     <property name="plugin-7" type="string" value="weather"/>
     <property name="plugin-9" type="string" value="showdesktop"/>

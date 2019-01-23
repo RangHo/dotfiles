@@ -248,7 +248,9 @@ bar-volume-empty = ─
 [module/music]
 type = custom/script
 
-;exec = "mprisctl tail --format '%{A1:mprisctl previous:}%{A} {{playing}}%{A1:mprisctl pause:}%{A}{{/playing}}{{paused}}%{A1:mprisctl play:}%{A}{{/paused}} %{A1:mprisctl next:}%{A} {{artist}} - {{title}}'"
+exec = "player-mpris-tail -f ' %{A1:player-mpris-tail previous:}%{A} %{A1:player-mpris-tail play-pause:}{icon}%{A} %{A1:player-mpris-tail next:}%{A} {:t20:{artist}:} - {title}' --icon-playing  --icon-pause  --icon-stopped "
+;exec = "player-mpris-tail -f '%{A1:player-mpris-tail previous:}  %{A} %{A1:player-mpris-tail play-pause:} {icon} %{A} %{A1:player-mpris-tail next:}  %{A} {:t20:{artist}:} - {title}' --icon-pause  --icon-playing  --icon-stopped "
+;mprisctl tail --format '%{A1:mprisctl previous:}%{A} {{playing}}%{A1:mprisctl pause:}%{A}{{/playing}}{{paused}}%{A1:mprisctl play:}%{A}{{/paused}} %{A1:mprisctl next:}%{A} {{artist}} - {{title}}'"
 
 tail = true
 
@@ -263,7 +265,7 @@ format-underline = ${colors.darkyellow}
 format-padding = ${appearances.padding}
 
 label-font = 4
-label = "%output:0:50:...%"
+label = "%output:::...%"
 
 
 

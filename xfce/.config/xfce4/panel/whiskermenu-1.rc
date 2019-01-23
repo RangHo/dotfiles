@@ -1,5 +1,5 @@
 favorites=exo-terminal-emulator.desktop,exo-file-manager.desktop,exo-mail-reader.desktop,exo-web-browser.desktop
-recent=exo-file-manager.desktop,exo-terminal-emulator.desktop,visual-studio-code.desktop,unity-editor.desktop,exo-web-browser.desktop,org.gnome.dfeet.desktop,firefox.desktop,ibus-setup.desktop,urxvt.desktop
+recent=exo-terminal-emulator.desktop,wine-KakaoTalk.desktop,exo-web-browser.desktop,google-chrome.desktop,exo-file-manager.desktop,visual-studio-code.desktop,unity-editor.desktop,org.gnome.dfeet.desktop,firefox.desktop,ibus-setup.desktop
 button-title=Applications
 button-icon=xfce4-whiskermenu
 button-single-row=false

@@ -1,0 +1,16 @@
+ARCH=(
+    alacritty
+    ttf-fira-code
+    awesome-terminal-fonts
+)
+
+AUR=(
+    ttf-d2coding
+    ttf-neodgm
+)
+
+DOTFILE=(
+    fontconfig
+    compton
+    zsh
+)

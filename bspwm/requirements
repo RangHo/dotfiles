@@ -1,0 +1,22 @@
+ARCH=(
+    # Core dependencies
+    bspwm
+    sxhkd
+    dunst
+    feh
+)
+
+AUR=(
+    polybar
+    compton-tryone-git
+)
+
+DOTFILE=(
+    rofi
+    localbin
+)
+
+ENSURE_EXISTS=(
+    "~/Pictures" 
+)
+

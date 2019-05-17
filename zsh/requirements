@@ -1,0 +1,21 @@
+ARCH=(
+    zsh
+    pyenv
+    rbenv
+    fzf
+    bat
+)
+
+AUR=(
+    pyenv-virtualenv
+)
+
+GEM=(
+    colorls
+)
+
+DOTFILE=(
+    alacritty
+    fontconfig
+)
+

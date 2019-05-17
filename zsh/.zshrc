@@ -5,72 +5,103 @@
 #  / /_\__ \ | | | | | (__ 
 # /____|___/_| |_|_|  \___|
 #                          
-# Generated using Oh-My-Zsh, modified by RangHo.
-# 
-# For a complete reference, visit: 
-# https://github.com/robbyrussell/oh-my-zsh/wiki
+# Simple zsh resources with zplugin, created by RangHo.
 #===============================================================================
 
-# ZSH SYSTEM CONFIGURATION #
-#--------------------------#
+# ZPLUGIN #
+#---------#
 
-# Path to Oh-My-Zsh configuration
-export ZSH="/home/zu0107/.oh-my-zsh"
+source ~/.zplugin/bin/zplugin.zsh
 
-# Theme to decorate the terminal.
-ZSH_THEME="powerlevel9k/powerlevel9k"
+zplugin light romkatv/powerlevel10k
 
-# Make the shell more tolerant about fucking up hyphens and underscores.
-HYPHEN_INSENSITIVE="true"
+zplugin light zsh-users/zsh-completions
+zplugin light zsh-users/zsh-autosuggestions
+zplugin light zdharma/fast-syntax-highlighting
 
-# Disable bi-weekly auto-update checks.
-#DISABLE_AUTO_UPDATE="true"
+zplugin light gretzky/auto-color-ls
 
-# Change automatic update-checking interval.
-#export UPDATE_ZSH_DAYS=13
+zplugin ice pick"init.zsh" blockf
+zplugin light laggardkernel/git-ignore
 
-# Uncomment the following line to disable auto-setting terminal title.
-#DISABLE_AUTO_TITLE="true"
+# KEYBINDINGS #
+#-------------#
 
-# Enable command auto-correction.
-#ENABLE_CORRECTION="true"
+bindkey -e
 
-# Display red dots whilst waiting for completion.
-#COMPLETION_WAITING_DOTS="true"
+# Zsh does not like inputrc for some reason
+# So let's shove keybindings into its mouth
+typeset -g -A key
 
-# Disable marking untracked files as dirty in VCS's.
-#DISABLE_UNTRACKED_FILES_DIRTY="true"
+key[Home]="${terminfo[khome]}"
+key[End]="${terminfo[kend]}"
+key[Insert]="${terminfo[kich1]}"
+key[Backspace]="${terminfo[kbs]}"
+key[Delete]="${terminfo[kdch1]}"
+key[Up]="${terminfo[kcuu1]}"
+key[Down]="${terminfo[kcud1]}"
+key[Left]="${terminfo[kcub1]}"
+key[Right]="${terminfo[kcuf1]}"
+key[PageUp]="${terminfo[kpp]}"
+key[PageDown]="${terminfo[knp]}"
+key[ShiftTab]="${terminfo[kcbt]}"
 
-# Change the command execution timestamp shown in the history command output.
-#HIST_STAMPS="mm/dd/yyyy"
+[[ -n "${key[Home]}" ]] \
+    && bindkey -- "${key[Home]}"        beginning-of-line
+[[ -n "${key[End]}" ]] \
+    && bindkey -- "${key[End]}"         end-of-line
+[[ -n "${key[Insert]}" ]] \
+    && bindkey -- "${key[Insert]}"      overwrite-mode
+[[ -n "${key[Backspace]}" ]] \
+    && bindkey -- "${key[Backspace]}"   backward-delete-char
+[[ -n "${key[Delete]}" ]] \
+    && bindkey -- "${key[Delete]}"      delete-char
+[[ -n "${key[Up]}" ]] \
+    && bindkey -- "${key[Up]}"          up-line-or-history
+[[ -n "${key[Down]}" ]] \
+    && bindkey -- "${key[Down]}"        down-line-or-history
+[[ -n "${key[Left]}" ]] \
+    && bindkey -- "${key[Left]}"        backward-char
+[[ -n "${key[Right]}" ]] \
+    && bindkey -- "${key[Right]}"       forward-char
+[[ -n "${key[PageUp]}" ]] \
+    && bindkey -- "${key[PageUp]}"      beginning-of-buffer-or-history
+[[ -n "${key[PageDown]}"  ]] \
+    && bindkey -- "${key[PageDown]}"    end-of-buffer-or-history
+[[ -n "${key[ShiftTab]}"  ]] \
+    && bindkey -- "${key[ShiftTab]}"    reverse-menu-complete
 
-# Specify plugins to load.
-# Install custom plugins in $ZSH/custom/plugins.
-plugins=(
-    git
-    thefuck
-    vscode
-    web-search
-    zsh_reload
-    fast-syntax-highlighting
-)
+# Finally, make sure the terminal is in application mode,
+# when zle is active. Only then are the values from $terminfo valid.
+if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
+    autoload -Uz add-zle-hook-widget
+    function zle_application_mode_start {
+        echoti smkx
+    }
+    function zle_application_mode_stop {
+        echoti rmkx
+    }
+    add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
+    add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+fi
 
-# Now fire up Oh My Zsh!
-source $ZSH/oh-my-zsh.sh
-
-#==============================================================================#
 
 # USER CONFIGURATION #
 #--------------------#
 
 # Preferred terminal emulator
-export TERMINAL=xfce4-terminal
+export TERMINAL=alacritty
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='nvim'
 else
-    export EDITOR='mvim'
+    export EDITOR='vim'
+fi
+
+# Add rubygems directory to $PATH
+if which ruby >/dev/null && which gem >/dev/null; then
+    export PATH="$(ruby -r rubygems -e 'puts Gem.user_dir')/bin:$PATH)"
 fi
 
 # Source Awesome Terminal Fonts scripts
@@ -80,42 +111,53 @@ if [ -d /usr/share/fonts/awesome-terminal-fonts ]; then
     done
 fi
 
+# Source Nerd Fonts scripts
+if [ -d /usr/lib/nerd-fonts-complete ]; then
+    source /usr/lib/nerd-fonts-complete/i_all.sh
+fi
+
+# Some useful aliases
+alias vim=nvim
+alias cat=bat
+alias ls=colorls
+
+# Case-insensitive Completion
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
 # POWERLEVEL9K THEME #
 #--------------------#
 
-code2icon() {
-    echo "\\u$1 "
-}
-
 # Tell Powerlevel9k to use fontconfig
-POWERLEVEL9K_MODE="awesome-fontconfig"
+POWERLEVEL9K_MODE="nerdfont-complete"
 
 # Start prompt on newline
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
 # DIR settings
-POWERLEVEL9K_HOME_ICON=$(code2icon $CODEPOINT_OF_AWESOME_HOME)
-POWERLEVEL9K_HOME_SUB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_FOLDER_OPEN)
-POWERLEVEL9K_FOLDER_ICON=$(code2icon $CODEPOINT_OF_AWESOME_FOLDER)
-POWERLEVEL9K_ETC_ICON=$(code2icon $CODEPOINT_OF_AWESOME_PUZZLE_PIECE)
-POWERLEVEL9K_DIR_SHORTEN_DIR_LENGTH=1
-POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_first_and_last"
+POWERLEVEL9K_HOME_ICON="$i_fa_home "
+POWERLEVEL9K_HOME_SUB_ICON="$i_fa_folder_open "
+POWERLEVEL9K_FOLDER_ICON="$i_fa_folder "
+POWERLEVEL9K_ETC_ICON="$i_fa_puzzle_piece "
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+POWERLEVEL9K_SHORTEN_DELIMITER=""
+POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
 
 # VCS settings
-POWERLEVEL9K_VCS_GIT_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GIT)
-POWERLEVEL9K_VCS_GIT_GITHUB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GITHUB)
-POWERLEVEL9K_VCS_GIT_BITBUCKET_ICON=$(code2icon $CODEPOINT_OF_AWESOME_BITBUCKET)
-POWERLEVEL9K_VCS_GIT_GITLAB_ICON=$(code2icon $CODEPOINT_OF_AWESOME_GITLAB)
+POWERLEVEL9K_VCS_GIT_ICON="$i_fa_git  "
+POWERLEVEL9K_VCS_GIT_GITHUB_ICON="$i_fa_github  "
+POWERLEVEL9K_VCS_GIT_BITBUCKET_ICON="$i_fa_bitbucket  "
+POWERLEVEL9K_VCS_GIT_GITLAB_ICON="$i_fa_gitlab  "
 
 # TIME settings
-POWERLEVEL9K_TIME_FORMAT="%D{%H:%M $(code2icon $CODEPOINT_OF_AWESOME_CALENDAR) %y/%m/%d}"
+POWERLEVEL9K_TIME_FORMAT="%D{%H:%M}"
 
 # Something else
-POWERLEVEL9K_CUSTOM_TERMINAL_ICON="echo $(code2icon $CODEPOINT_OF_AWESOME_TERMINAL)"
+POWERLEVEL9K_CUSTOM_TERMINAL_ICON="echo $i_fa_terminal"
 
 # Elements
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_terminal_icon dir vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(virtualenv time)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status rbenv pyenv time)
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
 POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%{%B%F{yellow}%K{blue}%} $%{%b%f%k%F{blue}%} %{%f%}"
+

@@ -1,6 +1,0 @@
-[submodule "zsh/.oh-my-zsh/custom/themes/powerlevel9k"]
-	path = zsh/.oh-my-zsh/custom/themes/powerlevel9k
-	url = https://github.com/bhilburn/powerlevel9k
-[submodule "zsh/.oh-my-zsh/custom/plugins/fast-syntax-highlighting"]
-	path = zsh/.oh-my-zsh/custom/plugins/fast-syntax-highlighting
-	url = https://github.com/zdharma/fast-syntax-highlighting

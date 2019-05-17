@@ -3,19 +3,22 @@
 install:
 ifdef install
 	@if [ -d $(install) ]; then \
-		if [ -f $(install)/init.sh ]; then \
-			echo "Initialization script found. Executing..."; \
-			$(install)/init.sh; \
-		else \
-			echo "Initialization script is not found. Skipping..."; \
+		echo "Installing $(install) configs!"; \
+		if [ -f $(install)/requirements ]; then \
+			echo ""; \
+			echo -e "\033[0;33m=== DEPENDENCIES ===\033[0m"; \
+			echo "We're gonna install some programs needed!"; \
+			echo "We might ask for your password here."; \
+			./require.sh $(install)/requirements; \
 		fi; \
-		stow -t ~ --ignore="init\.sh" --ignore="final\.sh" $(install); \
-		if [ -f $(install)/final.sh ]; then \
-			echo "Finalization script found. Executing..."; \
-			$(install)/final.sh; \
-		else \
-			echo "Finalization script is not found. Skipping..."; \
-		fi; \
+		echo ""; \
+		echo -e "\033[0;33m=== STOW ===\033[0m"; \
+		stow -t ~ \
+			--ignore="requirements" \
+			$(install); \
+		echo "Finished symlinking!"; \
+		echo ""; \
+		echo "Installation finished!"; \
 	fi
 endif
 ifdef uninstall
@@ -23,18 +26,18 @@ ifdef uninstall
 endif
 
 update:
+	@echo "Updating from the remote repository!"
 	@for target in *; do \
 		if [ -d $target ]; then \
-			stow -t ~ -D $target; \
+			make uninstall=$target && echo "Uninstalled $target."; \
 		fi; \
 	done
 	@git fetch --all
 	@git reset --hard origin/master
-	@echo "Update complete. Please re-install configuration files."
+	@echo "Update completed! Please reinstall configuration files!"
 
 remove:
+	@echo "Removing configuration files..."
 	@for target in *; do \
-		if [ -d $target ]; then \
-			stow -t ~ -D $target; \
-		fi; \
+		make uninstall=$target && echo "Uninstalled $target."; \
 	done

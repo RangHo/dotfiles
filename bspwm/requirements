@@ -6,14 +6,11 @@ ARCH=(
     feh
 )
 
-AUR=(
-    polybar
-    compton-tryone-git
-)
-
 DOTFILE=(
     rofi
     localbin
+    compton
+    polybar
 )
 
 ENSURE_EXISTS=(

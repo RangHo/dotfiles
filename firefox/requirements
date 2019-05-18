@@ -1,0 +1,16 @@
+ARCH=(
+    firefox
+)
+
+DOTFILE=(
+    fontconfig
+)
+
+ENSURE_EXISTS=(
+    "~/.mozilla/firefox/RangHo"
+)
+
+ENSURE_NONEXISTS=(
+    "~/.mozilla/firefox/profiles.ini"
+)
+

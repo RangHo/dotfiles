@@ -1,0 +1,9 @@
+ARCH=(
+    bluez
+    maim
+)
+
+PIP=(
+    dbus-python
+)
+

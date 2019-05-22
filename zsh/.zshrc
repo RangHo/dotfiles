@@ -11,6 +11,10 @@
 # ZPLUGIN #
 #---------#
 
+if ! [ "~/.zplugin/bin/zplugin.zsh" ]; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+fi
+
 source ~/.zplugin/bin/zplugin.zsh
 
 zplugin light romkatv/powerlevel10k
@@ -19,7 +23,8 @@ zplugin light zsh-users/zsh-completions
 zplugin light zsh-users/zsh-autosuggestions
 zplugin light zdharma/fast-syntax-highlighting
 
-zplugin light gretzky/auto-color-ls
+zplugin light desyncr/auto-ls
+AUTO_LS_COMMANDS=('/bin/lsd')
 
 zplugin ice pick"init.zsh" blockf
 zplugin light laggardkernel/git-ignore
@@ -119,7 +124,7 @@ fi
 # Some useful aliases
 alias vim=nvim
 alias cat=bat
-alias ls=colorls
+alias ls=lsd
 
 # Case-insensitive Completion
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'

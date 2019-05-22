@@ -1,21 +1,17 @@
 ARCH=(
     zsh
     pyenv
-    rbenv
     fzf
     bat
+    lsd
 )
 
 AUR=(
+    rbenv
     pyenv-virtualenv
 )
 
-GEM=(
-    colorls
-)
-
 DOTFILE=(
-    alacritty
     fontconfig
 )
 

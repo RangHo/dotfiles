@@ -35,16 +35,13 @@ install_AUR() {
         popd
         rm -rf $aur_directory
 
-        sudo tee -a > /dev/null <<- EOF
-			[AUR]
-			SigLevel = Optional TrustAll
-			Server = file:///home/$USER/AUR
-		EOF
+        echo -e "\n[AUR]\nSigLevel = Optional TrustAll\nServer = file:///home/$USER/AUR" \
+            | sudo tee -a /etc/pacman.conf
 
         sudo install -d /home/$USER/AUR/ -o $USER
-        repo-add /home/$USER/AUR.db.tar
+        repo-add /home/$USER/AUR/AUR.db.tar
 
-        pacman -Sy
+        sudo pacman -Sy
     fi
 
     for package in $@; do
@@ -75,7 +72,7 @@ install_GEM() {
     if ! command -v gem; then
         echo -e "${RED}RubyGem does not exist! Installing that first...${NO_COLOR}"
         
-        sudo pacman -Sy ruby rubygem
+        sudo pacman -Sy ruby rubygems
     fi
 
     gem install $@
@@ -86,7 +83,7 @@ install_DOTFILE() {
 
     echo -e "\n${WHITE}Installing ${GREEN}other Dotfiles${WHITE}...${NO_COLOR}"
     for package in $@; do
-        make install=$package | sed 's/^/    /'
+        make install=$package
     done
 }
 
@@ -97,7 +94,7 @@ ensure_exist() {
         if ! [ -d "$path" ]; then
             echo -e "\n${GREEN}$path${WHITE} directory is required. Creating...${NO_COLOR}"
 
-            mkdir -p $path
+            mkdir -p $(eval "echo $path")
         fi
     done
 }
@@ -109,7 +106,7 @@ ensure_nonexist() {
         if [ "$path" -o -d "$path" ]; then
             echo -e "\n${RED}$path${WHITE} directory must be removed. Deleting...${NO_COLOR}"
 
-            rm -rf $path
+            rm -rf $(eval "echo $path")
         fi
     done
 }

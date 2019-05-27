@@ -4,6 +4,7 @@ ARCH=(
     sxhkd
     dunst
     feh
+    uim
 )
 
 DOTFILE=(
@@ -15,5 +16,6 @@ DOTFILE=(
 
 ENSURE_EXISTS=(
     "~/Pictures" 
+    "~/.config/systemd/user"
 )
 

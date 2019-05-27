@@ -90,7 +90,7 @@ install_DOTFILE() {
 ensure_exist() {
     # Ensures that directories exist.
 
-    for path in $1; do
+    for path in $@; do
         if ! [ -d "$path" ]; then
             echo -e "\n${GREEN}$path${WHITE} directory is required. Creating...${NO_COLOR}"
 
@@ -102,7 +102,7 @@ ensure_exist() {
 ensure_nonexist() {
     # Ensures that directories/files do not exist.
     
-    for path in $1; do
+    for path in $@; do
         if [ "$path" -o -d "$path" ]; then
             echo -e "\n${RED}$path${WHITE} directory must be removed. Deleting...${NO_COLOR}"
 

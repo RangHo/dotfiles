@@ -1,0 +1,17 @@
+ARCH=(
+    keybase
+    kbfs
+    diff-so-fancy
+)
+
+AUR=(
+    gitflow-avr
+)
+
+DOTFILE=(
+    zsh
+)
+
+ENSURE_EXISTS=(
+    "~/Templates"
+)

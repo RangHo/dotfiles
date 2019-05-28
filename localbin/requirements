@@ -1,9 +1,7 @@
 ARCH=(
     bluez
+    bluez-utils
     maim
-)
-
-PIP=(
-    dbus-python
+    python-dbus
 )
 

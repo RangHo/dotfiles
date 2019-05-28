@@ -153,7 +153,7 @@ content-underline = ${colors.blue}
 content-padding = ${appearances.padding}
 content = ""
 
-click-left = "blueberry &"
+click-left = "blueman &"
 
 
 

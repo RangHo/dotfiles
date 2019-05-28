@@ -1,0 +1,19 @@
+ARCH=(
+    blueman
+    pulseaudio
+    pulseaudio-alsa
+    pulseaudio-bluetooth
+    pulseaudio-jack
+    pulseaudio-zeroconf
+    pamixer
+    pavucontrol
+)
+
+AUR=(
+    polybar
+)
+
+DOTFILE=(
+    localbin
+)
+

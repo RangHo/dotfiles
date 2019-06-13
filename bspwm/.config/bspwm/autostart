@@ -16,12 +16,12 @@ compton --config ~/.config/compton/compton.conf --daemon &
 # Start Polybar
 $HOME/.config/polybar/launch.sh
 
-# Start ibus daemon for Korean input.
-ibus-daemon -drx
-
 # Set wallpaper image with feh.
 feh --randomize --bg-fill ~/Pictures/Wallpapers/wallpaper-* &
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 mpris-proxy &
+
+# Dunst must be started
+dunst &
 

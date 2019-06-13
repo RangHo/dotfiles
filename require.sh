@@ -14,7 +14,7 @@ install_ARCH() {
     # Installs packages from Arch Official Repository.
     
     echo -e "\n${WHITE}Installing ${CYAN}Arch Official Packages${WHITE}...${NO_COLOR}"
-    sudo pacman -Sy $@
+    sudo pacman -Sy --noconfirm $@
 }
 
 install_AUR() {
@@ -48,7 +48,7 @@ install_AUR() {
         aur sync $package
     done
 
-    sudo pacman -Sy $@
+    sudo pacman -Sy --noconfirm $@
 
 }
 
@@ -59,7 +59,7 @@ install_PIP() {
     if ! command -v pip; then
         echo -e "${RED}Python-PIP does not exist! Installing that first...${NO_COLOR}"
         
-        sudo pacman -Sy python python-pip
+        sudo pacman -Sy --noconfirm python python-pip
     fi
 
     sudo pip install $@
@@ -72,7 +72,7 @@ install_GEM() {
     if ! command -v gem; then
         echo -e "${RED}RubyGem does not exist! Installing that first...${NO_COLOR}"
         
-        sudo pacman -Sy ruby rubygems
+        sudo pacman -Sy --noconfirm ruby rubygems
     fi
 
     gem install $@

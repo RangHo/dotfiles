@@ -22,6 +22,11 @@ export LOGOFF_COMMAND="bspc quit"
 # Make sure that .local/bin is in PATH
 export PATH=$HOME/.local/bin:$PATH
 
+# Set uim configs
+export GTK_IM_MODULE=uim
+export QT_IM_MODULE=uim
+export XMODIFIERS=@im=uim
+
 # Run sxhkd for hotkeys
 sxhkd &
 

@@ -5,6 +5,7 @@ ARCH=(
     dunst
     feh
     uim
+    wmname
 )
 
 DOTFILE=(

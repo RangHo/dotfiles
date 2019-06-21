@@ -25,3 +25,6 @@ mpris-proxy &
 # Dunst must be started
 dunst &
 
+# Execute wmname becuase Java GUI is a fucktard
+wmname LG3D
+

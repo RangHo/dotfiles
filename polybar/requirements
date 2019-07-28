@@ -11,6 +11,7 @@ ARCH=(
 
 AUR=(
     polybar
+    networkmanager-dmenu-git
 )
 
 DOTFILE=(

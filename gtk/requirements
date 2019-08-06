@@ -1,0 +1,13 @@
+ARCH=(
+    arc-gtk-theme
+    papirus-icon-theme
+    gtk2
+    gtk-engine-murrine
+    qt5-styleplugins
+    lxappearance
+)
+
+ENSURE_EXISTS=(
+    "~/.config/environment.d"
+)
+

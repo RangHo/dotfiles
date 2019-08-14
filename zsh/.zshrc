@@ -11,7 +11,7 @@
 # ZPLUGIN #
 #---------#
 
-if [ ! -e "~/.zplugin/bin/zplugin.zsh" ]; then
+if [ ! -e ~/.zplugin/bin/zplugin.zsh ]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
 fi
 

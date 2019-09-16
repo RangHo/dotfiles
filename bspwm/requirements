@@ -13,6 +13,7 @@ DOTFILE=(
     localbin
     compton
     polybar
+    gtk
 )
 
 ENSURE_EXISTS=(

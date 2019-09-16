@@ -27,6 +27,9 @@ export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 export XMODIFIERS=@im=uim
 
+# Direct Qt to use GTK themes
+export QT_QPA_PLATFORMTHEME=qt5ct
+
 # Run sxhkd for hotkeys
 sxhkd &
 

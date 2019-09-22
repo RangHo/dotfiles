@@ -5,3 +5,7 @@ ARCH=(
     python-dbus
 )
 
+ENSURE_EXISTS=(
+    "~/.config/environment.d"
+)
+

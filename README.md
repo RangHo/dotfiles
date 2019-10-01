@@ -7,15 +7,15 @@ Dotfiles are similar to what Windows users would call *hidden files*. They are o
 
 ## How to use
 
-Using `GNU stow`, we can manage the dotfiles easily. Though `stow` itself is not designed to be used with dotfiles, it works perfectly well. To add more functionalities, I wrapped `stow` with `make` so that I can automatically initialize and finalize installation.
+Using `GNU stow`, we can manage the dotfiles easily. Though `stow` itself is not designed to be used with dotfiles, it works perfectly well. To add more functionalities, I wrapped `stow` with `make` so that I can automatically install important dependencies while applying dotfiles.
 
-First, clone the repository to your favorite location. I will download it into `~/Dotfiles`.
+First, clone the repository into your favorite location. I am going to download it into `~/Dotfiles`, as it looks good among existing XDG User Directories. Don't forget to initialize submodules as some features depend on git submodules.
 
 ```sh
 git clone --recurse-submodules https://github.com/RangHo/dotfiles ~/Dotfiles
 ```
 
-I used `~/Dotfiles` for consistent feel with existing XDG directory structure. Recursively initialize submodules to load some external themes and stuff. Then `cd` into the directory you chose.
+Then `cd` into the directory you chose.
 
 ```sh
 cd ~/Dotfiles
@@ -27,13 +27,15 @@ Then we can install the configurations! Use this syntax to install a package: `m
 make install=firefox
 ```
 
+Note that while applying dotfies, it may ask you for a `sudo` password.
+
 ## List of commands
 
 Here are complete list of commands:
 
 | Command | What it does |
 |-----|-----|
-| `make install=<package>` | Installs a package named `<package>`. It runs initialize and finalize scripts too. |
+| `make install=<package>` | Installs a package named `<package>`. It installs dependencies too. |
 | `make uninstall=<package>` | Just an alias to `stow -t ~ -D <package>`. Uninstalls a package. |
 | `make update` | Updates the dotfiles repository. This first uninstalls all available configuration. You have to reinstall packages later. |
 | `make remove` | Remove all packages from the machine. It cannot guarantee that all artifacts are removed also. }

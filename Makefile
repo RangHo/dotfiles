@@ -1,4 +1,11 @@
-.PHONY: install update remove
+.PHONY: default init install update remove
+
+default: install
+
+init:
+	@if command -v stow >/dev/null 2>&1; then \
+		ARCH=(stow) ./require.sh; \
+	fi
 
 install:
 ifdef install
@@ -27,11 +34,7 @@ endif
 
 update:
 	@echo "Updating from the remote repository!"
-	@for target in *; do \
-		if [ -d $target ]; then \
-			make uninstall=$target && echo "Uninstalled $target."; \
-		fi; \
-	done
+	@make remove
 	@git fetch --all
 	@git reset --hard origin/master
 	@echo "Update completed! Please reinstall configuration files!"
@@ -39,5 +42,5 @@ update:
 remove:
 	@echo "Removing configuration files..."
 	@for target in *; do \
-		make uninstall=$target && echo "Uninstalled $target."; \
+		make uninstall=${target} && echo "Uninstalled ${target}."; \
 	done

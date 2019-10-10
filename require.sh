@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 NO_COLOR='\033[0m'  # Text Reset
 BLACK='\033[0;30m'  # Black
@@ -13,43 +13,79 @@ WHITE='\033[0;37m'  # White
 install_ARCH() {
     # Installs packages from Arch Official Repository.
     
-    echo -e "\n${WHITE}Installing ${CYAN}Arch Official Packages${WHITE}...${NO_COLOR}"
-    sudo pacman -Sy --noconfirm $@
+    if [ "$(cat /etc/os-release | awk -F "=" '/^ID/ {print $2}')" != "arch" ]; then
+        echo -e "\n--- ${RED}WARNING${NO_COLOR} ---"
+        echo -e "It seems like you are not running ${CYAN}Arch Linux${NO_COLOR}."
+        echo -e "Currently this script works only on Arch, so you have to"
+        echo -e "install dependencies manually. Here is the list of dependencies:"
+
+        for package in $@; do
+            echo -e "\t${YELLOW}$package${NO_COLOR}"
+        done
+        
+        echo ""
+
+        echo -e "Now I am going to let you write commands. Install all"
+        echo -e "Required packages now and type \"exit\" to continue."
+        echo -e "Type \"list\" to see the list of packages again."
+
+        while true; do
+            echo ""
+            echo -ne "${GREEN}Enter command:${NO_COLOR} "
+            read line
+            
+            if [ "$line" = "exit" ]; then
+                break
+            elif [ "$line" = "list" ]; then
+                echo "List of dependencies:"
+                for package in $@; do
+                    echo -e "\t${YELLOW}$package${NO_COLOR}"
+                done
+                continue
+            fi
+            
+            eval $line
+        done
+    else
+        echo -e "\n${WHITE}Installing ${CYAN}Arch Official Packages${WHITE}...${NO_COLOR}"
+        sudo pacman -Sy --needed --noconfirm $@
+    fi
 }
 
 install_AUR() {
     # Installs packages from Arch User Repository.
-
-    echo -e "\n${WHITE}Installing ${CYAN}Arch User Packages${WHITE}...${NO_COLOR}"
-    if ! command -v aur; then
-        echo -e "${RED}AURUTILS does not exist! Installing that first...${NO_COLOR}"
+     
+    if [ "$(cat /etc/os-release | awk -F "=" '/^ID/ {print $2}')" = "arch" ]; then
+        echo -e "\n${WHITE}Installing ${CYAN}Arch User Packages${WHITE}...${NO_COLOR}"
+        if ! command -v aur; then
+            echo -e "${RED}AURUTILS does not exist! Installing that first...${NO_COLOR}"
+            
+            aur_directory=$(mktemp -d)
+            pushd $aur_directory
         
-        aur_directory=$(mktemp -d)
-        pushd $aur_directory
+            git clone https://aur.archlinux.org/aurutils
         
-        git clone https://aur.archlinux.org/aurutils
-        
-        cd aurutils
-        makepkg -si
+            cd aurutils
+            makepkg -si
 
-        popd
-        rm -rf $aur_directory
+            popd
+            rm -rf $aur_directory
 
-        echo -e "\n[AUR]\nSigLevel = Optional TrustAll\nServer = file:///home/$USER/AUR" \
-            | sudo tee -a /etc/pacman.conf
+            echo -e "\n[AUR]\nSigLevel = Optional TrustAll\nServer = file:///home/$USER/AUR" \
+                | sudo tee -a /etc/pacman.conf
 
-        sudo install -d /home/$USER/AUR/ -o $USER
-        repo-add /home/$USER/AUR/AUR.db.tar
+            sudo install -d /home/$USER/AUR/ -o $USER
+            repo-add /home/$USER/AUR/AUR.db.tar
 
-        sudo pacman -Sy
+            sudo pacman -Sy
+        fi
+
+        for package in $@; do
+            aur sync $package
+        done
     fi
 
-    for package in $@; do
-        aur sync $package
-    done
-
-    sudo pacman -Sy --noconfirm $@
-
+    install_ARCH $@
 }
 
 install_PIP() {
@@ -59,7 +95,7 @@ install_PIP() {
     if ! command -v pip; then
         echo -e "${RED}Python-PIP does not exist! Installing that first...${NO_COLOR}"
         
-        sudo pacman -Sy --noconfirm python python-pip
+        install_ARCH python python-pip
     fi
 
     sudo pip install $@
@@ -72,7 +108,7 @@ install_GEM() {
     if ! command -v gem; then
         echo -e "${RED}RubyGem does not exist! Installing that first...${NO_COLOR}"
         
-        sudo pacman -Sy --noconfirm ruby rubygems
+        install_ARCH ruby rubygems
     fi
 
     gem install $@
@@ -126,7 +162,9 @@ create_links() {
     done
 }
 
-source $1
+if [ $1 ]; then
+    source $1
+fi
 
 if [ "$ARCH" ]; then
     install_ARCH ${ARCH[@]}

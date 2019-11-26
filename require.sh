@@ -26,7 +26,7 @@ install_ARCH() {
         echo ""
 
         echo -e "Now I am going to let you write commands. Install all"
-        echo -e "Required packages now and type \"exit\" to continue."
+        echo -e "required packages now and type \"exit\" to continue."
         echo -e "Type \"list\" to see the list of packages again."
 
         while true; do
@@ -98,7 +98,7 @@ install_PIP() {
         install_ARCH python python-pip
     fi
 
-    sudo pip install $@
+    pip install --user $@
 }
 
 install_GEM() {

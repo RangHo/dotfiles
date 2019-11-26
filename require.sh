@@ -162,39 +162,55 @@ create_links() {
     done
 }
 
-if [ $1 ]; then
-    source $1
-fi
 
-if [ "$ARCH" ]; then
-    install_ARCH ${ARCH[@]}
-fi
+if [ "$1" = "install" ]; then
+    if [ -f "$2/requirements" ]; then
+        source "$2/requirements"
+    fi
 
-if [ "$AUR" ]; then
-    install_AUR ${AUR[@]}
-fi
+    if [ -f "$HOME/.local/share/dotfiles/$2" -a "$3" != "--force" ]; then
+        echo "Package $2 is already installed. Skipping..."
+        exit
+    fi
 
-if [ "$PIP" ]; then
-    install_PIP ${PIP[@]}
-fi
+    ensure_exist "~/.local/share/dotfiles"
+    if [ -f "$2/requirements" ]; then
+        cp "$2/requirements" "$HOME/.local/share/dotfiles/$2"
+    else
+        touch "$HOME/.local/share/dotfiles/$2"
+    fi
+    
+    if [ "$ARCH" ]; then
+        install_ARCH ${ARCH[@]}
+    fi
 
-if [ "$GEM"]; then
-    install_GEM ${GEM[@]}
-fi
+    if [ "$AUR" ]; then
+        install_AUR ${AUR[@]}
+    fi
 
-if [ "$DOTFILE" ]; then
-    install_DOTFILE ${DOTFILE[@]}
-fi
+    if [ "$PIP" ]; then
+        install_PIP ${PIP[@]}
+    fi
 
-if [ "$ENSURE_EXISTS" ]; then
-    ensure_exist ${ENSURE_EXISTS[@]}
-fi
+    if [ "$GEM"]; then
+        install_GEM ${GEM[@]}
+    fi
 
-if [ "$ENSURE_NONEXISTS" ]; then
-    ensure_nonexist ${ENSURE_NONEXISTS[@]}
-fi
+    if [ "$DOTFILE" ]; then
+        install_DOTFILE ${DOTFILE[@]}
+    fi
 
-if [ "$LINK" ]; then
-    create_links ${LINK[@]}
-fi
+    if [ "$ENSURE_EXISTS" ]; then
+        ensure_exist ${ENSURE_EXISTS[@]}
+    fi
 
+    if [ "$ENSURE_NONEXISTS" ]; then
+        ensure_nonexist ${ENSURE_NONEXISTS[@]}
+    fi
+
+    if [ "$LINK" ]; then
+        create_links ${LINK[@]}
+    fi
+elif [ "$1" = "uninstall" ]; then
+    rm -f "~/.local/share/dotfiles/$3"
+fi

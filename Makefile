@@ -16,18 +16,24 @@ ifdef install
 			echo -e "\033[0;33m=== DEPENDENCIES ===\033[0m"; \
 			echo "We're gonna install some programs needed!"; \
 			echo "We might ask for your password here."; \
-			./require.sh $(install)/requirements; \
 		fi; \
+		./require.sh install $(install); \
 		echo ""; \
 		echo -e "\033[0;33m=== STOW ===\033[0m"; \
-		stow $(install); \
+		stow $(install) \
+			-t ~ \
+			--ignore="requirements" \
+			--ignore=".gitignore"; \
 		echo "Finished symlinking!"; \
 		echo ""; \
 		echo "Installation finished!"; \
 	fi
 endif
 ifdef uninstall
-	@if [ -d $(uninstall) ]; then stow -t ~ -D $(uninstall); fi
+	@if [ -d $(uninstall) ]; then \
+		stow -t ~ -D $(uninstall); \
+		./require.sh uninstall $(uninstall); \
+	fi
 endif
 
 update:

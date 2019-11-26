@@ -1,0 +1,11 @@
+ARCH=(
+    neovim
+
+    # Some LangServer implementations
+    python-language-server
+)
+
+PIP=(
+    pynvim
+)
+

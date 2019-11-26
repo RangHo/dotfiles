@@ -20,9 +20,7 @@ ifdef install
 		fi; \
 		echo ""; \
 		echo -e "\033[0;33m=== STOW ===\033[0m"; \
-		stow -t ~ \
-			--ignore="requirements" \
-			$(install); \
+		stow $(install); \
 		echo "Finished symlinking!"; \
 		echo ""; \
 		echo "Installation finished!"; \

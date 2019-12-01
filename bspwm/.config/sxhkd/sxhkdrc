@@ -69,7 +69,7 @@ super + alt + Escape
 super + {_,shift + } q
     bspc node -{c,k}
 
-# Alternate between the tiled and monocle layout (basically fullscreen toggle)
+# Alternate between the tiled and monocle layout (fullscreen with bars)
 super + f
     bspc desktop -l next
 
@@ -77,8 +77,16 @@ super + f
 
 # Toggle floating window
 super + space
-	if [ -z "$(bspc query -N -n focused.floating)" ]; then \
+    if [ -z "$(bspc query -N focused.floating)" ]; then \
         bspc node focused -t floating; \
+    else \
+        bspc node focused -t tiled; \
+    fi
+
+# Toggle fullscreen window
+super + shift + f
+    if [ -z "$(bspc query -N focused.fullscreen)" ]; then \
+        bspc node focused -t fullscreen; \
     else \
         bspc node focused -t tiled; \
     fi

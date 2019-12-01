@@ -1,0 +1,30 @@
+[bar/top]
+width = 100%
+height = 30
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+font-0 = "NeoDunggeunmo:size=12;2"
+font-1 = "Font Awesome:size=14;3"
+font-2 = "Noto Sans CJK KR:size=11;2"
+font-3 = "Noto Sans Mono CJK KR:size=12;2"
+
+line-size = 3
+
+padding = ${appearances.padding}
+
+fixed-center = true
+
+modules-left = i3 bspwm
+modules-center = xwindow
+modules-right = wlan eth bluetooth time
+
+module-margin = ${appearances.margin}
+
+; tray-position = right
+; tray-maxsize = 30
+; tray-background = ${root.background}
+; tray-scale = 1.0
+
+wm-restack = bspwm

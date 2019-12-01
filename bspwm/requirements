@@ -1,18 +1,37 @@
 ARCH=(
-    # Core dependencies
+    # System features
+    pulseaudio
+    pulseaudio-alsa
+    pulseaudio-jack
+    pulseaudio-zeroconf
+    pamixer
+    pavucontrol
+    blueman
+
+    # Windows Manager features
     bspwm
     sxhkd
     dunst
     feh
     uim
     wmname
+    rofi
+
+    # Compositor
+    #compton
+)
+
+AUR=(
+    # Bar
+    polybar
+    networkmanager-dmenu-git
+
+    # Using tryone144's fork until the active repo picks up
+    compton-tryone-git
 )
 
 DOTFILE=(
-    rofi
     localbin
-    compton
-    polybar
     gtk
 )
 

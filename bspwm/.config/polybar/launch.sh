@@ -11,4 +11,5 @@ done
 # Launch all bars in bars directory
 for bar in $HOME/.config/polybar/bars/*; do
     polybar $(basename $bar) &
+    sleep 0.1
 done

@@ -11,363 +11,327 @@
 ; https://github.com/jaagr/polybar/wiki
 ;===============================================================================
 
-include-file = $HOME/.config/polybar/bars/top
-include-file = $HOME/.config/polybar/bars/bottom
-include-file = $HOME/.config/polybar/bars/main
+include-file = $HOME/.config/polybar/base-bar
+
+include-file = $HOME/.config/polybar/bars/99-background
+include-file = $HOME/.config/polybar/bars/01-left
+include-file = $HOME/.config/polybar/bars/01-right
 
 ; Color Definition
 [colors]
-background = ${xrdb:background:#000000}
-foreground = ${xrdb:foreground:#ffffff}
+    background = ${xrdb:background:#000000}
+    foreground = ${xrdb:foreground:#ffffff}
 
-black   = ${xrdb:color0:#000}
-red     = ${xrdb:color1:#f00}
-green   = ${xrdb:color2:#0f0}
-yellow  = ${xrdb:color3:#ff0}
-blue    = ${xrdb:color4:#00f}
-magenta = ${xrdb:color5:#f0f}
-cyan    = ${xrdb:color6:#0ff}
-white   = ${xrdb.color7:#fff}
+    black   = ${xrdb:color0:#000}
+    red     = ${xrdb:color1:#f00}
+    green   = ${xrdb:color2:#0f0}
+    yellow  = ${xrdb:color3:#ff0}
+    blue    = ${xrdb:color4:#00f}
+    magenta = ${xrdb:color5:#f0f}
+    cyan    = ${xrdb:color6:#0ff}
+    white   = ${xrdb.color7:#fff}
 
-darkblack   = ${xrdb:color8:#000}
-darkred     = ${xrdb:color9:#d00}
-darkgreen   = ${xrdb:color10:#0d0}
-darkyellow  = ${xrdb:color11:#dd0}
-darkblue    = ${xrdb:color12:#00d}
-darkmagenta = ${xrdb:color13:#d0d}
-darkcyan    = ${xrdb:color14:#0dd}
-darkwhite   = ${xrdb.color15:#ddd}
+    darkblack   = ${xrdb:color8:#000}
+    darkred     = ${xrdb:color9:#d00}
+    darkgreen   = ${xrdb:color10:#0d0}
+    darkyellow  = ${xrdb:color11:#dd0}
+    darkblue    = ${xrdb:color12:#00d}
+    darkmagenta = ${xrdb:color13:#d0d}
+    darkcyan    = ${xrdb:color14:#0dd}
+    darkwhite   = ${xrdb.color15:#ddd}
 
 ; Aesthetics settings
 [appearances]
-padding = 1
-margin = 1
+    padding = 1
+    margin = 1
+
+    font-monospace = 1
+    font-korean = 2
+    font-japanese = 3
+    font-icon = 4
+    font-icon-big = 5
 
 ; Some variables that are set on runtime
 [variables]
-wireless-device = ${{ exec $SHELL }}
-ethernet-device = ${{ exec $SHELL }}
-something = ${{ echo something }}
-
-; bspwm module for interacting with bspwm
-[module/bspwm]
-type = internal/bspwm
-
-enable-click = true
-
-ws-icon-0 = "web;"
-ws-icon-1 = "chat;"
-ws-icon-2 = "code;"
-ws-icon-3 = "fun;"
-ws-icon-default = ""
-
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-
-format = "<label-state> <label-mode>"
-format-padding = ${appearances.padding}
-
-label-focused = "%icon%"
-label-focused-foreground = ${colors.blue}
-label-focused-underline= ${colors.blue}
-label-focused-padding = ${appearances.padding}
-
-label-occupied = "%icon%"
-label-occupied-padding = ${appearances.padding}
-
-label-urgent = "%icon%"
-label-urgent-foreground = ${colors.yellow}
-label-urgent-padding = ${appearances.padding}
-
-label-empty = "%icon%"
-label-empty-foreground = ${colors.black}
-label-empty-padding = ${appearances.padding}
-
-
-
-; Xwindow module that displays window title
-[module/xwindow]
-type = internal/xwindow
-
-label-font = 3
-label = " %title:0:80:...% "
-
-
-
-; Wireless module
-[module/wlan]
-type = internal/network
-interface = wlo1 
-interval = 5
-
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-
-format-connected = "%{A1:networkmanager_dmenu:} <label-connected>%{A}"
-format-connected-foreground = ${colors.magenta}
-format-connected-underline = ${colors.magenta}
-format-connected-padding = ${appearances.padding}
-
-format-disconnected = "%{A1:networkmanager_dmenu:} <label-disconnected>%{A}"
-format-disconnected-foreground = ${colors.darkmagenta}
-format-disconnected-underline = ${colors.darkmagenta}
-format-disconnected-padding = ${appearances.padding}
-
-label-connected = "%essid%"
-label-connected-foreground = ${colors.foreground}
-label-disconnected = "N/A"
-label-disconnected-foreground = ${colors.foreground}
-
-
-
-; Ethernet module
-[module/eth]
-type = internal/network
-
-interface = eno2
-interval = 5
-
-click-left = networkmanager_dmenu
-
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-
-format-connected-prefix = " "
-format-connected-prefix-foreground = ${colors.magenta}
-format-connected-underline = ${colors.magenta}
-format-connected-padding = ${appearances.padding}
-
-format-disconnected-prefix = " "
-format-disconnected-prefix-foreground = ${colors.darkmagenta}
-format-disconnected-underline = ${colors.darkmagenta}
-format-disconnected-padding = ${appearances.padding}
-
-label-connected = "%local_ip%"
-label-disconnected = "N/A"
-
-
-
-; Bluetooth module to display bluetooth icon
-[module/bluetooth]
-type = custom/text
-
-content-background = ${colors.background}
-content-foreground = ${colors.blue}
-content-underline = ${colors.blue}
-content-padding = ${appearances.padding}
-content = ""
-
-click-left = "blueman &"
-
-
-
-; Date module to display time10
-[module/time]
-type = internal/date
-
-interval = 5
-
-time = "%I:%M %p"
-
-date-alt = " %Y-%m-%d"
-time-alt = "%H:%M"
-
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-
-format-prefix = " "
-format-prefix-foreground = ${colors.green}
-format-underline = ${colors.green}
-format-padding = ${appearances.padding}
-
-label = "%date% %time%"
-
+    wireless-device = ${env:WIRELESS_DEVICE:wlo1}
+    ethernet-device = ${env:ETHERNET_DEVICE:eno2}
+    music-status = ${env:MUSIC_STATUS:mprisctl tail --format "%{A1:mprisctl playpause:} artist - title %{A}"}
 
 
 ; Power menu module to graphically turn off computer
 [module/powermenu]
-type = custom/menu
+    type = custom/text
 
-expand-right = true
+    content = ""
+    content-foreground = ${colors.darkred}
+    content-padding = ${appearances.padding}
 
-menu-0-0 = " Shutdown"
-menu-0-0-foreground = ${colors.red}
-menu-0-0-exec = "poweroff"
-menu-0-1 = " Reboot"
-menu-0-1-foreground = ${colors.yellow}
-menu-0-1-exec = "reboot"
-menu-0-2 = " Log off"
-menu-0-2-foreground = ${colors.blue}
-menu-0-2-exec = "eval $LOGOFF_COMMAND"
-menu-0-3 = " Lock"
-menu-0-3-foreground = ${colors.green}
-menu-0-3-exec = "dm-tool lock"
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+; Brightness control module
+[module/brightness]
+    type = internal/xbacklight
 
-format-underline = ${colors.darkwhite}
-format-padding = ${appearances.padding}
+    enable-scroll = true
 
-label-open = ""
-label-open-foreground = ${colors.darkwhite}
-label-close = ""
-label-close-foreground = ${colors.darkwhite}
+    format-prefix = " "
+    format-prefix-foreground = ${colors.yellow}
+    format = "<label>"
 
-label-separator = " | "
+    label = "%percentage%%"
 
+
+; bspwm module for interacting with bspwm
+[module/bspwm]
+    type = internal/bspwm
+
+    enable-click = true
+
+    ws-icon-0 = "web;"
+    ws-icon-1 = "chat;"
+    ws-icon-2 = "code;"
+    ws-icon-3 = "fun;"
+    ws-icon-default = ""
+
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
+
+    format = "<label-state> <label-mode>"
+
+    label-focused = "%icon%"
+    label-focused-foreground = ${colors.blue}
+    label-focused-underline= ${colors.blue}
+    label-focused-padding = ${appearances.padding}
+
+    label-occupied = "%icon%"
+    label-occupied-padding = ${appearances.padding}
+
+    label-urgent = "%icon%"
+    label-urgent-foreground = ${colors.yellow}
+    label-urgent-padding = ${appearances.padding}
+
+    label-empty = "%icon%"
+    label-empty-foreground = ${colors.black}
+    label-empty-padding = ${appearances.padding}
+
+
+; Wireless module
+[module/wlan]
+    type = internal/network
+    interface = ${variables.wireless-device}
+    interval = 5
+
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
+
+    format-connected = "%{A1:networkmanager_dmenu:} <label-connected>%{A}"
+    format-connected-foreground = ${colors.magenta}
+    format-connected-underline = ${colors.magenta}
+    format-connected-padding = ${appearances.padding}
+
+    format-disconnected = "%{A1:networkmanager_dmenu:} <label-disconnected>%{A}"
+    format-disconnected-foreground = ${colors.darkmagenta}
+    format-disconnected-underline = ${colors.darkmagenta}
+    format-disconnected-padding = ${appearances.padding}
+
+    label-connected = "%essid:0:6:...%"
+    label-connected-foreground = ${colors.foreground}
+    label-disconnected = "N/A"
+    label-disconnected-foreground = ${colors.foreground}
+
+
+; Ethernet module
+[module/eth]
+    type = internal/network
+
+    interface = ${variables.ethernet-device}
+    interval = 5
+
+    click-left = networkmanager_dmenu
+
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
+
+    format-connected-prefix = " "
+    format-connected-prefix-foreground = ${colors.magenta}
+    format-connected-underline = ${colors.magenta}
+    format-connected-padding = ${appearances.padding}
+
+    format-disconnected-prefix = " "
+    format-disconnected-prefix-foreground = ${colors.darkmagenta}
+    format-disconnected-underline = ${colors.darkmagenta}
+    format-disconnected-padding = ${appearances.padding}
+
+    label-connected = " UP "
+    label-disconnected = "DOWN"
+
+
+; Bluetooth module to display bluetooth icon
+[module/bluetooth]
+    type = custom/text
+
+    content-background = ${colors.background}
+    content-foreground = ${colors.blue}
+    content-underline = ${colors.blue}
+    content-padding = ${appearances.padding}
+    content = ""
+
+    click-left = "blueman &"
 
 
 ; PulseAudio module for volume adjustment
 [module/pulseaudio]
-type = internal/pulseaudio
+    type = internal/pulseaudio
 
-use-ui-max = false
+    use-ui-max = false
 
-interval = 1
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+    format-volume-prefix-foreground = ${colors.yellow}
+    format-volume = "<ramp-volume><label-volume>"
+    format-volume-underline = ${colors.yellow}
+    format-volume-padding = ${appearances.padding}
 
-format-volume-prefix = " "
-format-volume-prefix-foreground = ${colors.yellow}
-format-volume = "<bar-volume>"
-format-volume-underline = ${colors.yellow}
-format-volume-padding = ${appearances.padding}
+    format-muted-prefix = "ﱝ "
+    format-muted-prefix-font = ${appearances.font-icon-big}
+    format-muted = "MUTE"
+    format-muted-foreground = ${colors.black}
+    format-muted-underline = ${colors.yellow}
+    format-muted-padding = ${appearances.padding}
 
-format-muted-prefix = "  "
-format-muted = "<bar-volume>"
-format-muted-foreground = ${colors.black}
-format-muted-underline = ${colors.yellow}
-format-muted-padding = ${appearances.padding}
-
-bar-volume-width = 10
-bar-volume-indicator = |
-bar-volume-fill = ━
-bar-volume-empty = ─
+    label-volume = "%percentage:4%%"
+    ramp-volume-font = ${appearances.font-icon-big}
+    ramp-volume-foreground = ${colors.yellow}
+    ramp-volume-0 = "奄"
+    ramp-volume-1 = "奔"
+    ramp-volume-2 = "墳"
 
 
 
 ; Music module to display current song info
 [module/music]
-type = custom/script
+    type = custom/script
 
-exec = "mprisctl tail --format '%{A1:mprisctl previous:}%{A} {{playing}}%{A1:mprisctl pause:}%{A}{{/playing}}{{paused}}%{A1:mprisctl play:}%{A}{{/paused}} %{A1:mprisctl next:}%{A} {{artist}} - {{title}}'"
+    exec = ${variables.music-status}
+    tail = true
 
-;exec = "player-mpris-tail -f '%{A1:player-mpris-tail previous:}  %{A} %{A1:player-mpris-tail play-pause:} {icon} %{A} %{A1:player-mpris-tail next:}  %{A} {:t20:{artist}:} - {title}' --icon-pause  --icon-playing  --icon-stopped "
-;mprisctl tail --format '%{A1:mprisctl previous:}%{A} {{playing}}%{A1:mprisctl pause:}%{A}{{/playing}}{{paused}}%{A1:mprisctl play:}%{A}{{/paused}} %{A1:mprisctl next:}%{A} {{artist}} - {{title}}'"
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
 
-tail = true
+    format-prefix = " "
+    format-prefix-foreground = ${colors.darkyellow}
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+    format = "<label>"
+    format-underline = ${colors.darkyellow}
+    format-padding = ${appearances.padding}
 
-format-prefix = " "
-format-prefix-foreground = ${colors.darkyellow}
-
-format = "<label>"
-format-underline = ${colors.darkyellow}
-format-padding = ${appearances.padding}
-
-label-font = 4
-label = "%output:::...%"
-
+    label-font = ${appearances.font-korean}
+    label = "%output:0:40:...%"
 
 
 ; CPU module to display CPU usage
 [module/cpu]
-type = internal/cpu
+    type = internal/cpu
 
-interval = 1
+    interval = 1
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
 
-format-prefix = " "
-format-prefix-foreground = ${colors.cyan}
-format-underline = ${colors.cyan}
-format-padding = ${appearances.padding}
+    format-prefix = " "
+    format-prefix-foreground = ${colors.cyan}
+    format-underline = ${colors.cyan}
+    format-padding = ${appearances.padding}
 
-label = "CPU %percentage:3:3%%"
-
+    label = "CPU %percentage:3:3%%"
 
 
 ; Memory module to display current memory usage.
 [module/ram]
-type = internal/memory
+    type = internal/memory
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
 
-format-prefix = " "
-format-prefix-foreground = ${colors.darkcyan}
-format-underline = ${colors.darkcyan}
-format-padding = ${appearances.padding}
+    format-prefix = " "
+    format-prefix-foreground = ${colors.darkcyan}
+    format-underline = ${colors.darkcyan}
+    format-padding = ${appearances.padding}
 
-label = "%gb_used% / %gb_total%"
-
-
-
-[module/filesystem]
-type = internal/fs
-
-mount-0 = /
-
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
-
-format-mounted-prefix = " "
-format-mounted-prefix-foreground = ${colors.blue}
-format-mounted-underline = ${colors.blue}
-format-mounted-padding = ${appearances.padding}
-
-interval = 30
-
-label-mounted = "%used% / %total%"
-
+    label = "RAM %percentage_used:3:3%%"
 
 
 ; Battery module to display battery usage
 [module/battery]
-type = internal/battery
+    type = internal/battery
 
-battery = BAT1
-adapter = ADP1
+    battery = BAT1
+    adapter = ADP1
 
-full-at = 99
+    full-at = 99
 
-poll-interval = 5
+    poll-interval = 5
 
-ramp-capacity-0 = ""
-ramp-capacity-1 = ""
-ramp-capacity-2 = ""
-ramp-capacity-3 = ""
-ramp-capacity-4 = ""
-ramp-capacity-foreground = ${colors.darkblue}
+    ramp-capacity-0 = ""
+    ramp-capacity-1 = ""
+    ramp-capacity-2 = ""
+    ramp-capacity-3 = ""
+    ramp-capacity-4 = ""
+    ramp-capacity-foreground = ${colors.darkblue}
 
-animation-charging-0 = ""
-animation-charging-1 = ""
-animation-charging-2 = ""
-animation-charging-3 = ""
-animation-charging-4 = ""
-animation-charging-framerate = 750
-animation-charging-foreground = ${colors.darkblue}
+    animation-charging-0 = ""
+    animation-charging-1 = ""
+    animation-charging-2 = ""
+    animation-charging-3 = ""
+    animation-charging-4 = ""
+    animation-charging-framerate = 750
+    animation-charging-foreground = ${colors.darkblue}
 
-format-background = ${colors.background}
-format-foreground = ${colors.foreground}
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
 
-format-charging = "<animation-charging> <label-charging>"
-format-charging-underline = ${colors.darkblue}
-format-charging-padding = ${appearances.padding}
+    format-charging = "<animation-charging> <label-charging>"
+    format-charging-underline = ${colors.darkblue}
+    format-charging-padding = ${appearances.padding}
 
-format-discharging = "<ramp-capacity> <label-discharging>"
-format-discharging-underline = ${colors.darkblue}
-format-discharging-padding = ${appearances.padding}
+    format-discharging = "<ramp-capacity> <label-discharging>"
+    format-discharging-underline = ${colors.darkblue}
+    format-discharging-padding = ${appearances.padding}
 
-format-full = "<ramp-capacity> <label-full>"
-format-full-underline = ${colors.darkblue}
-format-full-padding = ${appearances.padding}
+    format-full = "<ramp-capacity> <label-full>"
+    format-full-underline = ${colors.darkblue}
+    format-full-padding = ${appearances.padding}
 
-label-charging = "%percentage:3:3%%"
-label-discharging = "%percentage:3:3%%"
-label-full = "FULL"
+    label-charging = "%percentage:3:3%%"
+    label-discharging = "%percentage:3:3%%"
+    label-full = "FULL"
+
+
+; Date module to display time10
+[module/time]
+    type = internal/date
+
+    interval = 5
+
+    time = "%I:%M %p"
+
+    date-alt = "%y-%m-%d"
+
+    format-background = ${root.background}
+    format-foreground = ${root.foreground}
+
+    format-prefix = " "
+    format-prefix-foreground = ${colors.green}
+    format-underline = ${colors.green}
+    format-padding = ${appearances.padding}
+
+    label = "%date%%time%"
+
+
+; Module separator
+[module/separator]
+    type = custom/text
+
+    content = "|"
+    content-foreground = ${colors.darkwhite}
+    content-padding = 1

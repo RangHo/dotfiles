@@ -1,0 +1,9 @@
+[bar/base]
+
+font-0 = "Fantasque Sans Mono:size=12;2"
+font-1 = "Binggrae:size=12;2"
+font-2 = "MotoyaLMaru:size=12;2"
+font-3 = "FantasqueSansMono Nerd Font:size=14;3.5"
+font-4 = "FantasqueSansMono Nerd Font:size=18;3.5"
+
+wm-restack = bspwm

@@ -1,0 +1,21 @@
+[bar/01-left]
+inherit = bar/base
+
+width = 600
+height = 40
+offset-x = 40
+offset-y = 10
+
+radius = 10
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+bottom = true
+override-redirect = true
+
+line-size = 0
+
+padding = 2
+
+modules-left = powermenu separator bspwm separator brightness pulseaudio separator

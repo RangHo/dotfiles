@@ -42,6 +42,8 @@ window:
   # Spread additional padding evenly around the terminal content.
   dynamic_padding: false
 
+  dynamic_title: true
+
   # Window decorations
   #
   # Values for `decorations`:
@@ -68,27 +70,6 @@ scrolling:
   # Number of lines the viewport will move for every line scrolled when
   # scrollback is enabled (history > 0).
   multiplier: 3
-
-  # Faux Scrolling
-  #
-  # The `faux_multiplier` setting controls the number of lines the terminal
-  # should scroll when the alternate screen buffer is active. This is used
-  # to allow mouse scrolling for applications like `man`.
-  #
-  # Specifying `0` will disable faux scrolling.
-  faux_multiplier: 3
-
-  # Scroll to the bottom when new text is written to the terminal.
-  auto_scroll: false
-
-# Spaces per Tab (changes require restart)
-#
-# This setting defines the width of a tab in cells.
-#
-# Some applications, like Emacs, rely on knowing about the width of a tab.
-# To prevent unexpected behavior in these applications, it's also required to
-# change the `it` value in terminfo when altering this setting.
-tabspaces: 8
 
 # Font configuration (changes require restart)
 #
@@ -170,104 +151,154 @@ debug:
 draw_bold_text_with_bright_colors: true
 
 # Colors
-colors:
-  # Default colors
-  primary:
-    background: '0x2d2d2d'
-    foreground: '0xd3d0c8'
+schemes:
+  eyecandy: &eyecandy
+    # Default colors
+    primary:
+      background: '0x2d2d2d'
+      foreground: '0xd3d0c8'
 
-    # Bright and dim foreground colors
-    #
-    # The dimmed foreground color is calculated automatically if it is not present.
-    # If the bright foreground color is not set, or `draw_bold_text_with_bright_colors`
-    # is `false`, the normal foreground color will be used.
-    #dim_foreground: '0x9a9a9a'
-    #bright_foreground: '0xffffff'
+    # Normal colors
+    normal:
+      black:   '0x474747'
+      red:     '0xf2777a'
+      green:   '0x99cc99'
+      yellow:  '0xffcc66'
+      blue:    '0x6699cc'
+      magenta: '0xcc99cc'
+      cyan:    '0x66cccc'
+      white:   '0xd3d0c8'
 
-  # Cursor colors
-  #
-  # Colors which should be used to draw the terminal cursor. If these are unset,
-  # the cursor color will be the inverse of the cell color.
-  #cursor:
-  #  text: '0x000000'
-  #  cursor: '0xffffff'
+    # Bright colors
+    bright:
+      black:   '0x747369'
+      red:     '0xbf6060'
+      green:   '0x709970'
+      yellow:  '0xcca352'
+      blue:    '0x517099'
+      magenta: '0x997099'
+      cyan:    '0x519999'
+      white:   '0xa1a1a1'
+  
+  akatsuki-class-dark: &akatsuki-class-dark
+    # Default colors
+    primary:
+      background: '0x2a2a2a'
+      foreground: '0xe3e3e3'
 
-  # Normal colors
-  normal:
-    black:   '0x474747'
-    red:     '0xf2777a'
-    green:   '0x99cc99'
-    yellow:  '0xffcc66'
-    blue:    '0x6699cc'
-    magenta: '0xcc99cc'
-    cyan:    '0x66cccc'
-    white:   '0xd3d0c8'
+    # Normal colors
+    normal:
+      black:   '0x383534'
+      red:     '0x9c3a3f'
+      green:   '0x6b6e61'
+      yellow:  '0x845c41'
+      blue:    '0x536069'
+      magenta: '0x635469'
+      cyan:    '0xa0abb4'
+      white:   '0xc8c3be'
 
-  # Bright colors
-  bright:
-    black:   '0x747369'
-    red:     '0xbf6060'
-    green:   '0x709970'
-    yellow:  '0xcca352'
-    blue:    '0x517099'
-    magenta: '0x997099'
-    cyan:    '0x519999'
-    white:   '0xa1a1a1'
+    # Bright colors
+    bright:
+      black:   '0x4d4d4d'
+      red:     '0xcf5353'
+      green:   '0xa1a18c'
+      yellow:  '0xba7c52'
+      blue:    '0x7c919c'
+      magenta: '0x917c9c'
+      cyan:    '0xcadee8'
+      white:   '0xfaf0f0'
 
+  akatsuki-class-light: &akatsuki-class-light
+    # Default colors
+    primary:
+      background: '0xe3e3e3'
+      foreground: '0x2a2a2a'
+  
+    # Normal colors
+    normal:
+      black:   '0x383534'
+      red:     '0x9c3a3f'
+      green:   '0x6b6e61'
+      yellow:  '0x845c41'
+      blue:    '0x536069'
+      magenta: '0x635469'
+      cyan:    '0xa0abb4'
+      white:   '0xc8c3be'
+  
+    # Bright colors
+    bright:
+      black:   '0x4d4d4d'
+      red:     '0xcf5353'
+      green:   '0xa1a18c'
+      yellow:  '0xba7c52'
+      blue:    '0x7c919c'
+      magenta: '0x917c9c'
+      cyan:    '0xcadee8'
+      white:   '0xfaf0f0'
 
+  yuugure-dark: &yuugure-dark
+    # Default colors
+    primary:
+      background: '0x404040'
+      foreground: '0xbfbfbf'
 
-  # Dim colors
-  #
-  # If the dim colors are not set, they will be calculated automatically based
-  # on the `normal` colors.
-  #dim:
-  #  black:   '0x333333'
-  #  red:     '0xf2777a'
-  #  green:   '0x99cc99'
-  #  yellow:  '0xffcc66'
-  #  blue:    '0x6699cc'
-  #  magenta: '0xcc99cc'
-  #  cyan:    '0x66cccc'
-  #  white:   '0xdddddd'
+    # Normal colors
+    normal:
+      black:   '0x525e69'
+      red:     '0x60696f'
+      green:   '0x6e7476'
+      yellow:  '0x83837d'
+      blue:    '0x9b927e'
+      magenta: '0xaf9877'
+      cyan:    '0xc1a072'
+      white:   '0xdca965'
 
-  # Indexed Colors
-  #
-  # The indexed colors include all colors from 16 to 256.
-  # When these are not set, they're filled with sensible defaults.
-  #indexed_colors:
-  #  - { index: 16, color: '0x000000' }
+    # Bright colors
+    bright:
+      black:   '0x67737e'
+      red:     '0x757f84'
+      green:   '0x818687'
+      yellow:  '0x8e8e8a'
+      blue:    '0xada592'
+      magenta: '0xc1aa8a'
+      cyan:    '0xd8b788'
+      white:   '0xf9c37b'
 
-# Visual Bell
-#
-# Any time the BEL code is received, Alacritty "rings" the visual bell. Once
-# rung, the terminal background will be set to white and transition back to the
-# default background color. You can control the rate of this transition by
-# setting the `duration` property (represented in milliseconds). You can also
-# configure the transition function by setting the `animation` property.
-#
-# Values for `animation`:
-#   - Ease
-#   - EaseOut
-#   - EaseOutSine
-#   - EaseOutQuad
-#   - EaseOutCubic
-#   - EaseOutQuart
-#   - EaseOutQuint
-#   - EaseOutExpo
-#   - EaseOutCirc
-#   - Linear
-#
-# Specifying a `duration` of `0` will disable the visual bell.
-visual_bell:
-  animation: EaseOutExpo
-  duration: 0
-  color: '0xffffff'
+  yuugure-light: &yuugure-light
+    # Default colors
+    primary:
+      background: '0xd9d9d9'
+      foreground: '0x424242'
+
+    # Normal colors
+    normal:
+      black:   '0x525e69'
+      red:     '0x60696f'
+      green:   '0x6e7476'
+      yellow:  '0x83837d'
+      blue:    '0x9b927e'
+      magenta: '0xaf9877'
+      cyan:    '0xc1a072'
+      white:   '0xdca965'
+
+    # Bright colors
+    bright:
+      black:   '0x67737e'
+      red:     '0x757f84'
+      green:   '0x818687'
+      yellow:  '0x8e8e8a'
+      blue:    '0xada592'
+      magenta: '0xc1aa8a'
+      cyan:    '0xd8b788'
+      white:   '0xf9c37b'
+
+colors: *yuugure-dark
 
 # Background opacity
 #
 # Window opacity as a floating point number from `0.0` to `1.0`.
 # The value `0.0` is completely transparent and `1.0` is opaque.
-background_opacity: 0.75
+background_opacity: 0.9
 
 # Mouse bindings
 #
@@ -319,8 +350,6 @@ selection:
   # the selection clipboard. Otherwise, it will only be copied to the selection
   # clipboard.
   save_to_clipboard: false
-
-dynamic_title: true
 
 cursor:
   # Cursor style

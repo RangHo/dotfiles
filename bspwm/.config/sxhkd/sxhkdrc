@@ -65,8 +65,12 @@ XF86WLAN
 super + alt + Escape
     bspc quit
 
+# Reload bspwm configurations
+super + shift + Escape
+    $HOME/.config/bspwm/bspwmrc
+
 # Close or kill focused window
-super + {_,shift + } q
+super + {_,shift + } w
     bspc node -{c,k}
 
 # Alternate between the tiled and monocle layout (fullscreen with bars)
@@ -155,13 +159,13 @@ super + r : shift + {Up,Down,Left,Right}
 super + {Up,Down,Left,Right}
     bspc node -v {0 -20,0 20,-20 0,20 0}
 
-# Rotate desktop clockwise by 90 degrees
-super + e
-    bspc node @/ -R 90
+# Rotate desktop/node clockwise by 90 degrees
+super + {_,shift + }e
+    bspc node {@/,_} -R 90
     
-# Rotate desktop counterclockwise by 90 degrees
-super + shift + e
-    bspc node @/ -R -90
+# Rotate desktop/node counterclockwise by 90 degrees
+super + {_,shift + }q
+    bspc node {@/,_} -R -90
 
 ## GAP MODIFICATION ############################################################
 

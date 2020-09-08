@@ -1,0 +1,29 @@
+{
+    "wallpaper": "/home/rangho/Pictures/Wallpapers/wallpaper-0.png",
+    "alpha": "100",
+    "special": {
+        "background": "#2a2a2a",
+        "foreground": "#e3e3e3",
+        "cursor": "#e3e3e3"
+    },
+    "colors": {
+        "color0": "#383534",
+        "color1": "#9c3a3f",
+        "color2": "#6b6e61",
+        "color3": "#845c41",
+        "color4": "#536069",
+        "color5": "#635469",
+        "color6": "#a0abb4",
+        "color7": "#c8c3be",
+        "color8": "#4d4d4d",
+        "color9": "#cf5353",
+        "color10": "#a1a18c",
+        "color11": "#ba7c52",
+        "color12": "#7c919c",
+        "color13": "#917c9c",
+        "color14": "#cadee8",
+        "color15": "#faf0f0"
+    }
+}
+
+

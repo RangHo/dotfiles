@@ -1,0 +1,196 @@
+#!/usr/bin/env sh
+
+# shellcheck shell=dash
+# This script assumes at least `local` extension is enabled.
+
+# Lock file used when installing packages
+readonly LOCKFILE_NAME="dotfile.lock"
+
+readonly DOTFILE_DEBUG=${DOTFILE_DEBUG:-0}
+readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
+
+# Color constants
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+
+# Text style constants
+BOLD=$(tput bold)
+UNDERLINE=$(tput smul)
+BLINK=$(tput blink)
+
+# Reset test to normal style
+NORMAL=$(tput sgr0)
+
+debug() {
+    [ "$DOTFILE_DEBUG" -ne 0 -o "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
+    printf "[${BOLD}${WHITE}DEBUG${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+info() {
+    [ "$DOTFILE_LOG_LEVEL" -lt 2 ] && return
+    printf "[${BOLD}${BLUE}INFO${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+warn() {
+    [ "$DOTFILE_LOG_LEVEL" -lt 1 ] && return
+    printf "[${BOLD}${YELLOW}WARNING${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+error() {
+    printf "[${BOLD}${RED}ERROR${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+################################
+
+## Install dependencies
+install_bin() {
+    sudo pacman -Sy $@
+}
+
+## Ensure a command succeeds
+ensure() {
+    if ! "$@"; then
+        error "Command failed: $*"
+        error "This command is required. Cannot proceed..."
+        exit 1
+    fi  
+}
+
+## Check if specified command exists
+is_command() {
+    command -v "$1" > /dev/null
+}
+
+## Check if specified directory exists
+is_directory() {
+    [ -d "$1" ]
+}
+
+## Check if specified symbolic link exists
+is_symlink() {
+    [ -L "$1" ]
+}
+
+################################
+
+usage() {
+    cat 1>&2 <<EOF
+USAGE:
+    $(basename "$0") <command>
+
+COMMANDS:
+    init         Initializes this machine.
+    install      Installs a package to this machine.
+    uninstall    Uninstalls a package from this machine.
+    update       Updates the repository to the most recent version.
+    remove       Remove all packages and try to make as clean as possible.
+    help         Displays this help message.
+EOF
+}
+
+init() {
+    # Initialization routine
+    # Things to do:
+    # 1. Create package folder ~/.local/share/dotfiles
+    # 2. Verify all necessary binaries are here (stow, etc.)
+    # 3. Symbolic link itself to ~/.local/bin
+    # 4. Add ~/.local/bin to $PATH, in case it's not there
+
+    # Create directory where package data will be stored
+    if ! is_directory "$HOME/.local/share/dotfiles"; then
+        info "Dotfiles package storage is not found. Creating..."
+        ensure mkdir -p "$HOME/.local/share/dotfiles"
+    fi
+
+    # git is required to update packages
+    if ! is_command git; then
+        info "git does not exist. Attempting to install..."
+        ensure install_bin git
+    fi
+
+    # stow is required to make symbolic links
+    if ! is_command stow; then
+        info "stow does not exist. Attempting to install..."
+        ensure install_bin stow
+    fi
+    
+    # This script is going to be installed in local PATH
+    if ! is_symlink "$HOME/.local/bin/dotfile"; then
+        info "Installing dotfile binary to local PATH..."
+        ensure mkdir -p "$HOME/.local/bin"
+        ensure ln -s "$(realpath $0)" "$HOME/.local/bin/dotfile"
+    fi
+}
+
+install() {
+    error "This feature is not implemented yet."
+    return
+}
+
+uninstall() {
+    error "This feature is not implemented yet."
+    return
+}
+
+update() {
+    error "This feature is not implemented yet."
+    return
+}
+
+remove() {
+    error "This feature is not implemented yet."
+    return
+}
+
+case "$1" in
+    help)
+        echo "dotfile -- automatic dotfile installer, because I am lazy as fuck"
+        echo ""
+        usage
+        ;;
+
+    init)
+        init
+        ;;
+    install)
+        install
+        ;;
+    uninstall)
+        uninstall
+        ;;
+    update)
+        update
+        ;;
+    remove)
+        remove
+        ;;
+    shell)
+        if [ "$DOTFILE_DEBUG" -eq 0 ]; then
+            error "Opening shell is not supported if DOTFILE_DEBUG environment variable is not set!"
+            exit 1
+        fi
+
+        while true; do
+            read -p "dotfile> " line
+
+            [ "$line" = "exit" ] && break
+
+            eval "$line"
+        done
+        ;;
+    "")
+        error "You must supply at least one command!"
+        usage
+        ;;
+    *)
+        error "Unknown command: $1"
+        usage
+        ;;
+esac
+

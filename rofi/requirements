@@ -1,8 +1,0 @@
-ARCH=(
-    rofi
-)
-
-DOTFILE=(
-    compton
-)
-

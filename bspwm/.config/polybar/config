@@ -62,7 +62,7 @@ include-file = $HOME/.config/polybar/bars/01-right
 [module/powermenu]
     type = custom/text
 
-    content = ""
+    content = " "
     content-foreground = ${colors.darkred}
     content-padding = ${appearances.padding}
 
@@ -86,11 +86,11 @@ include-file = $HOME/.config/polybar/bars/01-right
 
     enable-click = true
 
-    ws-icon-0 = "web;"
-    ws-icon-1 = "chat;"
-    ws-icon-2 = "code;"
-    ws-icon-3 = "fun;"
-    ws-icon-default = ""
+    ws-icon-0 = "web; "
+    ws-icon-1 = "chat; "
+    ws-icon-2 = "dev; "
+    ws-icon-3 = "fun; "
+    ws-icon-default = " "
 
     format-background = ${root.background}
     format-foreground = ${root.foreground}
@@ -123,12 +123,12 @@ include-file = $HOME/.config/polybar/bars/01-right
     format-background = ${root.background}
     format-foreground = ${root.foreground}
 
-    format-connected = "%{A1:networkmanager_dmenu:} <label-connected>%{A}"
+    format-connected = "%{A1:networkmanager_dmenu:}  <label-connected>%{A}"
     format-connected-foreground = ${colors.magenta}
     format-connected-underline = ${colors.magenta}
     format-connected-padding = ${appearances.padding}
 
-    format-disconnected = "%{A1:networkmanager_dmenu:} <label-disconnected>%{A}"
+    format-disconnected = "%{A1:networkmanager_dmenu:}  <label-disconnected>%{A}"
     format-disconnected-foreground = ${colors.darkmagenta}
     format-disconnected-underline = ${colors.darkmagenta}
     format-disconnected-padding = ${appearances.padding}
@@ -173,7 +173,7 @@ include-file = $HOME/.config/polybar/bars/01-right
     content-foreground = ${colors.blue}
     content-underline = ${colors.blue}
     content-padding = ${appearances.padding}
-    content = ""
+    content = " "
 
     click-left = "blueman &"
 
@@ -238,7 +238,7 @@ include-file = $HOME/.config/polybar/bars/01-right
     format-background = ${root.background}
     format-foreground = ${root.foreground}
 
-    format-prefix = " "
+    format-prefix = "  "
     format-prefix-foreground = ${colors.cyan}
     format-underline = ${colors.cyan}
     format-padding = ${appearances.padding}
@@ -253,7 +253,7 @@ include-file = $HOME/.config/polybar/bars/01-right
     format-background = ${root.background}
     format-foreground = ${root.foreground}
 
-    format-prefix = " "
+    format-prefix = "  "
     format-prefix-foreground = ${colors.darkcyan}
     format-underline = ${colors.darkcyan}
     format-padding = ${appearances.padding}

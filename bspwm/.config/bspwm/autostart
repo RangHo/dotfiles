@@ -18,7 +18,7 @@ singleton() {
     local process_name="$1"
     local full_command="$@"
 
-    killall -q "$1"
+    killall -q "$process_name"
 
     # Wait until all instances of the process is shut down
     while pgrep -u "$UID" -x "$process_name" >/dev/null; do
@@ -26,8 +26,16 @@ singleton() {
     done
 
     # Execute the command in the background
-    eval "$@" &
+    eval "$full_command &"
 }
+
+# Run sxhkd for hotkeys
+if [ "$(basename $SHELL)" == "fish" ]; then
+    # sxhkd does not play nice with fish shell
+    #export SXHKD_SHELL="/bin/sh"
+    echo "doing nothing"
+fi
+SXHKD_SHELL="$(which sh)" singleton sxhkd
 
 # Start picom compositor for prettier desktop.
 singleton picom --experimental-backends --daemon
@@ -44,5 +52,9 @@ singleton dunst
 # Execute wmname becuase Java GUI is a fucktard
 singleton wmname LG3D
 
+# Load previously selected colorscmeme
+wal -R
+
 # Start Polybar
 $HOME/.config/polybar/launch.sh
+

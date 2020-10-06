@@ -1,0 +1,66 @@
+;; Global settings
+
+; Input methods
+(define custom-activate-default-im-name? #t)
+(define custom-preserved-default-im-name 'byeoru)
+(define default-im-name 'byeoru)
+(define enabled-im-list '(byeoru))
+(define enable-im-switch? #f)
+(define enable-im-toggle? #f)
+(define enable-lazy-loading? #t)
+
+; Appearance
+(define uim-color 'uim-color-uim)
+(define candidate-window-style 'vertical)
+(define candidate-window-position 'caret)
+(define bridge-show-input-state? #f)
+
+
+;; Byeoru settings
+
+; Input method related
+(define byeoru-layout 'byeoru-layout-hangul2)
+(define byeoru-jamo-orderedness 'ordered)
+(define byeoru-esc-turns-off? #t)
+(define byeoru-commit-by-word? #f)
+(define byeoru-shifted-romaja-isolates-vowel? #f)
+(define byeoru-nr-candidate-max 10)
+(define byeoru-symbol-cache-size 5)
+(define byeoru-conversion-history-size 0)
+(define byeoru-refresh-xkb-map-at-switch-on? #f)
+(define byeoru-compatibility-jamos-for-incomplete-syllables? #t)
+
+; Keybinding 1
+(define byeoru-on-key "<Shift> ")
+(define byeoru-on-key? (make-key-predicate byeoru-on-key))
+(define byeoru-latin-key "<Shift> ")
+(define byeoru-latin-key? (make-key-predicate byeoru-latin-key))
+(define byeoru-conversion-key "<Control> ")
+(define byeoru-conversion-key? (make-key-predicate byeoru-conversion-key))
+(define byeoru-commit-key "return")
+(define byeoru-commit-key? (make-key-predicate byeoru-commit-key))
+(define byeoru-cancel-key "escape")
+(define byeoru-cancel-key? (make-key-predicate byeoru-cancel-key))
+
+; Keybinding 2
+(define byeoru-next-candidate-key '(" " "down"))
+(define byeoru-next-candidate-key? (make-key-predicate byeoru-next-candidate-key))
+(define byeoru-prev-candidate-key "up")
+(define byeoru-prev-candidate-key? (make-key-predicate byeoru-prev-candidate-key))
+(define byeoru-next-page-key "next")
+(define byeoru-next-page-key? (make-key-predicate byeoru-next-page-key))
+(define byeoru-prev-page-key "prior")
+(define byeoru-prev-page-key? (make-key-predicate byeoru-prev-page-key))
+(define byeoru-backspace-key "backspace")
+(define byeoru-backspace-key? (make-key-predicate byeoru-backspace-key))
+(define byeoru-delete-key "delete")
+(define byeoru-delete-key? (make-key-predicate byeoru-delete-key))
+(define byeoru-go-left-key "left")
+(define byeoru-go-left-key? (make-key-predicate byeoru-go-left-key))
+(define byeoru-go-right-key "right")
+(define byeoru-go-right-key? (make-key-predicate byeoru-go-right-key))
+(define byeoru-beginning-of-preedit-key "home")
+(define byeoru-beginning-of-preedit-key? (make-key-predicate byeoru-beginning-of-preedit-key))
+(define byeoru-end-of-preedit-key "end")
+(define byeoru-end-of-preedit-key? (make-key-predicate byeoru-end-of-preedit-key))
+

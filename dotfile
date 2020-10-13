@@ -4,7 +4,7 @@
 # This script assumes at least `local` extension is enabled.
 
 # Lock file used when installing packages
-readonly LOCKFILE_NAME="dotfile.lock"
+readonly DOTFILE_LOCKFILE_NAME="dotfile.lock"
 
 readonly DOTFILE_DEBUG=${DOTFILE_DEBUG:-0}
 readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
@@ -48,8 +48,45 @@ error() {
 
 ################################
 
+## Dependency list creator
+depends() {
+    # Syntax: depends <src> <packages>...
+    #   <src> can be `bin`, `pip`, `gem`, etc.
+    
+    local src package arrayname
+    src="$1"
+    package="$2"
+    shift 2
+
+    # Allow packages from arbitrary sources
+    arrayname="depends_$src"
+    append $package to $arrayname
+    
+    # If there are more than one packages
+    if [ $# -ne 0 ]; then
+        # RECURSIVE
+        depends $src $*
+    fi
+}
+
+## Append one item to a space-separated list
+append() {
+    # Syntax: append <item> to <array>
+    if [ $# -ne 3 ]; then
+        error "Usage: append <item> to <array>"
+        exit 1
+    fi
+
+    local array item
+    item=$1
+    array=$3
+
+    eval "$array=\"\${$array} $item\""
+}
+
 ## Install dependencies
 install_bin() {
+    # TODO: support other platforms as well
     sudo pacman -Sy $@
 }
 
@@ -90,6 +127,7 @@ COMMANDS:
     uninstall    Uninstalls a package from this machine.
     update       Updates the repository to the most recent version.
     remove       Remove all packages and try to make as clean as possible.
+    shell        Create a REPL instance. Useful when debugging functions.
     help         Displays this help message.
 EOF
 }
@@ -98,7 +136,7 @@ init() {
     # Initialization routine
     # Things to do:
     # 1. Create package folder ~/.local/share/dotfiles
-    # 2. Verify all necessary binaries are here (stow, etc.)
+    # 2. Verify all necessary binaries are here (git, stow, etc.)
     # 3. Symbolic link itself to ~/.local/bin
     # 4. Add ~/.local/bin to $PATH, in case it's not there
 

@@ -6,29 +6,33 @@
 # Lock file used when installing packages
 readonly DOTFILE_LOCKFILE_NAME="dotfile.lock"
 
-readonly DOTFILE_DEBUG=${DOTFILE_DEBUG:-0}
+readonly DOTFILE_DEBUG=${DEBUG:-0}
 readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
 
+# XDG base directories
+readonly XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+readonly XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+
 # Color constants
-BLACK=$(tput setaf 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
+readonly BLACK=$(tput setaf 0)
+readonly RED=$(tput setaf 1)
+readonly GREEN=$(tput setaf 2)
+readonly YELLOW=$(tput setaf 3)
+readonly BLUE=$(tput setaf 4)
+readonly MAGENTA=$(tput setaf 5)
+readonly CYAN=$(tput setaf 6)
+readonly WHITE=$(tput setaf 7)
 
 # Text style constants
-BOLD=$(tput bold)
-UNDERLINE=$(tput smul)
-BLINK=$(tput blink)
+readonly BOLD=$(tput bold)
+readonly UNDERLINE=$(tput smul)
+readonly BLINK=$(tput blink)
 
 # Reset test to normal style
-NORMAL=$(tput sgr0)
+readonly NORMAL=$(tput sgr0)
 
 debug() {
-    [ "$DOTFILE_DEBUG" -ne 0 -o "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
+    [ "$DOTFILE_DEBUG" -ne 0 ] || [ "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
     printf "[${BOLD}${WHITE}DEBUG${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
 }
 
@@ -51,7 +55,7 @@ error() {
 ## Dependency list creator
 depends() {
     # Syntax: depends <src> <packages>...
-    #   <src> can be `bin`, `pip`, `gem`, etc.
+    #   <src> can be `native`, `dotfile`, `pip`, `gem`, etc.
     
     local src package arrayname
     src="$1"
@@ -60,13 +64,10 @@ depends() {
 
     # Allow packages from arbitrary sources
     arrayname="depends_$src"
-    append $package to $arrayname
+    append "$package" to "$arrayname"
     
-    # If there are more than one packages
-    if [ $# -ne 0 ]; then
-        # RECURSIVE
-        depends $src $*
-    fi
+    # If there are more than one packages, recursively add more
+    [ $# -ne 0 ] && depends "$src" "$@"
 }
 
 ## Append one item to a space-separated list
@@ -84,10 +85,20 @@ append() {
     eval "$array=\"\${$array} $item\""
 }
 
-## Install dependencies
-install_bin() {
+## Install native package dependencies
+install_native() {
+    info "Installing native package dependencies..."
+    info "You might need to provide your sudo credential here."
     # TODO: support other platforms as well
-    sudo pacman -Sy $@
+    sudo pacman -Sy "$@"
+}
+
+## Install dotfile package dependencies
+install_dotfile() {
+    info "Installing dotfile dependencies..."
+    for pkg in $depends_dotfile; do
+        dotfile_install "$pkg"
+    done
 }
 
 ## Ensure a command succeeds
@@ -102,6 +113,11 @@ ensure() {
 ## Check if specified command exists
 is_command() {
     command -v "$1" > /dev/null
+}
+
+## Check if specified file exists
+is_file() {
+    [ -e "$1" ]
 }
 
 ## Check if specified directory exists
@@ -132,58 +148,85 @@ COMMANDS:
 EOF
 }
 
-init() {
+dotfile_init() {
     # Initialization routine
     # Things to do:
-    # 1. Create package folder ~/.local/share/dotfiles
-    # 2. Verify all necessary binaries are here (git, stow, etc.)
-    # 3. Symbolic link itself to ~/.local/bin
-    # 4. Add ~/.local/bin to $PATH, in case it's not there
+    # 1. Create configuration file $XDG_CONFIG_HOME/dotfile.conf
+    # 2. Create package folder $XDG_DATA_HOME/dotfile/
+    # 3. Verify all necessary binaries are here (git, stow, etc.)
+    # 4. Symbolic link itself to ~/.local/bin
+
+    # Create basic configuration file
+    if ! is_file "$XDG_CONFIG_HOME/dotfile.conf"; then
+        info "Dotfile configuration file is not found. Creating..."
+        ensure mkdir -p "$XDG_CONFIG_HOME"
+        ensure touch "$XDG_CONFIG_HOME/dotfile.conf"
+
+        info "Setting dotfile home directory as:"
+        echo "dotfile_home=$(dirname "$(realpath "$0")")" \
+            | ensure tee "$XDG_CONFIG_HOME/dotfile.conf" \
+            1>&2
+    fi
 
     # Create directory where package data will be stored
-    if ! is_directory "$HOME/.local/share/dotfiles"; then
-        info "Dotfiles package storage is not found. Creating..."
-        ensure mkdir -p "$HOME/.local/share/dotfiles"
+    if ! is_directory "$XDG_DATA_HOME/dotfile"; then
+        info "Dotfile package storage is not found. Creating..."
+        ensure mkdir -p "$XDG_DATA_HOME/dotfile"
     fi
 
     # git is required to update packages
     if ! is_command git; then
         info "git does not exist. Attempting to install..."
-        ensure install_bin git
+        ensure install_native git
     fi
 
     # stow is required to make symbolic links
     if ! is_command stow; then
         info "stow does not exist. Attempting to install..."
-        ensure install_bin stow
+        ensure install_native stow
     fi
     
     # This script is going to be installed in local PATH
     if ! is_symlink "$HOME/.local/bin/dotfile"; then
-        info "Installing dotfile binary to local PATH..."
+        info "Installing dotfile binary to local binary directory..."
         ensure mkdir -p "$HOME/.local/bin"
-        ensure ln -s "$(realpath $0)" "$HOME/.local/bin/dotfile"
+        ensure ln -s "$(realpath "$0")" "$HOME/.local/bin/dotfile"
     fi
 }
 
-install() {
+dotfile_install() {
     error "This feature is not implemented yet."
     return
 }
 
-uninstall() {
+dotfile_uninstall() {
     error "This feature is not implemented yet."
     return
 }
 
-update() {
+dotfile_update() {
     error "This feature is not implemented yet."
     return
 }
 
-remove() {
+dotfile_remove() {
     error "This feature is not implemented yet."
     return
+}
+
+dotfile_shell() {
+    if [ "$DOTFILE_DEBUG" -eq 0 ]; then
+        error "Opening shell is not supported if DEBUG environment variable is not set!"
+        exit 1
+    fi
+
+    while true; do
+        read -r -p "dotfile> " line
+
+        [ "$line" = "exit" ] && break
+
+        eval "$line"
+    done
 }
 
 case "$1" in
@@ -194,38 +237,34 @@ case "$1" in
         ;;
 
     init)
-        init
+        dotfile_init
         ;;
+
     install)
-        install
+        dotfile_install
         ;;
+
     uninstall)
-        uninstall
+        dotfile_uninstall
         ;;
+
     update)
-        update
+        dotfile_update
         ;;
+
     remove)
-        remove
+        dotfile_remove
         ;;
+
     shell)
-        if [ "$DOTFILE_DEBUG" -eq 0 ]; then
-            error "Opening shell is not supported if DOTFILE_DEBUG environment variable is not set!"
-            exit 1
-        fi
-
-        while true; do
-            read -p "dotfile> " line
-
-            [ "$line" = "exit" ] && break
-
-            eval "$line"
-        done
+        dotfile_shell
         ;;
+
     "")
         error "You must supply at least one command!"
         usage
         ;;
+
     *)
         error "Unknown command: $1"
         usage

@@ -2,13 +2,11 @@
 " Preparation
 " -----------
 
-" Vim/NeoVim specific configurations
+" Vim/NeoVim specific directories
 if has('nvim')
-    " TODO: Replace hardcoded directories with `stdpath` functions
-    " NeoVim 0.2.2 shipped with Ubuntu 18.04 LTS does not have this function.
-    let s:config_directory   = '~/.config/nvim/'
-    let s:data_directory     = '~/.local/share/nvim/'
-    let s:autoload_directory = '~/.local/share/nvim/site/autoload/'
+    let s:config_directory   = stdpath('config') . '/'
+    let s:data_directory     = stdpath('data') . '/'
+    let s:autoload_directory = stdpath('data') . '/site/autoload/'
 else
     let s:config_directory   = '~/.vim/'
     let s:data_directory     = '~/.vim/'
@@ -47,6 +45,9 @@ Plug 'tpope/vim-surround'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'hrsh7th/vim-vsnip'
 
+" File type support
+Plug 'dag/vim-fish'
+
 " Language Server Protocol support
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
@@ -56,8 +57,8 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'hrsh7th/vim-vsnip-integ'
 
 " Other features
+Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
-Plug 'mattn/webapi-vim'
 
 call plug#end()
 
@@ -85,6 +86,7 @@ set smartindent
 set foldmethod=expr
     \ foldexpr=lsp#ui#vim#folding#foldexpr()
     \ foldtext=lsp#ui#vim#folding#foldtext()
+let g:lsp_fold_enable = 0
 
 " Show line numbers
 set number relativenumber
@@ -102,7 +104,8 @@ set mouse=a
 " -----------
 
 " Tab completion (asyncomplete.vim)
+imap <C-Space> <Plug>(asyncomplete_force_refresh)
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
+inoremap <expr> <CR> pumvisible() ? asyncomplete#close_popup() . "\<CR>" : "\<CR>"
 

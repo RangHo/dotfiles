@@ -1,10 +1,12 @@
 #!/usr/bin/env sh
 
-# shellcheck shell=dash
+# shellcheck shell=ash
 # This script assumes at least `local` extension is enabled.
 
 # Lock file used when installing packages
 readonly DOTFILE_LOCKFILE_NAME="dotfile.lock"
+
+readonly DOTFILE_AVAILABLE_SOURCES="native dotfile"
 
 readonly DOTFILE_DEBUG=${DEBUG:-0}
 readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
@@ -31,8 +33,11 @@ readonly BLINK=$(tput blink)
 # Reset test to normal style
 readonly NORMAL=$(tput sgr0)
 
+## Logging functions
+################################
+
 debug() {
-    [ "$DOTFILE_DEBUG" -ne 0 ] || [ "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
+    [ "$DOTFILE_DEBUG" -eq 0 ] && [ "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
     printf "[${BOLD}${WHITE}DEBUG${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
 }
 
@@ -50,13 +55,16 @@ error() {
     printf "[${BOLD}${RED}ERROR${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
 }
 
+## Utility functions
 ################################
 
 ## Dependency list creator
 depends() {
     # Syntax: depends <src> <packages>...
     #   <src> can be `native`, `dotfile`, `pip`, `gem`, etc.
-    
+    #   There must be a function called install_<src> to install the
+    #   dependencies.
+
     local src package arrayname
     src="$1"
     package="$2"
@@ -65,7 +73,7 @@ depends() {
     # Allow packages from arbitrary sources
     arrayname="depends_$src"
     append "$package" to "$arrayname"
-    
+
     # If there are more than one packages, recursively add more
     [ $# -ne 0 ] && depends "$src" "$@"
 }
@@ -73,16 +81,39 @@ depends() {
 ## Append one item to a space-separated list
 append() {
     # Syntax: append <item> to <array>
-    if [ $# -ne 3 ]; then
+
+    local item to array occurrence
+    item=$1
+    to=$2
+    array=$3
+    
+    if [ $# -ne 3 ] || [ "$to" != "to" ]; then
         error "Usage: append <item> to <array>"
         exit 1
     fi
 
-    local array item
-    item=$1
-    array=$3
+    if contains "$array" "$item"; then
+        debug "$item already exists in $array."
+        return
+    fi
 
     eval "$array=\"\${$array} $item\""
+}
+
+## Check if the "array" contains the item
+contains() {
+    # Syntax: contains <array> <item>
+    local array item occurrence
+    array=$1
+    item=$2
+    occurrence=$(printf "%s\n" $(eval "echo \"\$$array\"") | grep -c "^$item$")
+
+    [ "$occurrence" -ne 0 ]
+}
+
+## Sources package information file
+source_dotpkg() {
+    . "$1/dotpkg"
 }
 
 ## Install native package dependencies
@@ -90,7 +121,8 @@ install_native() {
     info "Installing native package dependencies..."
     info "You might need to provide your sudo credential here."
     # TODO: support other platforms as well
-    sudo pacman -Sy "$@"
+    #sudo pacman -Sy "$@"
+    sudo apt-get install "$@"
 }
 
 ## Install dotfile package dependencies
@@ -107,7 +139,12 @@ ensure() {
         error "Command failed: $*"
         error "This command is required. Cannot proceed..."
         exit 1
-    fi  
+    fi
+}
+
+## Maybe a command exists
+maybe() {
+    is_command $1 && "$@"
 }
 
 ## Check if specified command exists
@@ -130,9 +167,10 @@ is_symlink() {
     [ -L "$1" ]
 }
 
+## Action handlers
 ################################
 
-usage() {
+dotfile_usage() {
     cat 1>&2 <<EOF
 USAGE:
     $(basename "$0") <command>
@@ -143,9 +181,12 @@ COMMANDS:
     uninstall    Uninstalls a package from this machine.
     update       Updates the repository to the most recent version.
     remove       Remove all packages and try to make as clean as possible.
-    shell        Create a REPL instance. Useful when debugging functions.
     help         Displays this help message.
 EOF
+
+    if [ "$DOTFILE_DEBUG" -ne 0 ]; then
+        echo "    shell        Create a REPL instance. Useful when debugging functions."
+    fi
 }
 
 dotfile_init() {
@@ -185,7 +226,7 @@ dotfile_init() {
         info "stow does not exist. Attempting to install..."
         ensure install_native stow
     fi
-    
+
     # This script is going to be installed in local PATH
     if ! is_symlink "$HOME/.local/bin/dotfile"; then
         info "Installing dotfile binary to local binary directory..."
@@ -195,7 +236,55 @@ dotfile_init() {
 }
 
 dotfile_install() {
-    error "This feature is not implemented yet."
+    local pkg
+    pkg="$1"
+
+    # Check package sanity
+    if ! is_directory $pkg; then
+        error "Dotfile package $pkg is not found! Aborting..."
+        exit 2
+    fi
+
+    if ! is_file "$pkg/dotpkg"; then
+        error "$pkg is not a valid dotfile package. Aborting..."
+        exit 2
+    fi
+
+    # If already visited, do nothing
+    if contains "visited" "$pkg"; then
+        warn "Circular dependency detected! $pkg is referenced more than once."
+        return
+    fi
+
+    # Load dotfile description file
+    source_dotpkg "$pkg"
+
+    # Mark current package as visited
+    append "$pkg" to "visited"
+
+    # Find out the direct dependencies
+    local difference
+    difference="$depends_dotfile"
+    for visited_pkg in $visited; do
+        difference=$(echo "$difference" | sed -E -e "s/^$visited_pkg | $visited_pkg|$visited_pkg | $visited_pkg\$//g")
+    done
+
+    # Install dependencies first
+    for dependency in $difference; do
+        dotfile_install $dependency
+    done
+
+    # Unset pre- and post-installation hooks
+    unset -f pre_install post_install
+
+    # Source dotfile description file again to restore changed hooks
+    source_dotpkg "$pkg"
+
+    # Install the package
+    maybe pre_install
+    debug "Installing $pkg or something"
+    maybe post_install
+
     return
 }
 
@@ -229,45 +318,52 @@ dotfile_shell() {
     done
 }
 
-case "$1" in
+## Entrypoint
+################################
+
+# Take the first positional argument
+action="$1"
+if [ -z "$action" ]; then
+    error "You must supply at least one command!"
+    dotfile_usage
+    return 1
+fi
+shift
+
+case "$action" in
     help)
         echo "dotfile -- automatic dotfile installer, because I am lazy as fuck"
         echo ""
-        usage
+        dotfile_usage
         ;;
 
     init)
-        dotfile_init
+        dotfile_init "$@"
         ;;
 
     install)
-        dotfile_install
+        dotfile_install "$@"
         ;;
 
     uninstall)
-        dotfile_uninstall
+        dotfile_uninstall "$@"
         ;;
 
     update)
-        dotfile_update
+        dotfile_update "$@"
         ;;
 
     remove)
-        dotfile_remove
+        dotfile_remove "$@"
         ;;
 
     shell)
-        dotfile_shell
-        ;;
-
-    "")
-        error "You must supply at least one command!"
-        usage
+        dotfile_shell "$@"
         ;;
 
     *)
-        error "Unknown command: $1"
-        usage
+        error "Unknown command: $action"
+        dotfile_usage
         ;;
 esac
 

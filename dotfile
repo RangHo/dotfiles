@@ -36,27 +36,17 @@ readonly NORMAL=$(tput sgr0)
 ## Logging functions
 ################################
 
-debug() {
-    [ "$DOTFILE_DEBUG" -eq 0 ] && [ "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
-    printf "[${BOLD}${WHITE}DEBUG${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
-}
-
-info() {
-    [ "$DOTFILE_LOG_LEVEL" -lt 2 ] && return
-    printf "[${BOLD}${BLUE}INFO${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
-}
-
-warn() {
-    [ "$DOTFILE_LOG_LEVEL" -lt 1 ] && return
-    printf "[${BOLD}${YELLOW}WARNING${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
-}
-
-error() {
-    printf "[${BOLD}${RED}ERROR${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
-}
+# Source logging library
+. _functions/logging.sh
 
 ## Utility functions
 ################################
+
+# Source stack library
+. _functions/stack.sh
+
+# Source checker library
+. _functions/checks.sh
 
 ## Dependency list creator
 depends() {
@@ -131,40 +121,6 @@ install_dotfile() {
     for pkg in $depends_dotfile; do
         dotfile_install "$pkg"
     done
-}
-
-## Ensure a command succeeds
-ensure() {
-    if ! "$@"; then
-        error "Command failed: $*"
-        error "This command is required. Cannot proceed..."
-        exit 1
-    fi
-}
-
-## Maybe a command exists
-maybe() {
-    is_command $1 && "$@"
-}
-
-## Check if specified command exists
-is_command() {
-    command -v "$1" > /dev/null
-}
-
-## Check if specified file exists
-is_file() {
-    [ -e "$1" ]
-}
-
-## Check if specified directory exists
-is_directory() {
-    [ -d "$1" ]
-}
-
-## Check if specified symbolic link exists
-is_symlink() {
-    [ -L "$1" ]
 }
 
 ## Action handlers
@@ -250,9 +206,16 @@ dotfile_install() {
         exit 2
     fi
 
-    # If already visited, do nothing
+    # Check circular dependency
+    if contains "$(stack_name ancestors)" "$pkg"; then
+        warn "Circular dependency detected! Ignoring the last attempt to install $pkg..."
+        warn "You may want to fix the package description file to resolve this issue."
+        return
+    fi
+
+    # If already visited, then do nothing
     if contains "visited" "$pkg"; then
-        warn "Circular dependency detected! $pkg is referenced more than once."
+        debug "Package $pkg is already installed by other package. Skipping..."
         return
     fi
 
@@ -280,9 +243,10 @@ dotfile_install() {
     # Source dotfile description file again to restore changed hooks
     source_dotpkg "$pkg"
 
-    # Install the package
+    # Run the pre-installation hook
     maybe pre_install
-    debug "Installing $pkg or something"
+
+    debug "Installing dotfile package $pkg..."
     maybe post_install
 
     return

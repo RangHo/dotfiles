@@ -3,10 +3,8 @@
 # shellcheck shell=ash
 # This script assumes at least `local` extension is enabled.
 
-# Lock file used when installing packages
-readonly DOTFILE_LOCKFILE_NAME="dotfile.lock"
-
-readonly DOTFILE_AVAILABLE_SOURCES="native dotfile"
+# External sources available for install
+readonly DOTFILE_AVAILABLE_SOURCES="native"
 
 readonly DOTFILE_DEBUG=${DEBUG:-0}
 readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
@@ -14,24 +12,6 @@ readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
 # XDG base directories
 readonly XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 readonly XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-
-# Color constants
-readonly BLACK=$(tput setaf 0)
-readonly RED=$(tput setaf 1)
-readonly GREEN=$(tput setaf 2)
-readonly YELLOW=$(tput setaf 3)
-readonly BLUE=$(tput setaf 4)
-readonly MAGENTA=$(tput setaf 5)
-readonly CYAN=$(tput setaf 6)
-readonly WHITE=$(tput setaf 7)
-
-# Text style constants
-readonly BOLD=$(tput bold)
-readonly UNDERLINE=$(tput smul)
-readonly BLINK=$(tput blink)
-
-# Reset test to normal style
-readonly NORMAL=$(tput sgr0)
 
 ## Logging functions
 ################################
@@ -82,28 +62,13 @@ append() {
         exit 1
     fi
 
-    if contains "$array" "$item"; then
+    does "$array" contain "$item"?
+    if yes; then
         debug "$item already exists in $array."
         return
     fi
 
     eval "$array=\"\${$array} $item\""
-}
-
-## Check if the "array" contains the item
-contains() {
-    # Syntax: contains <array> <item>
-    local array item occurrence
-    array=$1
-    item=$2
-    occurrence=$(printf "%s\n" $(eval "echo \"\$$array\"") | grep -c "^$item$")
-
-    [ "$occurrence" -ne 0 ]
-}
-
-## Sources package information file
-source_dotpkg() {
-    . "$1/dotpkg"
 }
 
 ## Install native package dependencies
@@ -112,7 +77,7 @@ install_native() {
     info "You might need to provide your sudo credential here."
     # TODO: support other platforms as well
     #sudo pacman -Sy "$@"
-    sudo apt-get install "$@"
+    #sudo apt-get install "$@"
 }
 
 ## Install dotfile package dependencies
@@ -154,7 +119,8 @@ dotfile_init() {
     # 4. Symbolic link itself to ~/.local/bin
 
     # Create basic configuration file
-    if ! is_file "$XDG_CONFIG_HOME/dotfile.conf"; then
+    is "$XDG_CONFIG_HOME/dotfile.conf" a file?
+    if no; then
         info "Dotfile configuration file is not found. Creating..."
         ensure mkdir -p "$XDG_CONFIG_HOME"
         ensure touch "$XDG_CONFIG_HOME/dotfile.conf"
@@ -166,25 +132,29 @@ dotfile_init() {
     fi
 
     # Create directory where package data will be stored
-    if ! is_directory "$XDG_DATA_HOME/dotfile"; then
+    is "$XDG_DATA_HOME/dotfile" a directory?
+    if no; then
         info "Dotfile package storage is not found. Creating..."
         ensure mkdir -p "$XDG_DATA_HOME/dotfile"
     fi
 
     # git is required to update packages
-    if ! is_command git; then
+    is git a command?
+    if no; then
         info "git does not exist. Attempting to install..."
         ensure install_native git
     fi
 
     # stow is required to make symbolic links
-    if ! is_command stow; then
+    is stow a command?
+    if no; then
         info "stow does not exist. Attempting to install..."
         ensure install_native stow
     fi
 
     # This script is going to be installed in local PATH
-    if ! is_symlink "$HOME/.local/bin/dotfile"; then
+    is "$HOME/.local/bin/dotfile" a symlink?
+    if no; then
         info "Installing dotfile binary to local binary directory..."
         ensure mkdir -p "$HOME/.local/bin"
         ensure ln -s "$(realpath "$0")" "$HOME/.local/bin/dotfile"
@@ -195,32 +165,38 @@ dotfile_install() {
     local pkg
     pkg="$1"
 
+    debug "Installing dotfile package $pkg..."
+
     # Check package sanity
-    if ! is_directory $pkg; then
+    is "$pkg" a directory?
+    if no; then
         error "Dotfile package $pkg is not found! Aborting..."
         exit 2
     fi
 
-    if ! is_file "$pkg/dotpkg"; then
+    is "$pkg/dotpkg" a file?
+    if no; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
     fi
 
     # Check circular dependency
-    if contains "$(stack_name ancestors)" "$pkg"; then
+    does "$(stack_name ancestors)" contain "$pkg"?
+    if yes; then
         warn "Circular dependency detected! Ignoring the last attempt to install $pkg..."
         warn "You may want to fix the package description file to resolve this issue."
         return
     fi
 
     # If already visited, then do nothing
-    if contains "visited" "$pkg"; then
+    does "visited" contain "$pkg"?
+    if yes; then
         debug "Package $pkg is already installed by other package. Skipping..."
         return
     fi
 
     # Load dotfile description file
-    source_dotpkg "$pkg"
+    . "$pkg/dotpkg"
 
     # Mark current package as visited
     append "$pkg" to "visited"
@@ -233,20 +209,38 @@ dotfile_install() {
     done
 
     # Install dependencies first
+    stack_push ancestors "$pkg"
     for dependency in $difference; do
-        dotfile_install $dependency
+        dotfile_install "$dependency"
     done
+    stack_pop ancestors > /dev/null
 
     # Unset pre- and post-installation hooks
     unset -f pre_install post_install
 
     # Source dotfile description file again to restore changed hooks
-    source_dotpkg "$pkg"
+    . "$pkg/dotpkg"
 
     # Run the pre-installation hook
     maybe pre_install
 
-    debug "Installing dotfile package $pkg..."
+    # Install external dependencies
+    for src in $DOTFILE_AVAILABLE_SOURCES; do
+        debug "Installing dependencies from $src..."
+        eval "install_$src \$depends_$src"
+
+        # Clear external dependency list after installation
+        unset "depends_$src"
+    done
+
+    # Stow the directory
+    debug "Symlinking the configuration files..."
+    ensure stow -t "$HOME" --ignore=".gitignore" --ignore="dotpkg" "$pkg"
+
+    # Copy description file to the data directory
+    ensure cp "$pkg/dotpkg" "$XDG_DATA_HOME/dotfile/$pkg"
+
+    # Run the post-installation hook
     maybe post_install
 
     return

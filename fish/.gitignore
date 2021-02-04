@@ -1,0 +1,7 @@
+# Plugin directories
+.config/fish/completions/
+.config/fish/conf.d/
+.config/fish/functions/
+
+# Universal variable file
+.config/fish/fish_variables

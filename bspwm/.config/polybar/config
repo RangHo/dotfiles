@@ -86,11 +86,11 @@ include-file = $HOME/.config/polybar/bars/01-right
 
     enable-click = true
 
-    ws-icon-0 = "web; "
-    ws-icon-1 = "chat; "
-    ws-icon-2 = "dev; "
-    ws-icon-3 = "fun; "
-    ws-icon-default = " "
+    ws-icon-0 = "web;  "
+    ws-icon-1 = "chat;  "
+    ws-icon-2 = "dev;  "
+    ws-icon-3 = "fun;  "
+    ws-icon-default = "  "
 
     format-background = ${root.background}
     format-foreground = ${root.foreground}

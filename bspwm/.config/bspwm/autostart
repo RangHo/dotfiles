@@ -37,11 +37,11 @@ if [ "$(basename $SHELL)" == "fish" ]; then
 fi
 SXHKD_SHELL="$(which sh)" singleton sxhkd
 
+# Start uim daemon
+singleton uim-xim
+
 # Start picom compositor for prettier desktop.
 singleton picom --experimental-backends --daemon
-
-# Set wallpaper image with feh.
-singleton feh --randomize --bg-fill ~/Pictures/Wallpapers/wallpaper-*
 
 # Start MPRIS-Proxy to control bluetooth audio using MPRIS
 singleton mpris-proxy

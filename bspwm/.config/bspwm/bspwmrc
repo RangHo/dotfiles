@@ -22,11 +22,10 @@ export LOGOFF_COMMAND="bspc quit"
 # Make sure that .local/bin is in PATH
 export PATH=$HOME/.local/bin:$PATH
 
-# Set uim configs
+# Set IME configs
 export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 export XMODIFIERS=@im=uim
-uim-xim &
 
 # Source colors from wal
 source $HOME/.cache/wal/colors.sh
@@ -34,19 +33,21 @@ source $HOME/.cache/wal/colors.sh
 # Direct Qt to use GTK themes
 export QT_QPA_PLATFORMTHEME=qt5ct
 
+# Java GUI suffers with bspwm
+export _JAVA_AWT_WM_NONREPARENTING=1
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+
 # Create workspaces
 bspc monitor -d web dev chat fun misc
 
-# If libvirt is installed, create VM workspace as well
-if command -v virsh; then
-    bspc monitor -a vm
-fi
+# Use alternate insertion strategy
+bspc config automatic_scheme alternate
 
 # Set default border and gap
-bspc config border_width            5
+bspc config border_width            0
 bspc config normal_border_color     $color1
 bspc config focused_border_color    $color4
-bspc config window_gap              20
+bspc config window_gap              50
 
 bspc config split_ratio         0.5
 bspc config borderless_monocle  true

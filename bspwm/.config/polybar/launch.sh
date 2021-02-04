@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Find all network interfaces
+NETWORK_INTERFACES=$(ip link show | egrep '^[0-9]+:' | cut -d':' -f2)
+export WIRELESS_DEVICE=$(for dev in $NETWORK_INTERFACES; do
+                             echo $dev | egrep '^[wW]' && break
+                         done)
+export ETHERNET_DEVICE=$(for dev in $NETWORK_INTERFACES; do
+                             echo $dev | egrep '^[eE]' && break
+                         done)
+
 # Kill polybar if running
 killall -q polybar
 

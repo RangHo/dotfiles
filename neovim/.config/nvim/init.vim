@@ -47,6 +47,7 @@ Plug 'hrsh7th/vim-vsnip'
 
 " File type support
 Plug 'dag/vim-fish'
+Plug 'neoclide/jsonc.vim'
 
 " Language Server Protocol support
 Plug 'prabirshrestha/async.vim'
@@ -57,6 +58,7 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'hrsh7th/vim-vsnip-integ'
 
 " Other features
+Plug 'rhysd/vim-clang-format'
 Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
 

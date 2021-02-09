@@ -33,7 +33,12 @@
 
 ;; Place custom file in its own file
 (setq custom-file (concat user-emacs-directory "custom.el"))
-(load-file custom-file)
+(if (file-exists-p custom-file)
+    (load-file custom-file))
+
+;; Enable Xterm mouse support if no windowing system is found
+(unless (display-graphic-p)
+  (xterm-mouse-mode))
 
 ;; Hydra keybinding manager
 (use-package hydra)
@@ -43,13 +48,14 @@
   :config (global-undo-tree-mode))
 
 ;; Evil mode
-(setq-default evil-want-keybinding nil)
-(setq-default evil-want-integration t)
 (use-package evil
   :after undo-tree
   :init
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
+  (setq evil-undo-system 'undo-tree)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-integration t)
   :config (evil-mode))
 (use-package evil-collection
   :after evil
@@ -64,9 +70,21 @@
 
 ;; Treemacs project explorer
 (use-package treemacs
-  :after hydra)
+  :after hydra
+  :defer t
+  :config (progn (treemacs-follow-mode t)
+                 (treemacs-filewatch-mode t)
+                 (treemacs-fringe-indicator-mode 'always)
+                 (pcase (cons (not (null (executable-find "git")))
+                              (not (null treemacs-python-executable)))
+                   (`(t . t)
+                    (treemacs-git-mode 'deferred))
+                   (`(t . _)
+                    (treemacs-git-mode 'simple)))))
 (use-package treemacs-evil
-  :after '(treemacs evil))
+  :after (treemacs evil))
+(use-package treemacs-magit
+  :after (treemacs magit))
 
 ;; Magit git repository manager
 (use-package magit)

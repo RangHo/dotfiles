@@ -14,6 +14,10 @@ readonly XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 readonly XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 readonly XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
 
+readonly DOTFILE_CONFIG_FILE="$XDG_CONFIG_HOME/dotfile.conf"
+readonly DOTFILE_CACHE_DIR="$XDG_CACHE_HOME/dotfile"
+readonly DOTFILE_DATA_DIR="$XDG_DATA_HOME/dotfile"
+
 ## Logging functions
 ################################
 
@@ -217,7 +221,6 @@ no() {
     [ "$checks_last_result" != "yes" ]
 }
 
-
 ## Dependency list creator
 depends() {
     # Syntax: depends <src> <packages>...
@@ -265,24 +268,42 @@ append() {
 install_native() {
     debug "Installing native packages: $@"
 
-    # Check if the user can access sudo
-    if ! sudo -v -p "Installing native packages requires sudo:"; then
-        printf "%s\n" $@ > $XDG_CACHE_HOME/native_pkgs.txt
+    local sudo_command
 
-        if ! [ dotfile_sudo_warned ]; then
-            warn "This account doesn't seem to have sudo access!"
-            warn "You may have to install some packages yourself."
-            warn "Refer to the native_pkgs.txt in ${XDG_CACHE_HOME} directory"
-            warn "after this command exits."
+    # Check if sudo exists in the first place
+    is sudo a command?
+    if yes; then
+        # Check if the user can access sudo
+        if ! sudo -v -p "Installing native packages requires sudo:"; then
+            is "$DOTFILE_CACHE_DIR" a directory?
+            no && mkdir -p "$DOTFILE_CACHE_DIR"
+            
+            printf "%s\n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
 
-            dotfile_sudo_warned="yes"
+            if ! [ dotfile_sudo_warned ]; then
+                warn "This account doesn't seem to have sudo access!"
+                warn "You may have to install some packages yourself."
+                warn "Refer to the native_pkgs.txt in ${XDG_CACHE_HOME} directory"
+                warn "after this command exits."
+
+                dotfile_sudo_warned="yes"
+            fi
+            return
         fi
-        return
-    fi
 
+        sudo_command='sudo'
+    else
+        # sudo doesn't exist and user is not root
+        if [ "$(id -u)" -ne 0 ]; then
+            error "This script requires sudo to install packages."
+            error "It seems like it cannot get root privilege via sudo."
+            return 120
+        fi
+    fi
+        
     # TODO: support other platforms as well
     #sudo pacman -Sy "$@"
-    #sudo apt-get install "$@"
+    $sudo_command apt-get install -y "$@"
 }
 
 ## Install dotfile package dependencies
@@ -296,6 +317,7 @@ install_dotfile() {
 ## Action handlers
 ################################
 
+# Print the usage information
 dotfile_usage() {
     cat 1>&2 <<EOF
 USAGE:
@@ -310,37 +332,38 @@ COMMANDS:
     help         Displays this help message.
 EOF
 
-if [ "$DOTFILE_DEBUG" -ne 0 ]; then
-    echo "    shell        Create a REPL instance. Useful when debugging functions."
-fi
+    if [ "$DOTFILE_DEBUG" -ne 0 ]; then
+        echo "    shell        Create a REPL instance."
+    fi
 }
 
+# Initialize the dotfile repository
 dotfile_init() {
     # Initialization routine
     # Things to do:
-    # 1. Create configuration file $XDG_CONFIG_HOME/dotfile.conf
-    # 2. Create package folder $XDG_DATA_HOME/dotfile/
+    # 1. Create configuration file $DOTFILE_CONFIG_FILE
+    # 2. Create package folder $DOTFILE_DATA_DIR/
     # 3. Verify all necessary binaries are here (git, stow, etc.)
     # 4. Symbolic link itself to ~/.local/bin
 
     # Create basic configuration file
-    is "$XDG_CONFIG_HOME/dotfile.conf" a file?
+    is "$DOTFILE_CONFIG_FILE" a file?
     if no; then
         info "Dotfile configuration file is not found. Creating..."
         ensure mkdir -p "$XDG_CONFIG_HOME"
-        ensure touch "$XDG_CONFIG_HOME/dotfile.conf"
+        ensure touch "$DOTFILE_CONFIG_FILE"
 
         info "Setting dotfile home directory as:"
         echo "dotfile_home=$(dirname "$(realpath "$0")")" \
-            | ensure tee "$XDG_CONFIG_HOME/dotfile.conf" \
+            | ensure tee "$DOTFILE_CONFIG_FILE" \
             1>&2
     fi
 
     # Create directory where package data will be stored
-    is "$XDG_DATA_HOME/dotfile" a directory?
+    is "$DOTFILE_DATA_DIR" a directory?
     if no; then
         info "Dotfile package storage is not found. Creating..."
-        ensure mkdir -p "$XDG_DATA_HOME/dotfile"
+        ensure mkdir -p "$DOTFILE_DATA_DIR"
     fi
 
     # git is required to update packages
@@ -366,6 +389,7 @@ dotfile_init() {
     fi
 }
 
+# Install a dotfile package
 dotfile_install() {
     if [ "$#" -ne 1 ]; then
         error "You must provide one package!"
@@ -376,7 +400,7 @@ dotfile_install() {
     local pkg
     pkg="$1"
 
-    debug "Installing dotfile package $pkg..."
+    info "Installing dotfile package $pkg..."
 
     # Check package sanity
     is "$pkg" a directory?
@@ -385,7 +409,7 @@ dotfile_install() {
         exit 2
     fi
 
-    is "$pkg/dotpkg" a file?
+    is "$pkg/pkginfo" a file?
     if no; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
@@ -407,7 +431,7 @@ dotfile_install() {
     fi
 
     # Load dotfile description file
-    . "$pkg/dotpkg"
+    . "$pkg/pkginfo"
 
     # Mark current package as visited
     append "$pkg" to "visited"
@@ -430,7 +454,7 @@ dotfile_install() {
     unset -f pre_install post_install
 
     # Source dotfile description file again to restore changed hooks
-    . "$pkg/dotpkg"
+    . "$pkg/pkginfo"
 
     # Run the pre-installation hook
     maybe pre_install
@@ -446,19 +470,100 @@ dotfile_install() {
 
     # Stow the directory
     debug "Symlinking the configuration files..."
-    ensure stow -t "$HOME" --ignore=".gitignore" --ignore="dotpkg" "$pkg"
+    ensure stow -S -t "$HOME" --ignore=".gitignore" --ignore="pkginfo" "$pkg"
 
     # Copy description file to the data directory
-    ensure cp "$pkg/dotpkg" "$XDG_DATA_HOME/dotfile/$pkg"
+    ensure cp "$pkg/pkginfo" "$DOTFILE_DATA_DIR/$pkg"
 
     # Run the post-installation hook
     maybe post_install
+
+    info "$pkg package is installed!"
 
     return
 }
 
 dotfile_uninstall() {
-    error "This feature is not implemented yet."
+    if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
+        error "You must provide one package!"
+        error "Usage: dotfile uninstall [--force] <package>"
+        return 1
+    fi
+
+    local force    
+    if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
+        force=1
+    fi
+
+    local pkg
+    pkg="$1"
+
+    info "Uninstalling dotfile package $pkg..."
+
+    # Package should be installed before uninstalling
+    is "$DOTFILE_DATA_DIR/$pkg" a file?
+    if no; then
+        error "Package '$pkg' is not installed currently."
+        error "Cannot uninstall a nonexistent package. Aborting..."
+        return 1
+    fi
+
+    # Check if any other package depends on this dotfile package
+    for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
+        # Skip the package to uninstall
+        [ "$pkg" = "$installed" ] && continue
+
+        # Source the package description file to load dependencies
+        . "$installed"
+
+        # If the package description has the package as dependency,
+        # the package will not work so mark it
+        does "$depends_dotfile" contain "$pkg"?
+        if yes; then
+            debug "$installed depends on $pkg!"
+            append "$installed" to broken_pkg
+        fi
+
+        # Reset the dotfile dependencies
+        unset depends_dotfile
+    done
+
+    # If there are to-be-broken packages, address them
+    if [ "$broken_pkg" ]; then
+        warn "Uninstalling this package will break dependencies for the following dotfiles:"
+        for broken in $broken_pkg; do
+            warn "  - $(basename $broken)"
+        done
+
+        # If not force, then crash and burn
+        if ! [ "$force" ]; then
+            error "Cannot remove $pkg due to dependency check failure."
+            error "To ignore this, use --force option."
+            return 1
+        fi
+    fi
+
+    # Unset pre- and post-uninstallation hooks
+    unset -f pre_uninstall post_uninstall
+
+    # Source dotfile description file again to restore changed hooks
+    . "$pkg/pkginfo"
+
+    # Run the pre-uninstallation hook
+    maybe pre_uninstall
+
+    # Unstow the directory
+    debug "Unstowing the configuration files..."
+    ensure stow -D "$pkg"
+
+    # Remove description file in the data directory
+    ensure rm -f "$DOTFILE_DATA_DIR/$pkg"
+
+    # Run the post-uninstallation hook
+    maybe post_uninstall
+
+    info "$pkg package is uninstalled!"
+
     return
 }
 
@@ -468,7 +573,6 @@ dotfile_update() {
 }
 
 dotfile_remove() {
-    error "This feature is not implemented yet."
     return
 }
 
@@ -509,18 +613,18 @@ fi
 
 # If there is no dotfile configuration file, instruct the user to run
 # `dotfile init` first
-is "$XDG_CONFIG_HOME/dotfile.conf" a file?
-if no && [ "$action" != "init" ]; then
+is "$DOTFILE_CONFIG_FILE" a file?
+if yes; then
+    # Go to the dotfile home directory
+    ensure . "$DOTFILE_CONFIG_FILE"
+    debug "Changing directory to $dotfile_home..."
+    dotfile_old_pwd="$(pwd)"
+    cd "$dotfile_home"
+elif [ "$action" != init ]; then
     error "Dotfile manager is not initialized yet!"
     error "Please run \"dotfile init\" first."
     exit 1
 fi
-
-# Go to the dotfile home directory
-ensure . "$XDG_CONFIG_HOME/dotfile.conf"
-debug "Changing directory to $dotfile_home..."
-dotfile_old_pwd="$(pwd)"
-cd "$dotfile_home"
 
 case "$action" in
     init)
@@ -554,5 +658,5 @@ case "$action" in
 esac
 
 # Restore the directory
-cd "$dotfile_old_pwd"
+[ "$dotfile_old_pwd" ] && cd "$dotfile_old_pwd"
 

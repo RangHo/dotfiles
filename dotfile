@@ -4,7 +4,7 @@
 # This script assumes at least `local` extension is enabled.
 
 # External sources available for install
-readonly DOTFILE_AVAILABLE_SOURCES="native"
+readonly DOTFILE_AVAILABLE_SOURCES="native pip cargo gem aur"
 
 readonly DOTFILE_DEBUG=${DEBUG:-0}
 readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
@@ -277,7 +277,9 @@ append() {
 
 ## Install native package dependencies
 install_native() {
-    debug "Installing native packages: $@"
+    [ "$#" -eq 0 ] && return
+
+    info "Installing native packages: $@"
 
     local sudo_command
 
@@ -336,8 +338,129 @@ install_native() {
     fi
 }
 
+## Install PIP package dependencies
+install_pip() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing PIP dependencies: $@"
+
+    is pip command?
+    if no; then
+        info "pip is not found! Installing that first..."
+        install_native python python-pip
+    fi
+
+    pip install --user "$@"
+}
+
+## Install cargo dependencies
+install_cargo() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing Cargo dependencies: $@"
+
+    is cargo command?
+    if no; then
+        info "Cargo is not found! Installing that first..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    fi
+
+    cargo install "$@"
+}
+
+## Install rubygem dependencies
+install_gem() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing Ruby Gem dependencies: $@"
+
+    is gem command?
+    if no; then
+        info "gem is not found! Installing that first..."
+        install_native ruby rubygems
+    fi
+
+    gem install "$@"
+}
+
+## Install Arch User Repository dependencies
+install_aur() {
+    [ "$#" -eq 0 ] && return
+
+    if [ "$(id -u)" -eq 0 ]; then
+        error "This script cannot be run as root!"
+        error "Please make a user account to install packages from AUR."
+        exit 200
+    fi
+
+    install_native base-devel
+
+    is platform arch?
+    if no; then
+        error "AUR dependency can be installed in Arch Linux and its derivatives."
+        error "Tapping out..."
+        error "You may have to check the package's information file to verify"
+        error "platform-check routines."
+        exit 1
+    fi
+
+    is aur command?
+    if no; then
+        info "aurutils is not found! Installing that first..."
+
+        debug "Creating a new group for AUR repo..."
+        sudo groupadd aur
+
+        debug "Adding the current user to the new group..."
+        sudo usermod -aG aur "$USER"
+
+        debug "Building aurutils from AUR..."
+        local aurdir prevdir
+        prevdir="$(pwd)"
+        aurdir="/tmp/aurutils-download"
+
+        is "$aurdir" directory?
+        if yes; then
+            rm -rf "$aurdir"
+        fi
+
+        mkdir "$aurdir"
+
+        cd "$aurdir"
+
+        git clone https://aur.archlinux.org/aurutils
+
+        cd aurutils
+        makepkg -si --noconfirm
+
+        cd "$prevdir"
+        rm -rf "$aurdir"
+
+        printf '\n[aur]\nSigLevel = Optional TrustAll\nServer = file:///home/aur' "$USER" \
+            | sudo tee -a /etc/pacman.conf
+
+        sudo install -d /home/aur -g aur
+
+        # Setting up setgid bit
+        sudo chmod 770 /home/aur
+        sudo chmod g+s /home/aur
+
+        sg aur "repo-add /home/aur/aur.db.tar"
+
+        sudo pacman -Sy vifm
+    fi
+
+    for package in $@; do
+        sg aur "aur sync $package"
+    done
+
+    install_native $@
+}
+
 ## Install dotfile package dependencies
 install_dotfile() {
+    [ "$#" -eq 0 ] && return
+
     info "Installing dotfile dependencies..."
     for pkg in $depends_dotfile; do
         dotfile_install "$pkg"
@@ -449,7 +572,7 @@ dotfile_install() {
     # Check if package is already installed
     is "$pkg" installed?
     if yes; then
-        info "$peg seems to be installed already! Skipping..."
+        info "$pkg seems to be installed already! Skipping..."
         return
     fi
 

@@ -1,33 +1,33 @@
-![Dotfiles](verniy-dotfiles.png)
-Original image by [キノスケ](https://www.pixiv.net/member_illust.php?id=3180989)
+<img align="center" src="verniy-dotfiles.png" />
+<p align="center">Original image by <a href="https://www.pixiv.net/member_illust.php?id=3180989">キノスケ</a></p>
 
-# What is `dotfile`?
-
-Dotfiles are similar to what Windows users would call *hidden files*. They are often used to customize UNIX systems. They are called **dotfiles** because in UNIX systems, hidden file's name starts with a `.`(dot). This convention traces its origin back to old UNIX where (by unintentional side effect) files starting with `.` became invisible by some programs. People exploited this "bug" to make files hidden, and the UNIX community finally adopted this as a "feature". Remember, *it's not a bug; it's a feature*.
+## What is `dotfile`?
+Dotfiles are similar to what Windows users would call *hidden files*. They are often used to customize UNIX systems. The name **dotfiles** comes from a UNIX convention where hidden file's name starts with a `.`(dot). This convention traces its origin back to old UNIX where (by unintentional side effect) files starting with `.` became invisible by some programs. People exploited this "bug" to make files hidden, and the UNIX community finally adopted this as a "feature". Remember: *it's not a bug; it's a feature*.
 
 ## How to use
+Though it isn't made to install dotfiles on systems, `GNU stow` provides a nice interface for installing dotfiles by creating symbolic links automatically. But, I, having too much free time that I should've spent doing something far more useful, created a "package manager" that installs binary dependencies as well.
 
-Using `GNU stow`, we can manage the dotfiles easily. Though `stow` itself is not designed to be used with dotfiles, it works perfectly well. To add more functionalities, I wrapped `stow` with `make` so that I can automatically install important dependencies while applying dotfiles.
-
-First, clone the repository into your favorite location. I am going to download it into `~/Dotfiles`, as it looks good among existing XDG User Directories. Don't forget to initialize submodules as some features depend on git submodules.
-
+First, clone the repository into your favorite location. Don't forget to initialize submodules as some features depend on submodules.
 ```sh
 git clone --recurse-submodules https://github.com/RangHo/dotfiles ~/Dotfiles
 ```
 
 Then `cd` into the directory you chose.
-
 ```sh
 cd ~/Dotfiles
 ```
 
-Then we can install the configurations! Use this syntax to install a package: `make install=<package>`. Here, I will install `firefox`.
-
+Now you should initialize dotfile manager by running this script below. Provide `sudo` password if necessary.
 ```sh
-make install=firefox
+./dotfile init
 ```
+By now, the `dotfile` script should have installed itself in `~/.local/bin` directory. It is just for convenient access, so you may still use the script directly.
 
-Note that while applying dotfies, it may ask you for a `sudo` password.
+To install a dotfile package, run the following command:
+```sh
+dotfile install <package>
+# where <package> is a directory that contains `pkginfo` file
+```
 
 ## List of commands
 
@@ -35,7 +35,7 @@ Here are complete list of commands:
 
 | Command | What it does |
 |-----|-----|
-| `make install=<package>` | Installs a package named `<package>`. It installs dependencies too. |
-| `make uninstall=<package>` | Just an alias to `stow -t ~ -D <package>`. Uninstalls a package. |
-| `make update` | Updates the dotfiles repository. This first uninstalls all available configuration. You have to reinstall packages later. |
-| `make remove` | Remove all packages from the machine. It cannot guarantee that all artifacts are removed also. }
+| `dotfile install <package>` | Installs a package named `<package>`. It installs dependencies too. |
+| `dotfile uninstall [--force] <package>` | Uninstalls a package named `<package>`. Note that this does not uninstall binary dependencies. |
+| `dotfile update` | Updates the dotfiles repository. This feature is not tested rigorously, so use with caution. |
+| `dotfile remove` | Remove all packages from the machine. It does not guarantee that all artifacts are removed also. |

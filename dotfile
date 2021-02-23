@@ -18,6 +18,7 @@ readonly DOTFILE_CONFIG_FILE="$XDG_CONFIG_HOME/dotfile.conf"
 readonly DOTFILE_CACHE_DIR="$XDG_CACHE_HOME/dotfile"
 readonly DOTFILE_DATA_DIR="$XDG_DATA_HOME/dotfile"
 
+
 ## Logging functions
 ################################
 
@@ -153,21 +154,30 @@ maybe() {
 is() {
     # Syntax: is <subject> a/an <complement>?
 
-    local subject article complement
-    subject="$1"
-    article="$2"
-    complement=$(echo "$3" | sed -e 's/\?$//')
-
-    if [ "$#" -ne 3 ] || [ "$article" != "a" ] && [ "$article" != "an" ]; then
-        error "Usage: is <subject> a(n) <complement>?"
+    if [ "$#" -ne 2 ] && [ "$#" -ne 3 ]; then
+        error "Usage: is <subject> [a(n)] <complement>?"
         return 1
     fi
+
+
+    local subject article complement
+    subject="$1"
+    shift
+
+    if [ "$1" = "a" ] || [ "$1" = "an" ]; then
+        article="$1"
+        shift
+    fi
+
+    complement=$(echo "$1" | sed -e 's/\?$//')
 
     case "$complement" in
         command) command -v "$subject" > /dev/null ;;
         file) [ -e "$subject" ] ;;
         directory) [ -d "$subject" ] ;;
         symlink) [ -L "$subject" ] ;;
+
+        installed) [ -e "$DOTFILE_DATA_DIR/$subject" ] ;;
 
         *)
             error "<complement> can be either command, file, directory, or symlink."
@@ -300,10 +310,10 @@ install_native() {
             return 120
         fi
     fi
-        
+    
     # TODO: support other platforms as well
     #sudo pacman -Sy "$@"
-    $sudo_command apt-get install -y "$@"
+    $sudo_command apt-get update && $sudo_command apt-get install -y "$@"
 }
 
 ## Install dotfile package dependencies
@@ -313,6 +323,7 @@ install_dotfile() {
         dotfile_install "$pkg"
     done
 }
+
 
 ## Action handlers
 ################################
@@ -337,7 +348,7 @@ EOF
     fi
 }
 
-# Initialize the dotfile repository
+## Initialize the dotfile repository
 dotfile_init() {
     # Initialization routine
     # Things to do:
@@ -356,7 +367,7 @@ dotfile_init() {
         info "Setting dotfile home directory as:"
         echo "dotfile_home=$(dirname "$(realpath "$0")")" \
             | ensure tee "$DOTFILE_CONFIG_FILE" \
-            1>&2
+                     1>&2
     fi
 
     # Create directory where package data will be stored
@@ -389,7 +400,7 @@ dotfile_init() {
     fi
 }
 
-# Install a dotfile package
+## Install a dotfile package
 dotfile_install() {
     if [ "$#" -ne 1 ]; then
         error "You must provide one package!"
@@ -413,6 +424,13 @@ dotfile_install() {
     if no; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
+    fi
+
+    # Check if package is already installed
+    is "$pkg" installed?
+    if yes; then
+        info "$peg seems to be installed already! Skipping..."
+        return
     fi
 
     # Check circular dependency
@@ -446,6 +464,7 @@ dotfile_install() {
     # Install dependencies first
     stack_push ancestors "$pkg"
     for dependency in $difference; do
+        for src in $DOTFILE_AVAILABLE_SOURCES; do unset "depends_$src"; done
         dotfile_install "$dependency"
     done
     stack_pop ancestors > /dev/null
@@ -493,6 +512,7 @@ dotfile_uninstall() {
     local force    
     if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
         force=1
+        shift
     fi
 
     local pkg
@@ -511,7 +531,7 @@ dotfile_uninstall() {
     # Check if any other package depends on this dotfile package
     for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
         # Skip the package to uninstall
-        [ "$pkg" = "$installed" ] && continue
+        [ "$pkg" = "$(basename $installed)" ] && continue
 
         # Source the package description file to load dependencies
         . "$installed"
@@ -547,7 +567,7 @@ dotfile_uninstall() {
     unset -f pre_uninstall post_uninstall
 
     # Source dotfile description file again to restore changed hooks
-    . "$pkg/pkginfo"
+    . "$DOTFILE_DATA_DIR/$pkg"
 
     # Run the pre-uninstallation hook
     maybe pre_uninstall
@@ -568,11 +588,78 @@ dotfile_uninstall() {
 }
 
 dotfile_update() {
-    error "This feature is not implemented yet."
+    # Fetch the changes from origin
+    git fetch origin
+
+    # Check which directories have changes
+    local changed_dirs
+    changed_dirs="$(git diff --name-only HEAD..origin/main | sed -e 's=^/==' -e 's=/.*==' | uniq)"
+    if [ -z "$changed_dirs" ]; then
+        info "Already up to date!"
+        return
+    fi
+
+    # Check if the directories are actually dotfile packages
+    local changed_pkgs
+    for candidate in $changed_dirs; do
+        if [ -e "$candidate/pkginfo" ]; then
+            debug "Package $candidate has changes available."
+            append "$candidate" to changed_pkgs
+        fi
+    done
+
+    # Remove packages with changes available
+    local installed_pkgs
+    for pkg in $changed_pkgs; do
+        dotfile_uninstall --force "$pkg"
+        append "$pkg" to installed_pkgs
+    done
+
+    # Try updating the repository...
+    if ! git merge --ff-only origin/main; then
+        error "Unable to fast-forward the update! Tapping out..."
+        error "It seems you have unsaved changes in the dotfile repository."
+        error "I'm gonna drop you into a new shell. In there, merge the commmits manually."
+
+        while true; do
+            sh
+
+            if [ -e ".git/MERGE_HEAD" ]; then
+                error "Merging is still in progress!"
+                error "Creating another shell for you..."
+            else
+                break
+            fi
+        done
+    fi
+
+    # Reinstall the updated packages
+    for pkg in $installed_pkgs; do
+        dotfile_install pkg
+    done
+
+    info "Update completed!"
+
     return
 }
 
 dotfile_remove() {
+    warn "This program will delete all dotfiles from your computer"
+    warn "and self-destruct itself. Do you wish to continue?"
+    read -p "(yes/no): " choice
+    [ "$choice" != yes ] && return
+
+    # Delete all packages
+    for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
+        dotfile_uninstall --force "$(basename $installed)" 2>/dev/null
+        debug "Uninstalled $installed."
+    done
+
+    # Remove dotfile configuration file
+    rm -f "$DOTFILE_CONFIG_FILE"
+
+    # Remove itself from local binary directory
+    rm -f "$HOME/.local/bin/dotfile"
     return
 }
 
@@ -580,16 +667,17 @@ dotfile_shell() {
     if [ "$DOTFILE_DEBUG" -eq 0 ]; then
         error "Opening shell is not supported if DEBUG environment variable is not set!"
         exit 1
-        fi
+    fi
 
-        while true; do
-            read -r -p "dotfile> " line
+    while true; do
+        read -r -p "dotfile> " line
 
-            [ "$line" = "exit" ] && break
+        [ "$line" = "exit" ] && break
 
-            eval "$line"
-        done
-    }
+        eval "$line"
+    done
+}
+
 
 ## Entrypoint
 ################################

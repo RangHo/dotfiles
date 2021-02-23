@@ -146,30 +146,27 @@ ensure() {
 
 ## Maybe a command exists
 maybe() {
-    is $1 a command?
+    is $1 command?
     yes && "$@" || debug "No such command: $1"
 }
 
 ## is-checks
 is() {
-    # Syntax: is <subject> a/an <complement>?
+    # Syntax: is <subject> <complement>?
 
-    if [ "$#" -ne 2 ] && [ "$#" -ne 3 ]; then
-        error "Usage: is <subject> [a(n)] <complement>?"
+    if [ "$#" -ne 2 ]; then
+        error "Usage: is <subject> <complement>?"
         return 1
     fi
 
-
-    local subject article complement
+    local subject complement
     subject="$1"
-    shift
+    complement=$(echo "$2" | sed -e 's/\?$//')
 
-    if [ "$1" = "a" ] || [ "$1" = "an" ]; then
-        article="$1"
-        shift
+    if [ "$subject" = "platform" ]; then
+        is_platform "$complement" && checks_last_result="yes" || checks_last_result="no"
+        return
     fi
-
-    complement=$(echo "$1" | sed -e 's/\?$//')
 
     case "$complement" in
         command) command -v "$subject" > /dev/null ;;
@@ -186,33 +183,38 @@ is() {
     esac && checks_last_result="yes" || checks_last_result="no"
 }
 
-## does-checks
-does() {
-    # Syntax: does <subject> <verb> <object>?
+is_platform() {
+    local query osname likename
+    query="$1"
 
-    local subject verb object
-    subject="$1"
-    verb="$2"
-    object=$(echo "$3" | sed -e 's/\?$//')
+    osname="$(uname -s)"
 
-    if [ "$#" -ne 3 ]; then
-        error "Usage: does <subject> <verb> <object>?"
-        return 1
+    # For Linux, query the distro name instead of the kernel
+    if [ "$osname" = "Linux" ]; then
+        is "/etc/os-release" file?
+        if yes; then
+            . /etc/os-release
+
+            [ "$ID" ] && osname="$ID"
+            [ "$ID_LIKE" ] && likename="$ID_LIKE"
+
+            append linux to likename
+
+        elif [ "$(uname -o)" = "Android" ]; then
+            osname=android
+
+        else
+            osname=linux
+        fi
     fi
 
-    case "$verb" in
-        contain) does_contain "$subject" "$object" ;;
-
-        *)
-            error "<verb> must be contain."
-            false
-            ;;
-    esac && checks_last_result="yes" || checks_last_result="no"
-
+    # Match the result
+    [ "$osname" = "$query" ] || contains likename "$query"
 }
 
 ## Check if the "array" contains the item
-does_contain() {
+contains() {
+    # Syntax: contains <array> <item>
     local array item occurrence
     array=$1
     item=$2
@@ -265,8 +267,7 @@ append() {
         exit 1
     fi
 
-    does "$array" contain "$item"?
-    if yes; then
+    if contains "$array" "$item"; then
         debug "$item already exists in $array."
         return
     fi
@@ -281,16 +282,16 @@ install_native() {
     local sudo_command
 
     # Check if sudo exists in the first place
-    is sudo a command?
+    is sudo command?
     if yes; then
         # Check if the user can access sudo
         if ! sudo -v -p "Installing native packages requires sudo:"; then
-            is "$DOTFILE_CACHE_DIR" a directory?
+            is "$DOTFILE_CACHE_DIR" directory?
             no && mkdir -p "$DOTFILE_CACHE_DIR"
             
             printf "%s\n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
 
-            if ! [ dotfile_sudo_warned ]; then
+            if ! [ "$dotfile_sudo_warned" ]; then
                 warn "This account doesn't seem to have sudo access!"
                 warn "You may have to install some packages yourself."
                 warn "Refer to the native_pkgs.txt in ${XDG_CACHE_HOME} directory"
@@ -306,14 +307,33 @@ install_native() {
         # sudo doesn't exist and user is not root
         if [ "$(id -u)" -ne 0 ]; then
             error "This script requires sudo to install packages."
-            error "It seems like it cannot get root privilege via sudo."
+            error "It seems like I cannot get root privilege via sudo."
             return 120
         fi
     fi
     
     # TODO: support other platforms as well
-    #sudo pacman -Sy "$@"
-    $sudo_command apt-get update && $sudo_command apt-get install -y "$@"
+    is platform debian?
+    if yes; then
+        $sudo_command apt-get update && $sudo_command apt-get install -y "$@"
+        return
+    fi
+
+    is platform arch?
+    if yes; then
+        $sudo_command pacman -Sy --needed --noconfirm "$@"
+        return
+    fi
+
+    printf "%n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
+
+    if ! [ "$dotfile_unsupported_warned" ]; then
+        warn "This operating system is not supported by me!"
+        warn "You may have to install some packages yourself."
+        warn "Refer to the native_pkgs.txt in $DOTFILE_CACHE_DIR."
+
+        dotfile_unsupported_warned="yes"
+    fi
 }
 
 ## Install dotfile package dependencies
@@ -358,7 +378,7 @@ dotfile_init() {
     # 4. Symbolic link itself to ~/.local/bin
 
     # Create basic configuration file
-    is "$DOTFILE_CONFIG_FILE" a file?
+    is "$DOTFILE_CONFIG_FILE" file?
     if no; then
         info "Dotfile configuration file is not found. Creating..."
         ensure mkdir -p "$XDG_CONFIG_HOME"
@@ -371,28 +391,28 @@ dotfile_init() {
     fi
 
     # Create directory where package data will be stored
-    is "$DOTFILE_DATA_DIR" a directory?
+    is "$DOTFILE_DATA_DIR" directory?
     if no; then
         info "Dotfile package storage is not found. Creating..."
         ensure mkdir -p "$DOTFILE_DATA_DIR"
     fi
 
     # git is required to update packages
-    is git a command?
+    is git command?
     if no; then
         info "git does not exist. Attempting to install..."
         ensure install_native git
     fi
 
     # stow is required to make symbolic links
-    is stow a command?
+    is stow command?
     if no; then
         info "stow does not exist. Attempting to install..."
         ensure install_native stow
     fi
 
     # This script is going to be installed in local PATH
-    is "$HOME/.local/bin/dotfile" a symlink?
+    is "$HOME/.local/bin/dotfile" symlink?
     if no; then
         info "Installing dotfile binary to local binary directory..."
         ensure mkdir -p "$HOME/.local/bin"
@@ -414,13 +434,13 @@ dotfile_install() {
     info "Installing dotfile package $pkg..."
 
     # Check package sanity
-    is "$pkg" a directory?
+    is "$pkg" directory?
     if no; then
         error "Dotfile package $pkg is not found! Aborting..."
         exit 2
     fi
 
-    is "$pkg/pkginfo" a file?
+    is "$pkg/pkginfo" file?
     if no; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
@@ -434,16 +454,14 @@ dotfile_install() {
     fi
 
     # Check circular dependency
-    does "$(stack_name ancestors)" contain "$pkg"?
-    if yes; then
+    if contains "$(stack_name ancestors)" "$pkg"; then
         warn "Circular dependency detected! Ignoring the last attempt to install $pkg..."
         warn "You may want to fix the package description file to resolve this issue."
         return
     fi
 
     # If already visited, then do nothing
-    does "visited" contain "$pkg"?
-    if yes; then
+    if contains "visited" "$pkg"; then
         debug "Package $pkg is already installed by other package. Skipping..."
         return
     fi
@@ -521,7 +539,7 @@ dotfile_uninstall() {
     info "Uninstalling dotfile package $pkg..."
 
     # Package should be installed before uninstalling
-    is "$DOTFILE_DATA_DIR/$pkg" a file?
+    is "$DOTFILE_DATA_DIR/$pkg" file?
     if no; then
         error "Package '$pkg' is not installed currently."
         error "Cannot uninstall a nonexistent package. Aborting..."
@@ -538,8 +556,7 @@ dotfile_uninstall() {
 
         # If the package description has the package as dependency,
         # the package will not work so mark it
-        does "$depends_dotfile" contain "$pkg"?
-        if yes; then
+        if contains "$depends_dotfile" "$pkg"; then
             debug "$installed depends on $pkg!"
             append "$installed" to broken_pkg
         fi
@@ -652,14 +669,17 @@ dotfile_remove() {
     # Delete all packages
     for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
         dotfile_uninstall --force "$(basename $installed)" 2>/dev/null
-        debug "Uninstalled $installed."
+        info "Uninstalled $installed."
     done
 
     # Remove dotfile configuration file
-    rm -f "$DOTFILE_CONFIG_FILE"
+    ensure rm -f "$DOTFILE_CONFIG_FILE"
+    info "Removed dotfile configuration file."
 
     # Remove itself from local binary directory
-    rm -f "$HOME/.local/bin/dotfile"
+    ensure rm -f "$HOME/.local/bin/dotfile"
+    info "Removed dotfile symbolic link in local binary directory."
+
     return
 }
 
@@ -701,7 +721,7 @@ fi
 
 # If there is no dotfile configuration file, instruct the user to run
 # `dotfile init` first
-is "$DOTFILE_CONFIG_FILE" a file?
+is "$DOTFILE_CONFIG_FILE" file?
 if yes; then
     # Go to the dotfile home directory
     ensure . "$DOTFILE_CONFIG_FILE"

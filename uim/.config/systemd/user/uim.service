@@ -1,0 +1,12 @@
+[Unit]
+Description=uim daemon
+Wants=uim-env.service
+After=xorg.target
+
+[Service]
+ExecStart=/usr/bin/uim-xim
+Restart=on-abort
+
+[Install]
+WantedBy=xorg.target
+

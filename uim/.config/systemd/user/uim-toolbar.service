@@ -1,0 +1,11 @@
+[Unit]
+Description=uim toolbar
+PartOf=uim.service
+
+[Service]
+ExecStart=/usr/bin/uim-toolbar-qt5
+Restart=on-abort
+
+[Install]
+WantedBy=uim.service
+

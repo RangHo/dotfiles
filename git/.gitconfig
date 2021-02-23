@@ -22,3 +22,5 @@
 [commit]
 	template = ~/Templates/git-commit-template
 	gpgsign = true
+[init]
+	defaultBranch = main

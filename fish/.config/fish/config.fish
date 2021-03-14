@@ -27,3 +27,8 @@ end
 if test -e ~/.profile
     fenv "source ~/.profile"
 end
+
+# If asdf version manager is installed, use that
+if test -d ~/.asdf
+    source ~/.asdf/asdf.fish
+end

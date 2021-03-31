@@ -1,0 +1,20 @@
+#!/bin/sh
+
+depends native neovim
+
+post_install() {
+    # Support legacy vim config directory as well
+    ln -s ~/.config/nvim/init.vim ~/.vimrc
+
+    # Install plugins
+    nvim +PlugInstall +qall
+}
+
+pre_uninstall() {
+    # This function is executed before the current dotfile packages is removed.
+}
+
+post_uninstall() {
+    # This function is executed after all packages are removed.
+}
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+depends native alacritty
+
+depends dotfile fontconfig zsh fish

@@ -1,0 +1,893 @@
+#!/usr/bin/env sh
+
+# shellcheck shell=ash
+# This script assumes at least `local` extension is enabled.
+
+# External sources available for install
+readonly DOTFILE_AVAILABLE_SOURCES="native pip cargo gem aur"
+
+readonly DOTFILE_DEBUG=${DEBUG:-0}
+readonly DOTFILE_LOG_LEVEL=${LOG_LEVEL:-2}
+
+# XDG base directories
+readonly XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+readonly XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+readonly XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+
+readonly DOTFILE_CONFIG_FILE="$XDG_CONFIG_HOME/dotfile.conf"
+readonly DOTFILE_CACHE_DIR="$XDG_CACHE_HOME/dotfile"
+readonly DOTFILE_DATA_DIR="$XDG_DATA_HOME/dotfile"
+
+
+## Logging functions
+################################
+
+# Color constants
+readonly BLACK=$(tput setaf 0)
+readonly RED=$(tput setaf 1)
+readonly GREEN=$(tput setaf 2)
+readonly YELLOW=$(tput setaf 3)
+readonly BLUE=$(tput setaf 4)
+readonly MAGENTA=$(tput setaf 5)
+readonly CYAN=$(tput setaf 6)
+readonly WHITE=$(tput setaf 7)
+
+# Text style constants
+readonly BOLD=$(tput bold)
+readonly UNDERLINE=$(tput smul)
+readonly BLINK=$(tput blink)
+
+# Reset test to normal style
+readonly NORMAL=$(tput sgr0)
+
+debug() {
+    [ "$DOTFILE_DEBUG" -eq 0 ] && [ "$DOTFILE_LOG_LEVEL" -lt 3 ] && return
+    printf "[${BOLD}${WHITE}DEBUG${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+info() {
+    [ "$DOTFILE_LOG_LEVEL" -lt 2 ] && return
+    printf "[${BOLD}${BLUE}INFO${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+warn() {
+    [ "$DOTFILE_LOG_LEVEL" -lt 1 ] && return
+    printf "[${BOLD}${YELLOW}WARNING${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+error() {
+    printf "[${BOLD}${RED}ERROR${NORMAL}] ${WHITE}%s${NORMAL}\n" "$@" >&2
+}
+
+
+## Utility functions
+################################
+
+## Push a new item to stack
+stack_push() {
+    # Syntax: stack_push <stack_id> <item>
+
+    if [ "$#" -ne 2 ]; then
+        error "Usage: stack_push <stack_id> <item>"
+        return 1
+    fi
+
+    local stack_id item
+    stack_id="$1"
+    item="$2"
+
+    eval "stack_$stack_id=\"\${stack_$stack_id} $item\""
+}
+
+## Pop an item from stack to stdout
+stack_pop() {
+    # Syntax: stack_pop <stack_id>
+
+    if [ "$#" -ne 1 ]; then
+        error "Usage: stack_pop <stack_id>"
+        return 1
+    fi
+
+    local stack_id result
+    stack_id="$1"
+    result=$(eval "echo \${stack_$stack_id}" | awk -F ' ' '{ print $NF }')
+
+    # Check if the result is empty
+    if [ -z "$result" ]; then
+        warn "Stack is already empty."
+        return
+    fi
+
+    # Remove the item from the end
+    eval "stack_$stack_id=\$(echo \"\${stack_$stack_id}\" | sed -e 's/ $result$//')"
+
+    # Print the last element to stdout
+    echo $result
+}
+
+## Print the content of the stack
+stack_print() {
+    # Syntax: stack_print <stack_id>
+
+    if [ "$#" -ne 1 ]; then
+        error "Usage: stack_print <stack_id>"
+        return 1
+    fi
+
+    local stack_id
+    stack_id="$1"
+
+    eval "echo \${stack_$stack_id}"
+}
+
+## Print the name of the stack
+stack_name() {
+    # Syntax: stack_name <stack_id>
+
+    if [ "$#" -ne 1 ]; then
+        error "Usage: stack_name <stack_id>"
+        return 1
+    fi
+
+    local stack_id
+    stack_id="$1"
+
+    echo "stack_$stack_id"
+}
+
+## Ensure a command succeeds
+ensure() {
+    if ! "$@"; then
+        error "Command failed: $*"
+        error "This command is required. Cannot proceed..."
+        exit 1
+    fi
+}
+
+## Maybe a command exists
+maybe() {
+    is $1 command?
+    yes && "$@" || debug "No such command: $1"
+}
+
+## is-checks
+is() {
+    # Syntax: is <subject> <complement>?
+
+    if [ "$#" -ne 2 ]; then
+        error "Usage: is <subject> <complement>?"
+        return 1
+    fi
+
+    local subject complement
+    subject="$1"
+    complement=$(echo "$2" | sed -e 's/\?$//')
+
+    if [ "$subject" = "platform" ]; then
+        is_platform "$complement" && checks_last_result="yes" || checks_last_result="no"
+        return
+    fi
+
+    case "$complement" in
+        command) command -v "$subject" > /dev/null ;;
+        file) [ -e "$subject" ] ;;
+        directory) [ -d "$subject" ] ;;
+        symlink) [ -L "$subject" ] ;;
+
+        installed) [ -e "$DOTFILE_DATA_DIR/$subject" ] ;;
+
+        *)
+            error "<complement> can be either command, file, directory, or symlink."
+            false
+            ;;
+    esac && checks_last_result="yes" || checks_last_result="no"
+}
+
+is_platform() {
+    local query osname likename
+    query="$1"
+
+    osname="$(uname -s)"
+
+    # For Linux, query the distro name instead of the kernel
+    if [ "$osname" = "Linux" ]; then
+        is "/etc/os-release" file?
+        if yes; then
+            . /etc/os-release
+
+            [ "$ID" ] && osname="$ID"
+            [ "$ID_LIKE" ] && likename="$ID_LIKE"
+
+            append linux to likename
+
+        elif [ "$(uname -o)" = "Android" ]; then
+            osname=android
+
+        else
+            osname=linux
+        fi
+    fi
+
+    # Match the result
+    [ "$osname" = "$query" ] || contains likename "$query"
+}
+
+## Check if the "array" contains the item
+contains() {
+    # Syntax: contains <array> <item>
+    local array item occurrence
+    array=$1
+    item=$2
+    occurrence=$(printf "%s\n" $(eval "echo \"\$$array\"") | grep -c "^$item$")
+
+    [ "$occurrence" -ne 0 ]
+}
+
+## Yes check
+yes() {
+    [ "$checks_last_result" = "yes" ]
+}
+
+## No check
+no() {
+    [ "$checks_last_result" != "yes" ]
+}
+
+## Dependency list creator
+depends() {
+    # Syntax: depends <src> <packages>...
+    #   <src> can be `native`, `dotfile`, `pip`, `gem`, etc.
+    #   There must be a function called install_<src> to install the
+    #   dependencies.
+
+    local src package arrayname
+    src="$1"
+    package="$2"
+    shift 2
+
+    # Allow packages from arbitrary sources
+    arrayname="depends_$src"
+    append "$package" to "$arrayname"
+
+    # If there are more than one packages, recursively add more
+    [ $# -ne 0 ] && depends "$src" "$@"
+}
+
+## Append one item to a space-separated list
+append() {
+    # Syntax: append <item> to <array>
+
+    local item to array occurrence
+    item=$1
+    to=$2
+    array=$3
+
+    if [ $# -ne 3 ] || [ "$to" != "to" ]; then
+        error "Usage: append <item> to <array>"
+        exit 1
+    fi
+
+    if contains "$array" "$item"; then
+        debug "$item already exists in $array."
+        return
+    fi
+
+    eval "$array=\"\${$array} $item\""
+}
+
+## Install native package dependencies
+install_native() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing native packages: $@"
+
+    local sudo_command
+
+    # Check if sudo exists in the first place
+    is sudo command?
+    if yes; then
+        # Check if the user can access sudo
+        if ! sudo -v -p "Installing native packages requires sudo:"; then
+            is "$DOTFILE_CACHE_DIR" directory?
+            no && mkdir -p "$DOTFILE_CACHE_DIR"
+            
+            printf "%s\n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
+
+            if ! [ "$dotfile_sudo_warned" ]; then
+                warn "This account doesn't seem to have sudo access!"
+                warn "You may have to install some packages yourself."
+                warn "Refer to the native_pkgs.txt in ${XDG_CACHE_HOME} directory"
+                warn "after this command exits."
+
+                dotfile_sudo_warned="yes"
+            fi
+            return
+        fi
+
+        sudo_command='sudo'
+    else
+        # sudo doesn't exist and user is not root
+        if [ "$(id -u)" -ne 0 ]; then
+            error "This script requires sudo to install packages."
+            error "It seems like I cannot get root privilege via sudo."
+            return 120
+        fi
+    fi
+    
+    # TODO: support other platforms as well
+    is platform debian?
+    if yes; then
+        $sudo_command apt-get update && $sudo_command apt-get install -y "$@"
+        return
+    fi
+
+    is platform arch?
+    if yes; then
+        $sudo_command pacman -Sy --needed --noconfirm "$@"
+        return
+    fi
+
+    printf "%n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
+
+    if ! [ "$dotfile_unsupported_warned" ]; then
+        warn "This operating system is not supported by me!"
+        warn "You may have to install some packages yourself."
+        warn "Refer to the native_pkgs.txt in $DOTFILE_CACHE_DIR."
+
+        dotfile_unsupported_warned="yes"
+    fi
+}
+
+## Install PIP package dependencies
+install_pip() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing PIP dependencies: $@"
+
+    is pip command?
+    if no; then
+        info "pip is not found! Installing that first..."
+        install_native python python-pip
+    fi
+
+    pip install --user "$@"
+}
+
+## Install cargo dependencies
+install_cargo() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing Cargo dependencies: $@"
+
+    is cargo command?
+    if no; then
+        info "Cargo is not found! Installing that first..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    fi
+
+    cargo install "$@"
+}
+
+## Install rubygem dependencies
+install_gem() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing Ruby Gem dependencies: $@"
+
+    is gem command?
+    if no; then
+        info "gem is not found! Installing that first..."
+        install_native ruby rubygems
+    fi
+
+    gem install "$@"
+}
+
+## Install Arch User Repository dependencies
+install_aur() {
+    [ "$#" -eq 0 ] && return
+
+    if [ "$(id -u)" -eq 0 ]; then
+        error "This script cannot be run as root!"
+        error "Please make a user account to install packages from AUR."
+        exit 200
+    fi
+
+    install_native base-devel
+
+    is platform arch?
+    if no; then
+        error "AUR dependency can be installed in Arch Linux and its derivatives."
+        error "Tapping out..."
+        error "You may have to check the package's information file to verify"
+        error "platform-check routines."
+        exit 1
+    fi
+
+    is aur command?
+    if no; then
+        info "aurutils is not found! Installing that first..."
+
+        debug "Creating a new group for AUR repo..."
+        sudo groupadd aur
+
+        debug "Adding the current user to the new group..."
+        sudo usermod -aG aur "$USER"
+
+        debug "Building aurutils from AUR..."
+        local aurdir prevdir
+        prevdir="$(pwd)"
+        aurdir="/tmp/aurutils-download"
+
+        is "$aurdir" directory?
+        if yes; then
+            rm -rf "$aurdir"
+        fi
+
+        mkdir "$aurdir"
+
+        cd "$aurdir"
+
+        git clone https://aur.archlinux.org/aurutils
+
+        cd aurutils
+        makepkg -si --noconfirm
+
+        cd "$prevdir"
+        rm -rf "$aurdir"
+
+        printf '\n[aur]\nSigLevel = Optional TrustAll\nServer = file:///home/aur' "$USER" \
+            | sudo tee -a /etc/pacman.conf
+
+        sudo install -d /home/aur -g aur
+
+        # Setting up setgid bit
+        sudo chmod 770 /home/aur
+        sudo chmod g+s /home/aur
+
+        sg aur "repo-add /home/aur/aur.db.tar"
+
+        sudo pacman -Sy vifm
+    fi
+
+    for package in $@; do
+        sg aur "aur sync $package"
+    done
+
+    install_native $@
+}
+
+## Install dotfile package dependencies
+install_dotfile() {
+    [ "$#" -eq 0 ] && return
+
+    info "Installing dotfile dependencies..."
+    for pkg in $depends_dotfile; do
+        dotfile_install "$pkg"
+    done
+}
+
+
+## Action handlers
+################################
+
+# Print the usage information
+dotfile_usage() {
+    cat 1>&2 <<EOF
+USAGE:
+    $(basename "$0") <command>
+
+COMMANDS:
+    init         Initializes this machine.
+    install      Installs a package to this machine.
+    uninstall    Uninstalls a package from this machine.
+    update       Updates the repository to the most recent version.
+    remove       Remove all packages and try to make as clean as possible.
+    help         Displays this help message.
+EOF
+
+    if [ "$DOTFILE_DEBUG" -ne 0 ]; then
+        echo "    shell        Create a REPL instance."
+    fi
+}
+
+## Initialize the dotfile repository
+dotfile_init() {
+    # Initialization routine
+    # Things to do:
+    # 1. Create configuration file $DOTFILE_CONFIG_FILE
+    # 2. Create package folder $DOTFILE_DATA_DIR/
+    # 3. Verify all necessary binaries are here (git, stow, etc.)
+    # 4. Symbolic link itself to ~/.local/bin
+
+    # Create basic configuration file
+    is "$DOTFILE_CONFIG_FILE" file?
+    if no; then
+        info "Dotfile configuration file is not found. Creating..."
+        ensure mkdir -p "$XDG_CONFIG_HOME"
+        ensure touch "$DOTFILE_CONFIG_FILE"
+
+        info "Setting dotfile home directory as:"
+        echo "dotfile_home=$(dirname "$(realpath "$0")")" \
+            | ensure tee "$DOTFILE_CONFIG_FILE" \
+                     1>&2
+    fi
+
+    # Create directory where package data will be stored
+    is "$DOTFILE_DATA_DIR" directory?
+    if no; then
+        info "Dotfile package storage is not found. Creating..."
+        ensure mkdir -p "$DOTFILE_DATA_DIR"
+    fi
+
+    # git is required to update packages
+    is git command?
+    if no; then
+        info "git does not exist. Attempting to install..."
+        ensure install_native git
+    fi
+
+    # stow is required to make symbolic links
+    is stow command?
+    if no; then
+        info "stow does not exist. Attempting to install..."
+        ensure install_native stow
+    fi
+
+    # This script is going to be installed in local PATH
+    is "$HOME/.local/bin/dotfile" symlink?
+    if no; then
+        info "Installing dotfile binary to local binary directory..."
+        ensure mkdir -p "$HOME/.local/bin"
+        ensure ln -s "$(realpath "$0")" "$HOME/.local/bin/dotfile"
+    fi
+}
+
+## Install a dotfile package
+dotfile_install() {
+    if [ "$#" -ne 1 ]; then
+        error "You must provide one package!"
+        error "Usage: dotfile install <package>"
+        return 1
+    fi
+
+    local pkg
+    pkg="$1"
+
+    info "Installing dotfile package $pkg..."
+
+    # Check package sanity
+    is "$pkg" directory?
+    if no; then
+        error "Dotfile package $pkg is not found! Aborting..."
+        exit 2
+    fi
+
+    is "$pkg/pkginfo" file?
+    if no; then
+        error "$pkg is not a valid dotfile package. Aborting..."
+        exit 2
+    fi
+
+    # Check if package is already installed
+    is "$pkg" installed?
+    if yes; then
+        info "$pkg seems to be installed already! Skipping..."
+        return
+    fi
+
+    # Check circular dependency
+    if contains "$(stack_name ancestors)" "$pkg"; then
+        warn "Circular dependency detected! Ignoring the last attempt to install $pkg..."
+        warn "You may want to fix the package description file to resolve this issue."
+        return
+    fi
+
+    # If already visited, then do nothing
+    if contains "visited" "$pkg"; then
+        debug "Package $pkg is already installed by other package. Skipping..."
+        return
+    fi
+
+    # Load dotfile description file
+    . "$pkg/pkginfo"
+
+    # Mark current package as visited
+    append "$pkg" to "visited"
+
+    # Find out the direct dependencies
+    local difference
+    difference="$depends_dotfile"
+    for visited_pkg in $visited; do
+        difference=$(echo "$difference" | sed -E -e "s/^$visited_pkg | $visited_pkg|$visited_pkg | $visited_pkg\$//g")
+    done
+
+    # Install dependencies first
+    stack_push ancestors "$pkg"
+    for dependency in $difference; do
+        for src in $DOTFILE_AVAILABLE_SOURCES; do unset "depends_$src"; done
+        dotfile_install "$dependency"
+    done
+    stack_pop ancestors > /dev/null
+
+    # Unset pre- and post-installation hooks
+    unset -f pre_install post_install
+
+    # Source dotfile description file again to restore changed hooks
+    . "$pkg/pkginfo"
+
+    # Run the pre-installation hook
+    maybe pre_install
+
+    # Install external dependencies
+    for src in $DOTFILE_AVAILABLE_SOURCES; do
+        debug "Installing dependencies from $src..."
+        eval "install_$src \$depends_$src"
+
+        # Clear external dependency list after installation
+        unset "depends_$src"
+    done
+
+    # Stow the directory
+    debug "Symlinking the configuration files..."
+    ensure stow -S -t "$HOME" --ignore=".gitignore" --ignore="pkginfo" "$pkg"
+
+    # Copy description file to the data directory
+    ensure cp "$pkg/pkginfo" "$DOTFILE_DATA_DIR/$pkg"
+
+    # Run the post-installation hook
+    maybe post_install
+
+    info "$pkg package is installed!"
+
+    return
+}
+
+dotfile_uninstall() {
+    if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
+        error "You must provide one package!"
+        error "Usage: dotfile uninstall [--force] <package>"
+        return 1
+    fi
+
+    local force    
+    if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
+        force=1
+        shift
+    fi
+
+    local pkg
+    pkg="$1"
+
+    info "Uninstalling dotfile package $pkg..."
+
+    # Package should be installed before uninstalling
+    is "$DOTFILE_DATA_DIR/$pkg" file?
+    if no; then
+        error "Package '$pkg' is not installed currently."
+        error "Cannot uninstall a nonexistent package. Aborting..."
+        return 1
+    fi
+
+    # Check if any other package depends on this dotfile package
+    for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
+        # Skip the package to uninstall
+        [ "$pkg" = "$(basename $installed)" ] && continue
+
+        # Source the package description file to load dependencies
+        . "$installed"
+
+        # If the package description has the package as dependency,
+        # the package will not work so mark it
+        if contains "$depends_dotfile" "$pkg"; then
+            debug "$installed depends on $pkg!"
+            append "$installed" to broken_pkg
+        fi
+
+        # Reset the dotfile dependencies
+        unset depends_dotfile
+    done
+
+    # If there are to-be-broken packages, address them
+    if [ "$broken_pkg" ]; then
+        warn "Uninstalling this package will break dependencies for the following dotfiles:"
+        for broken in $broken_pkg; do
+            warn "  - $(basename $broken)"
+        done
+
+        # If not force, then crash and burn
+        if ! [ "$force" ]; then
+            error "Cannot remove $pkg due to dependency check failure."
+            error "To ignore this, use --force option."
+            return 1
+        fi
+    fi
+
+    # Unset pre- and post-uninstallation hooks
+    unset -f pre_uninstall post_uninstall
+
+    # Source dotfile description file again to restore changed hooks
+    . "$DOTFILE_DATA_DIR/$pkg"
+
+    # Run the pre-uninstallation hook
+    maybe pre_uninstall
+
+    # Unstow the directory
+    debug "Unstowing the configuration files..."
+    ensure stow -D "$pkg"
+
+    # Remove description file in the data directory
+    ensure rm -f "$DOTFILE_DATA_DIR/$pkg"
+
+    # Run the post-uninstallation hook
+    maybe post_uninstall
+
+    info "$pkg package is uninstalled!"
+
+    return
+}
+
+dotfile_update() {
+    # Fetch the changes from origin
+    git fetch origin
+
+    # Check which directories have changes
+    local changed_dirs
+    changed_dirs="$(git diff --name-only HEAD..origin/main | sed -e 's=^/==' -e 's=/.*==' | uniq)"
+    if [ -z "$changed_dirs" ]; then
+        info "Already up to date!"
+        return
+    fi
+
+    # Check if the directories are actually dotfile packages
+    local changed_pkgs
+    for candidate in $changed_dirs; do
+        if [ -e "$candidate/pkginfo" ]; then
+            debug "Package $candidate has changes available."
+            append "$candidate" to changed_pkgs
+        fi
+    done
+
+    # Remove packages with changes available
+    local installed_pkgs
+    for pkg in $changed_pkgs; do
+        dotfile_uninstall --force "$pkg"
+        append "$pkg" to installed_pkgs
+    done
+
+    # Try updating the repository...
+    if ! git merge --ff-only origin/main; then
+        error "Unable to fast-forward the update! Tapping out..."
+        error "It seems you have unsaved changes in the dotfile repository."
+        error "I'm gonna drop you into a new shell. In there, merge the commmits manually."
+
+        while true; do
+            sh
+
+            if [ -e ".git/MERGE_HEAD" ]; then
+                error "Merging is still in progress!"
+                error "Creating another shell for you..."
+            else
+                break
+            fi
+        done
+    fi
+
+    # Reinstall the updated packages
+    for pkg in $installed_pkgs; do
+        dotfile_install pkg
+    done
+
+    info "Update completed!"
+
+    return
+}
+
+dotfile_remove() {
+    warn "This program will delete all dotfiles from your computer"
+    warn "and self-destruct itself. Do you wish to continue?"
+    read -p "(yes/no): " choice
+    [ "$choice" != yes ] && return
+
+    # Delete all packages
+    for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
+        dotfile_uninstall --force "$(basename $installed)" 2>/dev/null
+        info "Uninstalled $installed."
+    done
+
+    # Remove dotfile configuration file
+    ensure rm -f "$DOTFILE_CONFIG_FILE"
+    info "Removed dotfile configuration file."
+
+    # Remove itself from local binary directory
+    ensure rm -f "$HOME/.local/bin/dotfile"
+    info "Removed dotfile symbolic link in local binary directory."
+
+    return
+}
+
+dotfile_shell() {
+    if [ "$DOTFILE_DEBUG" -eq 0 ]; then
+        error "Opening shell is not supported if DEBUG environment variable is not set!"
+        exit 1
+    fi
+
+    while true; do
+        read -r -p "dotfile> " line
+
+        [ "$line" = "exit" ] && break
+
+        eval "$line"
+    done
+}
+
+
+## Entrypoint
+################################
+
+# Take the first positional argument
+action="$1"
+if [ -z "$action" ]; then
+    error "You must supply at least one command!"
+    dotfile_usage
+    return 1
+fi
+shift
+
+# Display help message
+if [ "$action" = "help" ]; then
+    echo "dotfile -- automatic dotfile installer, because I am lazy as fuck"
+    echo ""
+    dotfile_usage
+    exit
+fi
+
+# If there is no dotfile configuration file, instruct the user to run
+# `dotfile init` first
+is "$DOTFILE_CONFIG_FILE" file?
+if yes; then
+    # Go to the dotfile home directory
+    ensure . "$DOTFILE_CONFIG_FILE"
+    debug "Changing directory to $dotfile_home..."
+    dotfile_old_pwd="$(pwd)"
+    cd "$dotfile_home"
+elif [ "$action" != init ]; then
+    error "Dotfile manager is not initialized yet!"
+    error "Please run \"dotfile init\" first."
+    exit 1
+fi
+
+case "$action" in
+    init)
+        dotfile_init "$@"
+        ;;
+
+    install)
+        dotfile_install "$@"
+        ;;
+
+    uninstall)
+        dotfile_uninstall "$@"
+        ;;
+
+    update)
+        dotfile_update "$@"
+        ;;
+
+    remove)
+        dotfile_remove "$@"
+        ;;
+
+    shell)
+        dotfile_shell "$@"
+        ;;
+
+    *)
+        error "Unknown command: $action"
+        dotfile_usage
+        ;;
+esac
+
+# Restore the directory
+[ "$dotfile_old_pwd" ] && cd "$dotfile_old_pwd"
+

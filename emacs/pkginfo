@@ -1,0 +1,19 @@
+#!/bin/sh
+
+depends native emacs
+
+post_install() {
+    legacy_config_dir=$(emacs --batch --eval '(if (< emacs-major-version 27) (print "Legacy") (print "XDG"))')
+
+    if [ $legacy_config_dir = "Legacy" ]; then
+        ln -s "~/.config/emacs" "~/emacs.d"
+    fi
+}
+
+pre_uninstall() {
+    legacy_config_dir=$(emacs --batch --eval '(if (< emacs-major-version 27) (print "Legacy") (print "XDG"))')
+
+    if [ $legacy_config_dir = "Legacy" ]; then
+        rm -f "~/emacs.d"
+    fi
+}

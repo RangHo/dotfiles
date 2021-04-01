@@ -1,0 +1,27 @@
+#!/bin/sh
+
+depends native pulseaudio \
+               bspwm \
+               sxhkd \
+               dunst \
+               feh \
+               wmname \
+               picom
+
+is platform arch?
+if yes; then depends aur polybar; fi
+
+depends dotfile gtk wal uim fontconfig
+
+pre_install() {
+    # Make sure these directories exist
+    is "~/Pictures" directory?
+    if no; then
+        mkdir -p ~/Pictures
+    fi
+
+    is "~/.config/systemd/user" directory?
+    if no; then
+        mkdir -p ~/.config/systemd/user
+    fi
+}

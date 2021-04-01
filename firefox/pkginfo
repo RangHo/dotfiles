@@ -1,0 +1,15 @@
+#!/bin/sh
+
+depends native firefox
+
+depends dotfile fontconfig
+
+pre_install() {
+    # This function is executed before the current dotfile package is installed.
+    debug "Creating a user profile directory..."
+    mkdir -p "$HOME/.mozilla/firefox/RangHo"
+
+    debug "Deleting existing user profile configuration file..."
+    rm -f "$HOME/.mozilla/firefox/profile.ini"
+}
+

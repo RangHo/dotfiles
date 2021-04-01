@@ -1,0 +1,11 @@
+#!/bin/sh
+
+depends native git
+
+pre_install() {
+     # Make sure template directory exists
+     is "~/Templates" directory?
+     if no; then
+         mkdir -p "~/Templates"
+     fi
+}

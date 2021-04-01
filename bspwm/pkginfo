@@ -15,13 +15,18 @@ depends dotfile gtk wal uim fontconfig
 
 pre_install() {
     # Make sure these directories exist
-    is "~/Pictures" directory?
+    is "~/Pictures/Resources" directory?
     if no; then
-        mkdir -p ~/Pictures
+        mkdir -p ~/Pictures/Resources
     fi
 
     is "~/.config/systemd/user" directory?
     if no; then
         mkdir -p ~/.config/systemd/user
+    fi
+
+    is "~/.local/bin" directory?
+    if no; then
+        mkdir -p ~/.local/bin
     fi
 }

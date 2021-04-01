@@ -1,3 +1,9 @@
 #!/bin/sh
 
 depends native uim
+
+is platform arch?
+if yes; then
+    # Provide fonts needed by uim (uim/uim#156)
+    depends native xorg-fonts-misc
+fi

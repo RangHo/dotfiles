@@ -39,3 +39,8 @@ Here are complete list of commands:
 | `dotfile uninstall [--force] <package>` | Uninstalls a package named `<package>`. Note that this does not uninstall binary dependencies. |
 | `dotfile update` | Updates the dotfiles repository. This feature is not tested rigorously, so use with caution. |
 | `dotfile remove` | Remove all packages from the machine. It does not guarantee that all artifacts are removed also. |
+
+## Screenshots
+![image](https://user-images.githubusercontent.com/10833976/113498541-ce85ef00-9548-11eb-847d-b40af369fbe8.png)
+![image](https://user-images.githubusercontent.com/10833976/113498569-160c7b00-9549-11eb-9944-34e362aa4c4b.png)
+![image](https://user-images.githubusercontent.com/10833976/113498617-756a8b00-9549-11eb-8907-8b814e313ec3.png)

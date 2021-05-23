@@ -4,8 +4,8 @@ depends native git
 
 pre_install() {
      # Make sure template directory exists
-     is "~/Templates" directory?
+     is "$HOME/Templates" directory?
      if no; then
-         mkdir -p "~/Templates"
+         mkdir -p "$HOME/Templates"
      fi
 }

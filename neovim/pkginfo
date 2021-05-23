@@ -10,11 +10,7 @@ post_install() {
     nvim +PlugInstall +qall
 }
 
-pre_uninstall() {
-    # This function is executed before the current dotfile packages is removed.
-}
-
 post_uninstall() {
-    # This function is executed after all packages are removed.
+    # Remove legacy vimrc
+    rm -rf ~/.vimrc ~/.vim
 }
-

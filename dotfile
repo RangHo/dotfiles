@@ -327,6 +327,7 @@ install_native() {
         return
     fi
 
+    mkdir -p $DOTFILE_CACHE_DIR
     printf "%n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
 
     if ! [ "$dotfile_unsupported_warned" ]; then
@@ -830,7 +831,7 @@ action="$1"
 if [ -z "$action" ]; then
     error "You must supply at least one command!"
     dotfile_usage
-    return 1
+    exit 1
 fi
 shift
 

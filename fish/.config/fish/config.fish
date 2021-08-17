@@ -12,7 +12,7 @@ if ! type -q fisher; and test "$__fish_fisher_installed" != yes
     set --universal __fish_fisher_installed yes
 
     # Install fisher properly
-    fisher install jorgebucaran/fisher
+    #fisher install jorgebucaran/fisher
 
     # Install other plugins
     fisher update

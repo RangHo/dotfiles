@@ -105,6 +105,9 @@ set mouse=a
 " Keybindings
 " -----------
 
+" Map <leader>w as Ctrl-W (for use in web terminals)
+nnoremap <leader>w <C-w>
+
 " Tab completion (asyncomplete.vim)
 imap <C-Space> <Plug>(asyncomplete_force_refresh)
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"

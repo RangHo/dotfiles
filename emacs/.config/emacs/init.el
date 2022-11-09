@@ -185,7 +185,7 @@
             (mapcar 'concat
                     (directory-files config-dir nil "\\.el")))))
 
-;; Apply theme
-(load-theme 'rangho)
+;; Apply theme without asking (coz I made it anyways)
+(load-theme 'rangho t)
 
 (provide 'init)

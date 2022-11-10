@@ -2,8 +2,9 @@
 
 ;; Use Svelte major mode
 (use-package svelte-mode
-  :hook (svelte-mode . lsp))
+  :hook (svelte-mode . eglot-ensure))
 
-(add-to-list 'lsp-language-id-configuration '(svelte-mode . "svelte"))
+(add-to-list 'eglot-server-programs
+             '(svelte-mode :language-id "svelte"))
 
 (provide 'language-svelte)

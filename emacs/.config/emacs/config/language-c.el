@@ -19,8 +19,8 @@
 (add-to-list 'auto-mode-alist '("\\.inl'" . c++-mode))
 
 ;; Use language server for C
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
 
 ;; Install CMake support
 (use-package cmake-mode)

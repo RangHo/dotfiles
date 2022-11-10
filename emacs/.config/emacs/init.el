@@ -135,19 +135,9 @@
   :config (global-company-mode))
 
 ;; Language Server Protocol support
-(use-package lsp-mode
-  :after company
-  :init (setq lsp-keymap-prefix "C-c l")
-  :commands lsp)
-(use-package lsp-ui
-  :commands lsp-ui)
-(use-package lsp-ivy
-  :after ivy
-  :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs
-  :after treemacs
-  :commands lsp-treemacs-error-list)
-(use-package dap-mode)
+;; Starting from Emacs 29, eglot langserver client is built-in.
+(if (< emacs-major-version 29)
+    (use-package eglot))
 
 ;; Appearance packages
 (use-package nyan-mode

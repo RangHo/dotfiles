@@ -75,7 +75,10 @@
 
 ;; Undo-tree undo manager
 (use-package undo-tree
-  :config (global-undo-tree-mode))
+  :config (global-undo-tree-mode)
+  :init
+  (setq undo-tree-history-directory-alist
+        `(("." . ,(concat user-emacs-directory "undo-tree")))))
 
 ;; Evil mode
 (use-package evil

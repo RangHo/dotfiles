@@ -2,9 +2,15 @@
 
 (deftheme rangho "RangHo's day-to-day Emacs theme")
 
+
 ;; ==============
 ;; User Interface
 ;; ==============
+
+;; No stupid startup stuff
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
 
 ;; Disable unnecessary UI elements after loading
 (menu-bar-mode 0)
@@ -14,7 +20,9 @@
 ;; Set default frame style
 (setq default-frame-alist
       (append (list '(width . 80)
-                    '(height . 25))))
+                    '(height . 25)
+                    '(left-fringe . 0)
+                    '(right-fringe . 0))))
 
 ;; No ugly checkboxes
 (setq widget-image-enable nil)
@@ -24,6 +32,7 @@
 
 ;; Enable visual bell
 (setq visual-bell t)
+
 
 ;; ============
 ;; Font-related
@@ -44,10 +53,20 @@
 (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK CN"))
 (set-fontset-font t 'unicode (font-spec :name "semteulche"))
 (set-fontset-font t
+                  ;; The `emoji' charset is introduced in Emacs 28.1
                   (if (version< emacs-version "28.1")
                       '(#x1f300 . #x1fad0)
                     'emoji)
                   (font-spec :name "Noto Color Emoji"))
+
+;; Enable font ligatures
+;; Emacs 27 has a problem dealing with ligatures.
+;; It's not worth trying to workaround this issue as I have to do make significant
+;; changes that I'd rather compile Emacs myself.
+(unless (= emacs-major-version 27)
+  (use-package ligature
+    :config
+    (global-ligature-mode)))
 
 ;; ===========
 ;; Colorscheme
@@ -55,8 +74,8 @@
 
 ;; Load values from pywal, if available
 ;; If colorscheme is not available, use a sensible "grayscale" as default
-(if (file-exists-p (concat user-cache-directory "/wal/colors.el"))
-    (require 'pywal-colors (concat user-cache-directory "/wal/colors.el") 'noerror)
+(if (file-exists-p (concat user-cache-directory "wal/colors.el"))
+    (require 'pywal-colors (concat user-cache-directory "wal/colors.el") 'noerror)
   (setq-default wal/foreground "#f7f7f7"
                 wal/background "#101010"
                 wal/cursor "#f7f7f7"
@@ -78,51 +97,106 @@
                 wal/color15 "#f7f7f7"))
 
 ;; Map color values to their representative colors
-;; Note: A plus sign(+) next to color name represents that
+;; Note: An `i' next to color name represents that
 ;; it is the "intense" variant of the color
-(let ((color/fg       wal/foreground)
-      (color/bg       wal/background)
-      (color/cursor   wal/cursor)
-      (color/black    wal/color0)
-      (color/black+   wal/color8)
-      (color/red      wal/color1)
-      (color/red+     wal/color9)
-      (color/green    wal/color2)
-      (color/green+   wal/color10)
-      (color/yellow   wal/color3)
-      (color/yellow+  wal/color11)
-      (color/blue     wal/color4)
-      (color/blue+    wal/color12)
-      (color/magenta  wal/color5)
-      (color/magenta+ wal/color13)
-      (color/cyan     wal/color6)
-      (color/cyan+    wal/color14)
-      (color/white    wal/color7)
-      (color/white+   wal/color15))
+(defvar rangho/color-name-alist
+  `((color/fg        . ,wal/foreground)
+    (color/bg        . ,wal/background)
+    (color/cursor    . ,wal/cursor)
+    (color/black     . ,wal/color0)
+    (color/blacki    . ,wal/color8)
+    (color/red       . ,wal/color1)
+    (color/redi      . ,wal/color9)
+    (color/green     . ,wal/color2)
+    (color/greeni    . ,wal/color10)
+    (color/yellow    . ,wal/color3)
+    (color/yellowi   . ,wal/color11)
+    (color/blue      . ,wal/color4)
+    (color/bluei     . ,wal/color12)
+    (color/magenta   . ,wal/color5)
+    (color/magentai  . ,wal/color13)
+    (color/cyan      . ,wal/color6)
+    (color/cyani     . ,wal/color14)
+    (color/white     . ,wal/color7)
+    (color/whitei    . ,wal/color15))
+  "Association list to map wal colors to friendly names.")
+
+;; List of shades to generate for each colors
+(defvar rangho/color-shade-list
+  (number-sequence -20 20 5)
+  "List of percentage values to lighten/darken the original colors.")
+
+;; Color manipulation utility
+(defun color-hex-to-rgb (color)
+  "Decompose hex representation of a color to 3-tuple (r, g, b)."
+  (list (/ (string-to-number (substring color 1 3) 16) 255.0)
+        (/ (string-to-number (substring color 3 5) 16) 255.0)
+        (/ (string-to-number (substring color 5) 16) 255.0)))
+
+(defun color-lighten-hex (color percent)
+  "Lighten or darken an RGB color string by percent."
+  (let* ((rgb (color-hex-to-rgb color))
+         (hsl (apply 'color-rgb-to-hsl rgb))
+         (hsl2 (apply 'color-lighten-hsl (nconc hsl `(,percent))))
+         (rgb2 (apply 'color-hsl-to-rgb hsl2)))
+    (apply 'color-rgb-to-hex (nconc rgb2 '(2)))))
+
+    ;; Color shade creation utility
+    (defun rangho/create-color-matrix-alist (color-alist lighten-list)
+    "Create a matrix of colors based on a color alist and list of shades."
+    ;; For each color association...
+    (append color-alist
+            (mapcan (lambda (original-color)
+                        ;; And then for each lighten value...
+                        (mapcar (lambda (lighten-value)
+                                ;; Create a list of...
+                                (cons (intern (concat (symbol-name (car original-color))
+                                                            (if (>= lighten-value 0) "+" "")
+                                                            (number-to-string lighten-value)))
+                                        (color-lighten-hex (cdr original-color) lighten-value)))
+                                lighten-list))
+                    color-alist)))
+
+    ;; Create a color matrix
+    (defvar rangho/color-matrix-alist
+    (rangho/create-color-matrix-alist rangho/color-name-alist
+                                        rangho/color-shade-list))
+
+;; Apply the color theme
+(require 'let-alist)
+(let-alist rangho/color-matrix-alist
   (custom-theme-set-faces
    'rangho
 
-   ;; Basic UI elements
-   `(default ((t (:foreground ,color/fg :background ,color/bg))))
-   `(cursor ((t (:foreground ,color/bg :background ,color/cursor))))
-   `(region ((t (:foreground ,color/black :background ,color/white))))
-   `(highlight ((t (:background, color/black+))))
-   `(button ((t (:underline t))))
-   `(link ((t (:foreground ,color/blue+ :underline t :weight bold))))
-   `(link-visited ((t (:foreground ,color/blue :underline t :weight normal))))
-   `(success ((t (:foreground ,color/green :weight bold))))
-   `(warning ((t :foreground ,color/yellow :weight bold))))
+   ;; Base faces
 
+   ;; Basic UI elements
+   `(default      ((t (:foreground ,.color/fg :background ,.color/bg))))
+   `(cursor       ((t (:foreground ,.color/bg :background ,.color/cursor))))
+   `(region       ((t (:foreground ,.color/bg :background ,.color/fg))))
+   `(highlight    ((t (:background ,.color/blacki))))
+   `(button       ((t (:underline t))))
+   `(link         ((t (:foreground ,.color/bluei :underline t :weight bold))))
+   `(link-visited ((t (:foreground ,.color/blue :underline t :weight normal))))
+   `(success      ((t (:foreground ,.color/green :weight bold))))
+   `(warning      ((t (:foreground ,.color/yellow :weight bold))))
+
+   ;; Modeline configuration
+   `(mode-line           ((t (:foreground ,.color/bg :background ,.color/fg+5 :box (:line-width 3 :color ,.color/fg :style nil)))))
+   `(mode-line-inactive  ((t (:foreground ,.color/fg :background ,.color/bg :box (:line-width 3 :color ,.color/bg :style nil)))))
+   `(mode-line-highlight ((t (:inherit highlight))))
+   `(mode-line-emphasis  ((t (:weight regular))))
+   `(mode-line-buffer-id ((t (:weight regular))))
+   
    ;; font-lock!
-   `(font-lock-comment-face ((t (:foreground ,color/green))))
-   `(font-lock-doc-face ((t (:foreground ,color/green+))))
-   `(font-lock-keyword-face ((t (:foreground ,color/blue+))))
-   `(font-lock-builtin-face ((t (:foreground ,color/blue))))
-   `(font-lock-type-face ((t (:foreground ,color/cyan))))
-   `(font-lock-string-face ((t (:foreground ,color/yellow+))))
-   `(font-lock-variable-name-face ((t (:foreground ,color/yellow))))
-   `(font-lock-constant-face ((t (:foreground ,color/magenta+))))
-   `(font-lock-function-name-face ((t (:foreground ,color/magenta))))
-   ))
+   `(font-lock-comment-face ((t (:foreground ,.color/green))))
+   `(font-lock-doc-face ((t (:foreground ,.color/greeni))))
+   `(font-lock-keyword-face ((t (:foreground ,.color/bluei))))
+   `(font-lock-builtin-face ((t (:foreground ,.color/blue))))
+   `(font-lock-type-face ((t (:foreground ,.color/cyan))))
+   `(font-lock-string-face ((t (:foreground ,.color/yellowi))))
+   `(font-lock-variable-name-face ((t (:foreground ,.color/yellow))))
+   `(font-lock-constant-face ((t (:foreground ,.color/magentai))))
+   `(font-lock-function-name-face ((t (:foreground ,.color/magenta))))))
 
 (provide-theme 'rangho)

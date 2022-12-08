@@ -8,10 +8,32 @@
 ;; Emacs configuration file, created by RangHo.
 ;;===============================================================================
 
+
+;;-------------------------------------------------------------------------------
+;; Early init settings
+;;
+;; These values impact the initialization process, so they must be set very early
+;; in the init file. Ususally performance-related and bootstraping stuff.
+;;-------------------------------------------------------------------------------
+
 ;; Emacs 26.2 apparently has a TLS bug
 (if (and (<= emacs-major-version 26)
          (<= emacs-minor-version 2))
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+
+;; Big GC threshold for big brain moments
+(defun rangho/increase-gc-threshold ()
+  "Increase the GC threshold to maximum.
+This function is never intended to be called on regular usage.
+Use when no user interaction is intended; i.e. initialization and minibuffer usage."
+  (setq gc-cons-threshold most-positive-fixnum))
+(defun rangho/decrease-gc-threshold ()
+  "Decrease the GC threshold to the default 800KB."
+  (setq gc-cons-threshold (* 800 1000)))
+(rangho/increase-gc-threshold) ; increase threshold during init
+(add-hook 'after-init-hook #'rangho/decrease-gc-threshold) ; revert back after init
+(add-hook 'minibuffer-setup-hook #'rangho/increase-gc-threshold) ; more space in minibuffer
+(add-hook 'minibuffer-exit-hook #'rangho/decrease-gc-threshold) ; exiting means more editing
 
 ;; Initialize straight.el first
 (defvar bootstrap-version)
@@ -26,6 +48,17 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+;; Replace use-package with straight-use-package
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+
+;;-------------------------------------------------------------------------------
+;; Constants and helpers
+;;
+;; Useful values that are used throughout the init file.
+;;-------------------------------------------------------------------------------
 
 ;; Useful user directory configurations
 (defconst user-config-directory
@@ -53,9 +86,12 @@
                    ".cache/")))
   "Per-user cache directory")
 
-;; Replace use-package with straight-use-package
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+
+;;-------------------------------------------------------------------------------
+;; Emacs behavior modification
+;;
+;; Default Emacs has its own quirks. Let's fix that.
+;;-------------------------------------------------------------------------------
 
 ;; Place custom file in its own file
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -66,19 +102,33 @@
 (unless (display-graphic-p)
   (xterm-mouse-mode))
 
-;; Hydra keybinding manager
-(use-package hydra)
+;; Move the autosave/backup files out of the way
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
-;; View which keybinding is available
-(use-package which-key
-  :config (which-key-mode))
+;; Ivy completion engine
+;; For future me: this is for M-x completion
+(use-package ivy
+  :diminish
+  :config (ivy-mode))
 
-;; Undo-tree undo manager
-(use-package undo-tree
-  :config (global-undo-tree-mode)
-  :init
-  (setq undo-tree-history-directory-alist
-        `(("." . ,(concat user-emacs-directory "undo-tree")))))
+;; Activate uim if available
+(setq-default uim-candidate-display-inline t)
+(when (require 'uim nil 'no-error)
+  (add-hook 'prog-mode-hook (lambda () (uim-mode))))
+
+;; Show ElDoc documentation in a child frame
+(use-package eldoc-box
+  :hook (prog-mode . eldoc-box-hover-at-point-mode))
+
+
+;;-------------------------------------------------------------------------------
+;; Keybindings
+;;
+;; Emacs is all about using keyboard. These packages make it even more enjoyable.
+;;-------------------------------------------------------------------------------
 
 ;; Evil mode
 (use-package evil
@@ -97,12 +147,24 @@
   :after evil
   :config (global-evil-surround-mode))
 
-;; EditorConfig plugin
-(use-package editorconfig
-  :config (editorconfig-mode))
+;; Hydra keybinding manager
+(use-package hydra)
 
-;; All-the-icons
-(use-package all-the-icons)
+;; View which keybinding is available
+(use-package which-key
+  :config (which-key-mode))
+
+
+;;-------------------------------------------------------------------------------
+;; Workspaces and projects
+;;
+;; Let's keep things nice and organized.
+;;-------------------------------------------------------------------------------
+
+;; Projectile project manager
+(use-package projectile
+  :ensure t
+  :config (projectile-mode 1))
 
 ;; Treemacs project explorer
 (use-package treemacs
@@ -121,44 +183,27 @@
   :after (treemacs evil))
 (use-package treemacs-magit
   :after (treemacs magit))
+(use-package treemacs-projectile
+  :after (treemacs projectile))
+
+;; All-the-icons and treemacs integration
+(use-package all-the-icons)
 (use-package treemacs-all-the-icons
   :after (treemacs all-the-icons)
   :config (treemacs-load-theme "all-the-icons"))
 
 ;; Magit git repository manager
-(use-package magit)
+(use-package magit
+  :init (if (not (boundp 'project-switch-commands))
+            (setq project-switch-commands nil))
+  :bind (("C-c g" . magit-file-dispatch)))
 
-;; Ivy completion engine
-(use-package ivy
-  :diminish
-  :config (ivy-mode))
 
-;; Company in-buffer completion engine
-(use-package company
-  :config (global-company-mode))
-
-;; Language Server Protocol support
-;; Starting from Emacs 29, eglot langserver client is built-in.
-(if (< emacs-major-version 29)
-    (use-package eglot))
-
-;; Appearance packages
-(use-package nyan-mode
-  :init
-  (setq nyan-animate-nyancat t)
-  (setq nyan-wavy-trail t)
-  :config (nyan-mode))
-
-;; Move the autosave/backup files out of the way
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
-
-;; Activate uim if available
-(setq-default uim-candidate-display-inline t)
-(when (require 'uim nil 'no-error)
-  (add-hook 'prog-mode-hook (lambda () (uim-mode))))
+;;-------------------------------------------------------------------------------
+;; Editing support
+;;
+;; Packages that are useful *specifically* when writing code.
+;;-------------------------------------------------------------------------------
 
 ;; Fuck tabs because reasons
 (setq-default indent-tabs-mode nil)
@@ -166,6 +211,48 @@
 
 ;; Display line number for programming-related modes
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+;; Language Server Protocol support
+;; Starting from Emacs 29, eglot langserver client is built-in.
+(if (< emacs-major-version 29)
+    (use-package eglot))
+
+;; Company in-buffer completion engine
+;; For future me: this is for code completion
+(use-package company
+  :config (global-company-mode))
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+;; Undo-tree undo manager
+(use-package undo-tree
+  :config (global-undo-tree-mode)
+  :init
+  (setq undo-tree-history-directory-alist
+        `(("." . ,(concat user-emacs-directory "undo-tree")))))
+
+;; EditorConfig plugin
+(use-package editorconfig
+  :config (editorconfig-mode))
+
+;; Use colorful delimiters because Lisp
+(use-package rainbow-delimiters
+  :hook prog-mode)
+
+;; Always auto-insert matching delimiters
+(add-hook 'prog-mode-hook 'electric-pair-mode)
+
+;; Show RGB color codes what they look like
+(use-package rainbow-mode
+  :init (setq rainbow-x-colors nil)
+  :hook prog-mode)
+
+
+;;-------------------------------------------------------------------------------
+;; Extra configurations
+;;
+;; Language-specific configuration or utilities go in a separate file.
+;;-------------------------------------------------------------------------------
 
 ;; Load non-global configurations
 (let* ((config-dir (concat user-emacs-directory "config"))

@@ -187,8 +187,10 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
   :after (treemacs projectile))
 
 ;; All-the-icons and treemacs integration
-(use-package all-the-icons)
+(use-package all-the-icons
+  :if (display-graphic-p))
 (use-package treemacs-all-the-icons
+  :if (display-graphic-p)
   :after (treemacs all-the-icons)
   :config (treemacs-load-theme "all-the-icons"))
 

@@ -19,7 +19,7 @@
 
 ;; Set default frame style
 (setq default-frame-alist
-      (append (list '(width . 80)
+      (append (list '(width . 115) ; 80 col of editor + 35 col of treemacs
                     '(height . 25)
                     '(left-fringe . 0)
                     '(right-fringe . 0))))
@@ -141,26 +141,26 @@
          (rgb2 (apply 'color-hsl-to-rgb hsl2)))
     (apply 'color-rgb-to-hex (nconc rgb2 '(2)))))
 
-    ;; Color shade creation utility
-    (defun rangho/create-color-matrix-alist (color-alist lighten-list)
-    "Create a matrix of colors based on a color alist and list of shades."
-    ;; For each color association...
-    (append color-alist
-            (mapcan (lambda (original-color)
-                        ;; And then for each lighten value...
-                        (mapcar (lambda (lighten-value)
-                                ;; Create a list of...
-                                (cons (intern (concat (symbol-name (car original-color))
-                                                            (if (>= lighten-value 0) "+" "")
-                                                            (number-to-string lighten-value)))
-                                        (color-lighten-hex (cdr original-color) lighten-value)))
-                                lighten-list))
-                    color-alist)))
+;; Color shade creation utility
+(defun rangho/create-color-matrix-alist (color-alist lighten-list)
+  "Create a matrix of colors based on a color alist and list of shades."
+  ;; For each color association...
+  (append color-alist
+          (mapcan (lambda (original-color)
+                    ;; And then for each lighten value...
+                    (mapcar (lambda (lighten-value)
+                              ;; Create a list of...
+                              (cons (intern (concat (symbol-name (car original-color))
+                                                    (if (>= lighten-value 0) "+" "")
+                                                    (number-to-string lighten-value)))
+                                    (color-lighten-hex (cdr original-color) lighten-value)))
+                            lighten-list))
+                  color-alist)))
 
-    ;; Create a color matrix
-    (defvar rangho/color-matrix-alist
-    (rangho/create-color-matrix-alist rangho/color-name-alist
-                                        rangho/color-shade-list))
+;; Create a color matrix
+(defvar rangho/color-matrix-alist
+  (rangho/create-color-matrix-alist rangho/color-name-alist
+                                    rangho/color-shade-list))
 
 ;; Apply the color theme
 (require 'let-alist)
@@ -182,8 +182,8 @@
    `(warning      ((t (:foreground ,.color/yellow :weight bold))))
 
    ;; Modeline configuration
-   `(mode-line           ((t (:foreground ,.color/bg :background ,.color/fg+5 :box (:line-width 3 :color ,.color/fg :style nil)))))
-   `(mode-line-inactive  ((t (:foreground ,.color/fg :background ,.color/bg :box (:line-width 3 :color ,.color/bg :style nil)))))
+   `(mode-line           ((t (:foreground ,.color/bg-10 :background ,.color/fg+10 :box (:line-width 3 :color ,.color/fg+10 :style nil)))))
+   `(mode-line-inactive  ((t (:foreground ,.color/fg-10 :background ,.color/bg+10 :box (:line-width 3 :color ,.color/bg+10 :style nil)))))
    `(mode-line-highlight ((t (:inherit highlight))))
    `(mode-line-emphasis  ((t (:weight regular))))
    `(mode-line-buffer-id ((t (:weight regular))))

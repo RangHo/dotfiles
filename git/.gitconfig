@@ -1,7 +1,6 @@
 [user]
 	email = hello@rangho.me
 	name = RangHo Lee
-	signingkey = 7418ADBAA9F8BD15
 [core]
 	pager = diff-so-fancy | less --tabs=4 -RFX
 	editor = nvim
@@ -21,6 +20,5 @@
 	whitespace = red reverse
 [commit]
 	template = ~/Templates/git-commit-template
-	gpgsign = true
 [init]
 	defaultBranch = main

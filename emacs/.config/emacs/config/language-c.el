@@ -25,4 +25,8 @@
 ;; Install CMake support
 (use-package cmake-mode)
 
+;; Install meson support
+(use-package meson-mode
+  :hook (meson-mode . company-mode))
+
 (provide 'language-c)

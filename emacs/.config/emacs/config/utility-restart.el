@@ -17,4 +17,9 @@
                                          #'rangho/start-emacs-nw)))))
     (save-buffers-kill-emacs)))
 
+(defun reload-emacs ()
+  "Reload the init.el file."
+  (interactive)
+  (load-file user-init-file))
+
 (provide 'utility-restart)

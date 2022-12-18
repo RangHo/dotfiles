@@ -7,3 +7,5 @@
 
 (use-package typescript-mode
   :hook (typescript-mode . eglot-ensure))
+
+(provide 'language-javascript)

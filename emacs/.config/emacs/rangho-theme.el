@@ -7,6 +7,15 @@
 ;; User Interface
 ;; ==============
 
+;; Set default frame style
+(setq default-frame-alist
+      (list '(width . 115) ; 80 col of editor + 35 col of treemacs
+                    '(height . 25)
+                    '(left-fringe . 0)
+                    '(right-fringe . 0)
+                    '(horizontal-scroll-bar . nil)
+                    '(vertical-scroll-bar . nil)))
+
 ;; No stupid startup stuff
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-message t)
@@ -16,13 +25,6 @@
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
-
-;; Set default frame style
-(setq default-frame-alist
-      (append (list '(width . 115) ; 80 col of editor + 35 col of treemacs
-                    '(height . 25)
-                    '(left-fringe . 0)
-                    '(right-fringe . 0))))
 
 ;; No ugly checkboxes
 (setq widget-image-enable nil)
@@ -45,19 +47,34 @@
 ;;   - Hangul   : 다람쥐 헌 쳇바퀴에 타고파.
 ;;   - Kana     : いろはにほへと ちりぬるを / わかよたれそ つねならむ
 ;;   - Emoji(?) : I'm blue, da💨🎟️ ba🐋🐟 dee 🐦👖da📘🔷 ba💙💠 dai🌊🌀
-(set-face-attribute 'default nil
-                    :font "semteulche"
-                    :height 110)
-(set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
-(set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
-(set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK CN"))
-(set-fontset-font t 'unicode (font-spec :name "semteulche"))
-(set-fontset-font t
-                  ;; The `emoji' charset is introduced in Emacs 28.1
-                  (if (version< emacs-version "28.1")
-                      '(#x1f300 . #x1fad0)
-                    'emoji)
-                  (font-spec :name "Noto Color Emoji"))
+(defun rangho/set-fontset-font ()
+  "Set the default font to use throughout Emacs."
+  (interactive)
+  (set-face-attribute 'default nil
+                      :font "semteulche"
+                      :height 110)
+  (set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
+  (set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
+  (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK CN"))
+  (set-fontset-font t 'unicode (font-spec :name "semteulche"))
+  (set-fontset-font t
+                    ;; The `emoji' charset is introduced in Emacs 28.1
+                    (if (version< emacs-version "28.1")
+                        '(#x1f300 . #x1fad0)
+                      'emoji)
+                    (font-spec :name "Noto Color Emoji")))
+
+;; There are three cases:
+;;   1. daemon mode,
+;;   2. graphical mode,
+;;   3. terminal mode.
+(cond ((daemonp) (add-hook 'after-make-frame-functions
+                           (lambda (frame)
+                             (select-frame frame)
+                             (if (display-graphic-p frame)
+                                 (rangho/set-fontset-font)))))
+      ((display-graphic-p) (rangho/set-fontset-font))
+      (t nil))
 
 ;; Enable font ligatures
 ;; Emacs 27 has a problem dealing with ligatures.
@@ -67,6 +84,7 @@
   (use-package ligature
     :config
     (global-ligature-mode)))
+
 
 ;; ===========
 ;; Colorscheme

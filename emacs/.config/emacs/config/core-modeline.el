@@ -7,7 +7,7 @@
 ;; all-the-icons *should* be installed by now
 ;; unless Emacs is running in a terminal, of course
 (use-package all-the-icons
-  :if (display-graphic-p)
+  :if (or (daemonp) (display-graphic-p))
   :ensure t)
 
 ;; Nyanyanyanyanyanyanya!
@@ -31,6 +31,11 @@
   (eq rangho/selected-window (or target
                                  (selected-window))))
 
+(defun rangho/selected-window-graphic-p (&optional target)
+  "Check if the selected window's frame is graphical."
+  (display-graphic-p (window-frame (or target
+                                       (selected-window)))))
+
 (defun rangho/set-selected-window (&rest _)
   "Function to call when the selected window changes."
   (unless (minibuffer-window-active-p (frame-selected-window))
@@ -46,16 +51,16 @@
 
 (defun rangho/faicon (icon-name)
   "Grab a FontAwesome icon using the `icon-name' string, with the appropriate centering offset."
-  (if (display-graphic-p)
+  (if (rangho/selected-window-graphic-p)
       (all-the-icons-faicon icon-name :height 1.0 :v-adjust 0.0)
     " "))
 
 (defconst rangho/buffer-status-alist
-  `(("*" ,(rangho/faicon "circle") ; edited, yet to be saved
+  `(("*" "circle" ; edited, yet to be saved
      :background "#f0c674" :foreground "#1d1f21")
-    ("-" ,(rangho/faicon "check-circle") ; saved
+    ("-" "check-circle" ; saved
      :background "#b5bd68" :foreground "#1d1f21")
-    ("%" ,(rangho/faicon "times-circle") ; read-only
+    ("%" "times-circle" ; read-only
      :background "#cc6666" :foreground "#1d1f21"))
   "List of icons and faces to indicate the current status of the buffer")
 
@@ -63,7 +68,7 @@
   "Modeline component that indicates the current status of buffer."
   (let* ((current-status (assoc (format-mode-line "%*")
                                 rangho/buffer-status-alist))
-         (status-icon (cadr current-status))
+         (status-icon (rangho/faicon (cadr current-status)))
          (status-prop (cddr current-status)))
     (funcall 'propertize
              (concat " " status-icon " ")
@@ -123,7 +128,7 @@
    " "
 
    ;; Show the file/buffer name with appropriate icons
-   (when (display-graphic-p)
+   (when (rangho/selected-window-graphic-p)
      (concat
       (all-the-icons-icon-for-file (buffer-name) :height 0.90 :v-adjust 0.0)
       " "))
@@ -132,7 +137,7 @@
    ;; If project is available show that as well
    (when (and (buffer-file-name) (project-current))
      (concat " in "
-             (when (display-graphic-p)
+             (when (rangho/selected-window-graphic-p)
                (concat
                 (all-the-icons-octicon "repo" :height 0.90 :v-adjust 0.0)
                 " "))
@@ -141,7 +146,7 @@
    ;; Show the branch name, if available
    (when (and (buffer-file-name) (vc-git--symbolic-ref (buffer-file-name)))
      (concat " on "
-             (when (display-graphic-p)
+             (when (rangho/selected-window-graphic-p)
                (concat
                 (all-the-icons-octicon "git-branch" :height 0.90 :v-adjust 0.0)
                 " "))
@@ -149,7 +154,7 @@
 
    ;; Show the current major mode
    (concat " using "
-           (when (display-graphic-p)
+           (when (rangho/selected-window-graphic-p)
              (concat
               (all-the-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
               " "))

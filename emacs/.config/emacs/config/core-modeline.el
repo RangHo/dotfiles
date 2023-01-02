@@ -114,6 +114,16 @@
                'face (append status-prop
                              `(:weight bold :box (:color ,(plist-get status-prop :background))))))))
 
+(defvar rangho/current-buffer-project
+  (project-current)
+  "Name of the current project, updated whenever active buffer changes.")
+
+(defun rangho/update-buffer-project (_)
+  "Update the current buffer's project name."
+  (setq rangho/current-buffer-project (project-current)))
+
+(add-hook 'window-buffer-change-functions #'rangho/update-buffer-project)
+
 (defun rangho/mode-line-buffer-description ()
   "Modeline component that shows what file is being edited."
   ;; Basically,it displays the current information in the following form:
@@ -135,13 +145,13 @@
    (buffer-name)
 
    ;; If project is available show that as well
-   (when (and (buffer-file-name) (project-current))
+   (when (and (buffer-file-name) rangho/current-buffer-project)
      (concat " in "
              (when (rangho/selected-window-graphic-p)
                (concat
                 (all-the-icons-octicon "repo" :height 0.90 :v-adjust 0.0)
                 " "))
-             (file-name-nondirectory (directory-file-name (cdr (project-current))))))
+             (file-name-nondirectory (directory-file-name (cdr rangho/current-buffer-project)))))
 
    ;; Show the branch name, if available
    (when (and (buffer-file-name) (vc-git--symbolic-ref (buffer-file-name)))
@@ -154,7 +164,8 @@
 
    ;; Show the current major mode
    (concat " using "
-           (when (rangho/selected-window-graphic-p)
+           (when (and (rangho/selected-window-graphic-p)
+                      (assoc major-mode all-the-icons-mode-icon-alist))
              (concat
               (all-the-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
               " "))

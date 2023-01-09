@@ -114,10 +114,13 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
   :diminish
   :config (ivy-mode))
 
-;; Activate uim if available
+;; Activate uim if available, or fall back to elisp IME
 (setq-default uim-candidate-display-inline t)
-(when (require 'uim nil 'no-error)
-  (add-hook 'prog-mode-hook (lambda () (uim-mode))))
+(if (require 'uim nil 'no-error)
+    (add-hook 'prog-mode-hook (lambda () (uim-mode)))
+  (set-input-method "korean-hangul390"))
+
+
 
 ;; Show ElDoc documentation in a child frame
 (use-package eldoc-box

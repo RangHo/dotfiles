@@ -28,7 +28,7 @@
 ;;; Code:
 
 (require 'quail)
-(require 'cl)
+(require 'cl-lib)
 (load-library "hanja-util")
 
 ;; Hangul double jamo table.

@@ -93,6 +93,9 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
 ;; Default Emacs has its own quirks. Let's fix that.
 ;;-------------------------------------------------------------------------------
 
+;; Apply theme without asking (coz I made it anyways)
+(load-theme 'rangho t)
+
 ;; Place custom file in its own file
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (if (file-exists-p custom-file)
@@ -269,8 +272,5 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
       (mapc load-user-config-file
             (mapcar 'concat
                     (directory-files config-dir nil "\\.el")))))
-
-;; Apply theme without asking (coz I made it anyways)
-(load-theme 'rangho t)
 
 (provide 'init)

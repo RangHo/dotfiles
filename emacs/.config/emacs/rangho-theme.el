@@ -46,12 +46,15 @@
 ;;   - Alphabet : The quick brown fox jumps over the lazy dog.
 ;;   - Hangul   : 다람쥐 헌 쳇바퀴에 타고파.
 ;;   - Kana     : いろはにほへと ちりぬるを / わかよたれそ つねならむ
-;;   - Emoji(?) : I'm blue, da💨🎟️ ba🐋🐟 dee 🐦👖da📘🔷 ba💙💠 dai🌊🌀
+;;   - Emoji(?) : I'm blue, da💨🎟 ba🐋🐟 dee 🐦👖da📘🔷 ba💙💠 dai🌊🌀
 (defun rangho/set-fontset-font ()
   "Set the default font to use throughout Emacs."
   (interactive)
   (set-face-attribute 'default nil
                       :font "semteulche"
+                      :height 110)
+  (set-face-attribute 'variable-pitch nil
+                      :font "Noto Sans CJK KR"
                       :height 110)
   (set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
   (set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
@@ -138,6 +141,9 @@
     (color/white     . ,wal/color7)
     (color/whitei    . ,wal/color15))
   "Association list to map wal colors to friendly names.")
+
+;; Load color utility
+(require 'color)
 
 ;; List of shades to generate for each colors
 (defvar rangho/color-shade-list

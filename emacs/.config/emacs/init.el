@@ -129,6 +129,9 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
+;; Do not show native compilation warnings; they are annoying
+(setq native-comp-async-report-warnings-errors nil)
+
 
 ;;-------------------------------------------------------------------------------
 ;; Keybindings

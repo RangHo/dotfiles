@@ -169,7 +169,9 @@
              (concat
               (all-the-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
               " "))
-           mode-name)))
+           (if (listp mode-name)
+               (car mode-name)
+             mode-name))))
 
 (defun rangho/mode-line-line-column ()
   "Modeline component that displays the current line and column number."

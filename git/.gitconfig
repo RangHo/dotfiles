@@ -2,7 +2,7 @@
 	email = hello@rangho.me
 	name = RangHo Lee
 [core]
-	pager = diff-so-fancy | less --tabs=4 -RFX
+	pager = delta
 	editor = nvim
 [color]
 	ui = true
@@ -20,5 +20,14 @@
 	whitespace = red reverse
 [commit]
 	template = ~/Templates/git-commit-template
+	gpgSign = false
 [init]
 	defaultBranch = main
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictstyle = diff3
+[diff]
+	colorMoved = default

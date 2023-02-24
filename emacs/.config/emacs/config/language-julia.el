@@ -3,4 +3,7 @@
 ;; Install Julia major mode
 (use-package julia-mode)
 
+;; Eglot Julia helper package
+(use-package eglot-jl)
+
 (provide 'language-julia)

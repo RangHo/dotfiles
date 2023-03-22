@@ -12,7 +12,6 @@
   :after evil
   :ensure t
   :hook (prog-mode . copilot-mode)
-  :init (evil-define-key 'insert copilot-mode-map (kbd "<tab>") #'rangho/copilot-tab))
-
+  :init (evil-define-key 'insert copilot-mode-map (kbd "TAB") #'rangho/copilot-tab))
 
 (provide 'utility-copilot)

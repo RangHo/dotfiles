@@ -3,9 +3,9 @@
 ;; Emacs 27 has good JS mode including JSX support
 (if (< emacs-major-version 27)
     (use-package js2-mode
-      :hook (js2-mode . eglot-ensure)))
+      :hook (js2-mode . lsp-deferred)))
 
 (use-package typescript-mode
-  :hook (typescript-mode . eglot-ensure))
+  :hook (typescript-mode . lsp-deferred))
 
 (provide 'language-javascript)

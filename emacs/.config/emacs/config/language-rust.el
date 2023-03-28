@@ -2,11 +2,11 @@
 
 ;; Install Rust major mode
 (use-package rust-mode
-  :hook (rust-mode . eglot-ensure))
+  :hook (rust-mode . lsp-deferred))
 
 ;; Use rustfmt when saving sources
 (add-hook 'before-save-hook (lambda ()
                               (when (eq major-mode 'rust-mode)
-                                (eglot-format-buffer))))
+                                (lsp-format-buffer))))
 
 (provide 'language-rust)

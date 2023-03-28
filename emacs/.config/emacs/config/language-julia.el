@@ -4,6 +4,6 @@
 (use-package julia-mode)
 
 ;; Eglot Julia helper package
-(use-package eglot-jl)
+(use-package lsp-julia)
 
 (provide 'language-julia)

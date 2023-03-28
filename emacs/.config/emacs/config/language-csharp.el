@@ -4,6 +4,6 @@
 (use-package csharp-mode
   :mode (("\\.cs\\'" . csharp-mode)
          ("\\.csx\\'" . csharp-mode))
-  :hook (csharp-mode . eglot-ensure))
+  :hook (csharp-mode . lsp-deferred))
 
 (provide 'language-csharp)

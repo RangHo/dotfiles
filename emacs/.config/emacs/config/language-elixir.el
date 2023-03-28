@@ -2,6 +2,6 @@
 
 ;; Add Elixir syntax highlight support
 (use-package elixir-mode
-  :hook (elixir-mode . eglot-ensure))
+  :hook (elixir-mode . lsp-deferred))
 
 (provide 'language-elixir)

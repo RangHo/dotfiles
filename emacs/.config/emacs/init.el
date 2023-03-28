@@ -123,8 +123,6 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
     (add-hook 'prog-mode-hook (lambda () (uim-mode)))
   (set-input-method "korean-hangul390"))
 
-
-
 ;; Show ElDoc documentation in a child frame
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
@@ -223,10 +221,28 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
 ;; Display line number for programming-related modes
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
+;; Flycheck syntax checker
+(use-package flycheck
+  :init (global-flycheck-mode))
+
 ;; Language Server Protocol support
-;; Starting from Emacs 29, eglot langserver client is built-in.
-(if (< emacs-major-version 29)
-    (use-package eglot))
+(use-package lsp-mode
+  :after (flycheck which-key)
+  :commands (lsp lsp-deferred)
+  :init (setq lsp-keymap-prefix "C-c l")
+  :config (lsp-enable-which-key-integration t))
+(use-package lsp-ui
+  :after (lsp-mode)
+  :commands lsp-ui-mode)
+(use-package lsp-ivy
+  :after (lsp-mode ivy)
+  :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs
+  :after (lsp-mode treemacs)
+  :commands lsp-treemacs-errors-list)
+(use-package dap-mode
+  :after lsp-mode
+  :config (dap-auto-configure-mode))
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion

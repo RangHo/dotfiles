@@ -14,9 +14,6 @@ if not type -q fisher
     set xdg_config_home_backup $XDG_CONFIG_HOME
     set -x XDG_CONFIG_HOME $tmpdir
 
-    # Install fisher properly
-    #fisher install jorgebucaran/fisher
-
     # Install other plugins
     fisher update
 
@@ -25,29 +22,33 @@ if not type -q fisher
     set -gx XDG_CONFIG_HOME $xdg_config_home_backup
 end
 
-# If fish_plugins file is different, run fisher update
-diff -q -w (cat $__fish_config_dir/fish_plugins | sort | psub) (fisher list | sort | psub); \
+# Try updating the plugins
+if not set --query __dotfiles_fish_update
+    set -x __dotfiles_fish_update 1
+
+    diff -qw (cat $__fish_config_dir/fish_plugins | sort | psub) (fisher list | sort | psub) >/dev/null
     or fisher update
+end
 
 # Fix curses-based GPG pinentry screen
 set -gx GPG_TTY (tty)
 
-# If on WSL, then set VcXsrv as main display
-if uname -r | grep -q -e [Mm]icrosoft
-    set -gx DISPLAY (grep nameserver /etc/resolv.conf | cut -d ' ' -f 2):0
-    set -gx LIBGL_ALWAYS_INDIRECT 1
-end
-
 # Import wal colorscheme, if exists
-test -e ~/.cache/wal/sequences; \
-    and /bin/cat ~/.cache/wal/sequences
+test -e ~/.cache/wal/sequences
+and /bin/cat ~/.cache/wal/sequences
 
 # If there is ~/.profile, then source the file
-if test -e ~/.profile
-    fenv "source ~/.profile"
-end
+test -e ~/.profile
+and fenv "source ~/.profile"
 
 # If asdf version manager is installed, use that
-if test -d ~/.asdf
-    source ~/.asdf/asdf.fish
-end
+test -e ~/.asdf/asdf.fish
+and source ~/.asdf/asdf.fish
+
+# If rtx version manager is installed, use that
+type -q rtx
+and rtx activate fish | source
+
+# If thefuck command correction engine is installed, use that
+type -q thefuck
+and thefuck --alias | source

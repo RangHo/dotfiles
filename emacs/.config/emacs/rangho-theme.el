@@ -1,5 +1,11 @@
 ;;; rangho-theme.el --- RangHo's Emacs theme
 
+;;; Commentary:
+
+;; My Emacs theme.
+
+;;; Code:
+
 (deftheme rangho "RangHo's day-to-day Emacs theme")
 
 
@@ -66,6 +72,61 @@
                         '(#x1f300 . #x1fad0)
                       'emoji)
                     (font-spec :name "Noto Color Emoji")))
+
+(defvar rangho/serif-font-ignore-face-list
+  '( ;; Texts highlighted with font-lock
+    font-lock-builtin-face
+    font-lock-comment-face
+    font-lock-comment-delimiter-face
+    font-lock-constant-face
+    font-lock-doc-face
+    font-lock-function-name-face
+    font-lock-keyword-face
+    font-lock-negation-char-face
+    font-lock-preprocessor-face
+    font-lock-regexp-grouping-backslash
+    font-lock-regexp-grouping-construct
+    font-lock-string-face
+    font-lock-type-face
+    font-lock-variable-name-face
+    font-lock-warning-face
+    font-lock-error-face)
+  "List of faces to ignore when setting serif font.")
+
+(defun rangho/toggle-serif-font ()
+  "Toggle serif font for the current buffer non-code related texts."
+  (interactive)
+  (when (display-graphic-p)
+    (let ((serif-family "Noto Serif CJK KR")
+          (serif-height 120)
+          (default-family (face-attribute 'default :family))
+          (default-height (face-attribute 'default :height)))
+      (if (not (bound-and-true-p rangho/serif-font-enabled))
+          (progn
+            ;; Serif is not enabled now; enable it
+            (make-local-variable 'rangho/serif-font-enabled)
+            (make-local-variable 'rangho/serif-font-preserved)
+            (setq rangho/serif-font-enabled
+                  (face-remap-add-relative 'default
+                                           :family serif-family
+                                           :height serif-height))
+            (setq rangho/serif-font-preserved nil)
+
+            ;; Restore the default font for code-related texts
+            (dolist (face rangho/serif-font-ignore-face-list)
+              (add-to-list 'rangho/serif-font-preserved
+                           (face-remap-add-relative face
+                                                    :family default-family
+                                                    :height default-height)))
+            (message "Serif font enabled in the current buffer."))
+        (progn
+          ;; Serif is enabled; disable it
+          (face-remap-remove-relative rangho/serif-font-enabled)
+          (dolist (face rangho/serif-font-preserved)
+            (face-remap-remove-relative face))
+          (setq rangho/serif-font-enabled nil)
+          (setq rangho/serif-font-preserved nil)
+          (message "Serif font disabled in the current buffer."))))))
 
 ;; There are three cases:
 ;;   1. daemon mode,
@@ -152,13 +213,13 @@
 
 ;; Color manipulation utility
 (defun color-hex-to-rgb (color)
-  "Decompose hex representation of a color to 3-tuple (r, g, b)."
+  "Decompose hex representation of a COLOR to 3-tuple (r, g, b)."
   (list (/ (string-to-number (substring color 1 3) 16) 255.0)
         (/ (string-to-number (substring color 3 5) 16) 255.0)
         (/ (string-to-number (substring color 5) 16) 255.0)))
 
 (defun color-lighten-hex (color percent)
-  "Lighten or darken an RGB color string by percent."
+  "Lighten or darken an RGB color string COLOR by PERCENT."
   (let* ((rgb (color-hex-to-rgb color))
          (hsl (apply 'color-rgb-to-hsl rgb))
          (hsl2 (apply 'color-lighten-hsl (nconc hsl `(,percent))))
@@ -167,7 +228,7 @@
 
 ;; Color shade creation utility
 (defun rangho/create-color-matrix-alist (color-alist lighten-list)
-  "Create a matrix of colors based on a color alist and list of shades."
+  "Create a matrix of colors based on a COLOR-ALIST and LIGHTEN-LIST."
   ;; For each color association...
   (append color-alist
           (mapcan (lambda (original-color)
@@ -224,3 +285,5 @@
    `(font-lock-function-name-face ((t (:foreground ,.color/magenta))))))
 
 (provide-theme 'rangho)
+
+;;; rangho-theme.el ends here

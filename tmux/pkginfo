@@ -1,0 +1,28 @@
+#!/bin/sh
+
+## dotinfo template file
+##
+## The following commands are available:
+##   * debug, info, warn, error - shows messages to the user
+##   * depends <type> <packages...> - adds following files to dependency list
+depends native tmux
+
+pre_install() {
+    # This function is executed before the current dotfile package is installed.
+    true
+}
+
+post_install() {
+    # This function is executed after all required packages are installed.
+    true
+}
+
+pre_uninstall() {
+    # This function is executed before the current dotfile packages is removed.
+    true
+}
+
+post_uninstall() {
+    # This function is executed after all packages are removed.
+    true
+}

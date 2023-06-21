@@ -86,6 +86,9 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
                    ".cache/")))
   "Per-user cache directory")
 
+;; Long-lost Emacs string manipulation library
+(use-package s)
+
 
 ;;-------------------------------------------------------------------------------
 ;; Emacs behavior modification
@@ -115,7 +118,9 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
 ;; For future me: this is for M-x completion
 (use-package ivy
   :diminish
-  :config (ivy-mode))
+  :config
+  (ivy-mode)
+  (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
 
 ;; Activate uim if available, or fall back to elisp IME
 (setq-default uim-candidate-display-inline t)

@@ -1,6 +1,9 @@
 ;;; language-python.el --- Langugage support for python
 
-;; Use langauge server for Python
-(add-hook 'python-mode-hook 'lsp-deferred)
+;; Use pyright as the primary language server
+(use-package lsp-pyright
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp-deferred))))
 
 (provide 'language-python)

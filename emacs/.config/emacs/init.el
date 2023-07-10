@@ -68,7 +68,7 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
          (file-name-as-directory (getenv "XDG_CONFIG_HOME")))
         (t (concat (file-name-as-directory (getenv "HOME"))
                    ".config/")))
-  "Per-user configuration directory")
+  "Per-user configuration directory.")
 (defconst user-data-directory
   (cond ((eq system-type 'windows-nt)
          (file-name-as-directory (getenv "AppData")))
@@ -76,7 +76,7 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
          (file-name-as-directory (getenv "XDG_DATA_HOME")))
         (t (concat (file-name-as-directory (getenv "HOME"))
                    ".local/share/")))
-  "Per-user data directory")
+  "Per-user data directory.")
 (defconst user-cache-directory
   (cond ((eq system-type 'windows-nt)
          (file-name-as-directory (concat user-data-directory "Cache")))
@@ -84,7 +84,7 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
          (file-name-as-directory (getenv "XDG_CACHE_HOME")))
         (t (concat (file-name-as-directory (getenv "HOME"))
                    ".cache/")))
-  "Per-user cache directory")
+  "Per-user cache directory.")
 
 ;; Long-lost Emacs string manipulation library
 (use-package s)

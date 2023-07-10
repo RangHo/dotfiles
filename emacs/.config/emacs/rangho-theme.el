@@ -13,24 +13,31 @@
 ;; User Interface
 ;; ==============
 
-;; Set default frame style
-(setq default-frame-alist
-      (list '(width . 115) ; 80 col of editor + 35 col of treemacs
-                    '(height . 25)
-                    '(left-fringe . 0)
-                    '(right-fringe . 0)
-                    '(horizontal-scroll-bar . nil)
-                    '(vertical-scroll-bar . nil)))
-
 ;; No stupid startup stuff
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-message t)
 (setq inhibit-startup-echo-area-message t)
 
+;; Set default frame style
+(setq default-frame-alist
+      (list '(width . 115) ; 80 col of editor + 35 col of treemacs
+            '(height . 25)
+            '(left-fringe . 0)
+            '(right-fringe . 0)
+            '(internal-border-width . 10)))
+
 ;; Disable unnecessary UI elements after loading
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
+
+;; Disable scrollbars when making new frames
+(defun rangho/disable-scroll-bars (frame)
+  "Disable scrollbars in FRAME."
+  (modify-frame-parameters frame
+                           '((vertical-scroll-bars . nil)
+                             (horizontal-scroll-bars . nil))))
+(add-hook 'after-make-frame-functions 'rangho/disable-scroll-bars)
 
 ;; No ugly checkboxes
 (setq widget-image-enable nil)
@@ -64,7 +71,8 @@
                       :height 110)
   (set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
   (set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
-  (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK CN"))
+  (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK SC"))
+  (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK TC"))
   (set-fontset-font t 'unicode (font-spec :name "semteulche"))
   (set-fontset-font t
                     ;; The `emoji' charset is introduced in Emacs 28.1
@@ -147,6 +155,19 @@
 (unless (= emacs-major-version 27)
   (use-package ligature
     :config
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
     (global-ligature-mode)))
 
 

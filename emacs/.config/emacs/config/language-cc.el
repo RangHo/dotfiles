@@ -57,8 +57,8 @@
                                   (use-tab (rangho/clang-format-item clang-format-string "UseTab" "Never")))
                              (progn
                                (setq-local c-basic-offset (string-to-number indent-width))
-                               (setq-local indent-tabs-mode (not (string-equal use-tab "Never")))))))
-         (before-save . clang-format-buffer)))
+                               (setq-local indent-tabs-mode (not (string-equal use-tab "Never")))))
+                           (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
 
 (provide 'language-c)
 

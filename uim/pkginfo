@@ -1,9 +1,16 @@
 #!/bin/sh
 
-depends native uim
-
 is platform arch?
 if yes; then
+    depends aur uim
+
     # Provide fonts needed by uim (uim/uim#156)
     depends native xorg-fonts-misc
 fi
+
+pre_install() {
+    # Make sure the user systemd unit directory exists
+    if [ ! -d "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user" ]; then
+        mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+    fi
+}

@@ -1,4 +1,4 @@
-;; Global settings
+;; Global settings -*- mode: scheme -*-
 
 ; Input methods
 (define custom-activate-default-im-name? #t)
@@ -19,7 +19,7 @@
 ;; Byeoru settings
 
 ; Input method related
-(define byeoru-layout 'byeoru-layout-hangul2)
+(define byeoru-layout 'byeoru-layout-strict390)
 (define byeoru-jamo-orderedness 'ordered)
 (define byeoru-esc-turns-off? #t)
 (define byeoru-commit-by-word? #f)

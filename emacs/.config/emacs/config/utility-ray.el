@@ -1,5 +1,13 @@
 ;;; utility-ray.el --- Create beautiful screenshot with ray.so
 
+;;; Commentary:
+
+;; This package provides a functionality to take a "screenshot" of a region
+;; using ray.so (https://ray.so/).  Upon execution, it will open a new browser
+;; window with the selected region visible on ray.so.
+
+;;; Code:
+
 (defgroup rangho/ray nil
   "Emacs integration with ray.so screenshot generator."
   :group 'applications
@@ -37,7 +45,7 @@
     (buffer-substring-no-properties region-start-point region-end-point)))
 
 (defun rangho/ray-assemble-url ()
-  "Creates the request url according to settings."
+  "Create the request url according to settings."
   (concat rangho/ray-baseurl
           "?colors=" (if rangho/ray-colors "true" "false")
           "&background=" (if rangho/ray-background "true" "false")
@@ -47,8 +55,10 @@
           "&code=" (base64-encode-string (rangho/ray-get-region))))
 
 (defun screenshot-ray ()
-  "Open current region in ray.so"
+  "Open current region in ray.so."
   (interactive)
   (browse-url (rangho/ray-assemble-url)))
 
 (provide 'utility-ray)
+
+;;; utility-ray.el ends here

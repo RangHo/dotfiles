@@ -1,5 +1,11 @@
 ;;; utility-elcord.el --- Discord RPC integration for Emacs
 
+;;; Commentary:
+
+;; This package installs `elcord' minor mode to to interface with Discord.
+
+;;; Code:
+
 ;; Install Discord integration
 (use-package elcord)
 
@@ -7,9 +13,12 @@
 (setq elcord-quiet t)
 
 ;; Enable elcord only when focused
-(add-hook 'focus-in-hook
-          (lambda () (elcord-mode 1)))
-(add-hook 'focus-out-hook
-          (lambda () (elcord-mode 0)))
+(add-function :after after-focus-change-function
+              (lambda ()
+                (if (frame-focus-state)
+                    (elcord-mode 1)
+                  (elcord-mode -1))))
 
 (provide 'utility-elcord)
+
+;;; utility-elcord.el ends here

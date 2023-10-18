@@ -1,5 +1,11 @@
 ;;; core-modeline.el --- My personal custom modeline.
 
+;;; Commentary:
+
+;; My custom modeline.
+
+;;; Code:
+
 ;; ============
 ;; Dependencies
 ;; ============
@@ -169,9 +175,7 @@
              (concat
               (all-the-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
               " "))
-           (if (listp mode-name)
-               (car mode-name)
-             mode-name))))
+           (format-mode-line mode-name))))
 
 (defun rangho/mode-line-line-column ()
   "Modeline component that displays the current line and column number."
@@ -234,3 +238,5 @@
                                                rangho/mode-line-right)))
 
 (provide 'core-modeline)
+
+;;; core-modeline.el ends here

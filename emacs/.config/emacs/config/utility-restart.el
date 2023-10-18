@@ -1,5 +1,14 @@
 ;;; utility-restart.el --- Restart Emacs easily
 
+;;; Commentary:
+
+;; This package provides a command to restart Emacs easily.
+;; It provides two interactive command:
+;;   - `restart-emacs' :: Restart the current Emacs process
+;;   - `reload-emacs' :: Reload the Emacs configuration file
+
+;;; Code:
+
 (defun rangho/start-emacs-nw ()
   "Start another Emacs process in no-window mode."
   (suspend-emacs "fg; emacs -nw"))
@@ -23,3 +32,5 @@
   (load-file user-init-file))
 
 (provide 'utility-restart)
+
+;;; utility-restart.el ends here

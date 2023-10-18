@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; This package provides support for JavaScript and TypeScript.
+;;
 
 ;;; Code:
 
@@ -11,12 +11,14 @@
          ("\\.mjs\\'" . js2-mode)
          ("\\.js\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode))
-  :hook (js2-mode . lsp-deferred))
+  :hook (js2-mode . eglot-ensure))
 
 (use-package typescript-mode
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
-  :hook (typescript-mode . lsp-deferred))
+  :hook (typescript-mode . eglot-ensure))
+
+(use-package json-mode)
 
 (provide 'language-javascript)
 

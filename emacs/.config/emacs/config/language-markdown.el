@@ -1,6 +1,11 @@
 ;;; language-markdown.el --- Language support for markdown
 
-;; Markdown "live preview" support with impatient mode
+;;; Commentary:
+
+;;
+
+;;; Code:
+
 (defconst rangho/md2html-template "\
 <!DOCTYPE html>
 <html>
@@ -23,16 +28,16 @@
   "Template to use when rendering markdown document.")
 
 (defun rangho/md2html (buffer)
-  "Transform a markdown document in a buffer to a self-parsing HTML file."
+  "Transform a markdown document in BUFFER to a self-parsing HTML file."
   (princ (with-current-buffer buffer
-           (format rangho/md2html-template 
+           (format rangho/md2html-template
                    (rangho/escape-html
                     (buffer-substring-no-properties (point-min)
                                                     (point-max)))))
          (current-buffer)))
 
 (defun rangho/escape-html (string)
-  "Replace troublesome characters in a string with HTML entities."
+  "Replace troublesome characters in STRING with HTML entities."
   (replace-regexp-in-string
    "[&<>]"
    (lambda (m)
@@ -44,23 +49,18 @@
 
 (use-package impatient-mode)
 
-;; Install markdown major mode
-(defun rangho/markdown-hook ()
-  (imp-set-user-filter #'rangho/md2html))
-
 (use-package markdown-mode
   :after impatient-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :hook ((markdown-mode . rangho/markdown-hook)
-         (gfm-mode . rangho/markdown-hook))
   :init
   (setq markdown-command "multimarkdown")
   (setq markdown-fontify-code-blocks-natively t))
 
 ;; Create helper command to start web server and impatient mode
 (defun rangho/markdown-preview ()
+  "Preview the current markdown file in a web browser."
   (interactive)
   (if (or (eq major-mode 'markdown-mode)
           (eq major-mode 'gfm-mode))
@@ -71,3 +71,5 @@
     (message "Not in a markdown buffer.")))
 
 (provide 'language-markdown)
+
+;;; language-markdown.el ends here

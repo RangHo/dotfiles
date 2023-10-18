@@ -32,9 +32,9 @@
 (add-to-list 'auto-mode-alist '("\\.ixx'" . c++-mode))
 
 ;; Use language server for C
-(add-hook 'c-mode-hook 'lsp-deferred)
-(add-hook 'c++-mode-hook 'lsp-deferred)
-(add-hook 'objc-mode-hook 'lsp-deferred)
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'objc-mode-hook 'eglot-ensure)
 
 ;; Install CMake support
 (use-package cmake-mode)

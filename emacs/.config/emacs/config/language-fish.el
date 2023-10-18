@@ -1,5 +1,11 @@
 ;;; language-fish.el --- Language support for fish shell.
 
+;;; Commentary:
+
+;;
+
+;;; Code:
+
 ;; Install fish major mode
 (use-package fish-mode
   :straight (fish-mode :type git
@@ -12,3 +18,5 @@
                                'fish_indent-before-save)))
 
 (provide 'language-fish)
+
+;;; language-fish.el ends here

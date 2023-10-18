@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; This file provides support for HTML and other template languages by web-mode.
+;;
 
 ;;; Code:
 
@@ -32,4 +32,5 @@
          ("\\.as[cp]x?\\'" . web-mode)))
 
 (provide 'language-html)
+
 ;;; language-html.el ends here

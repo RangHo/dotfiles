@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; This package provides language support for YAML.
+;;
 
 ;;; Code:
 

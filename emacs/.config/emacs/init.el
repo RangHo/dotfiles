@@ -230,23 +230,7 @@
   :init (global-flycheck-mode))
 
 ;; Language Server Protocol support
-(use-package lsp-mode
-  :after (flycheck which-key)
-  :commands (lsp lsp-deferred)
-  :init (setq lsp-keymap-prefix "C-c l")
-  :config (lsp-enable-which-key-integration t))
-(use-package lsp-ui
-  :after (lsp-mode)
-  :commands lsp-ui-mode)
-(use-package lsp-ivy
-  :after (lsp-mode ivy)
-  :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs
-  :after (lsp-mode treemacs)
-  :commands lsp-treemacs-errors-list)
-(use-package dap-mode
-  :after lsp-mode
-  :config (dap-auto-configure-mode))
+(use-package eglot)
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion

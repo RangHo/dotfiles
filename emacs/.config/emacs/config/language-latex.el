@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; This package provides a major mode for editing LaTeX source files.
+;;
 
 ;;; Code:
 

@@ -1,9 +1,13 @@
 ;;; language-python.el --- Langugage support for python
 
-;; Use pyright as the primary language server
-(use-package lsp-pyright
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp-deferred))))
+;;; Commentary:
+
+;;
+
+;;; Code:
+
+(add-hook 'python-mode-hook 'eglot-ensure)
 
 (provide 'language-python)
+
+;;; language-python.el ends here

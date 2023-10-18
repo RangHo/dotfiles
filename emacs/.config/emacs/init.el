@@ -161,6 +161,9 @@
 ;; Hydra keybinding manager
 (use-package hydra)
 
+;; God speed!
+(use-package god-mode)
+
 ;; View which keybinding is available
 (use-package which-key
   :config (which-key-mode))

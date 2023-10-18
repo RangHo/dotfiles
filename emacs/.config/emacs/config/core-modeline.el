@@ -105,7 +105,9 @@
     (replace "REPLACE"
              :background "#f2777a" :foreground "#733939")
     (visual "VISUAL"
-            :background "#ffcc66" :foreground "#806330"))
+            :background "#ffcc66" :foreground "#806330")
+    (hades "HADES"
+         :background "#cc99cc" :foreground "#4d394d"))
   "List of texts and colors that represent the current evil status.")
 
 (defun rangho/mode-line-evil-status ()

@@ -1,39 +1,33 @@
-;;===============================================================================
-;;  _       _ _         _ 
-;; (_)_ __ (_) |_   ___| |
-;; | | '_ \| | __| / _ \ |
-;; | | | | | | |_ |  __/ |
-;; |_|_| |_|_|\__(_)___|_|
-;; 
-;; Emacs configuration file, created by RangHo.
-;;===============================================================================
+;;; init.el --- RangHo's Emacs configurations
 
+;; Copyright (C) 2019-2023 RangHo Lee
+
+;; Author: RangHo Lee <hello@rangho.me>
+;; URL: https://github.com/RangHo/dotfiles
+
+;; This file is NOT part of GNU Emacs.
+
+;;; Commentary:
+
+;; This file is a part of my personal Emacs configurations.  The init file sets
+;; up the package manager, load some important packages.  Language-specific and
+;; other utilities are broken down and loaded from a separate directory.  See
+;; the `config' directory for per-language settings.
+
+;;; Code:
 
 ;;-------------------------------------------------------------------------------
 ;; Early init settings
 ;;
 ;; These values impact the initialization process, so they must be set very early
-;; in the init file. Ususally performance-related and bootstraping stuff.
+;; in the init file.
+;; Ususally performance-related and bootstraping stuff.
 ;;-------------------------------------------------------------------------------
 
 ;; Emacs 26.2 apparently has a TLS bug
 (if (and (<= emacs-major-version 26)
          (<= emacs-minor-version 2))
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-
-;; Big GC threshold for big brain moments
-(defun rangho/increase-gc-threshold ()
-  "Increase the GC threshold to maximum.
-This function is never intended to be called on regular usage.
-Use when no user interaction is intended; i.e. initialization and minibuffer usage."
-  (setq gc-cons-threshold most-positive-fixnum))
-(defun rangho/decrease-gc-threshold ()
-  "Decrease the GC threshold to the default 800KB."
-  (setq gc-cons-threshold (* 800 1000)))
-(rangho/increase-gc-threshold) ; increase threshold during init
-(add-hook 'after-init-hook #'rangho/decrease-gc-threshold) ; revert back after init
-(add-hook 'minibuffer-setup-hook #'rangho/increase-gc-threshold) ; more space in minibuffer
-(add-hook 'minibuffer-exit-hook #'rangho/decrease-gc-threshold) ; exiting means more editing
 
 ;; Initialize straight.el first
 (defvar bootstrap-version)
@@ -52,6 +46,11 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
 ;; Replace use-package with straight-use-package
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
+
+;; Big GC threshold for big brain moments
+(use-package gcmh
+  :config
+  (gcmh-mode 1))
 
 
 ;;-------------------------------------------------------------------------------
@@ -298,3 +297,5 @@ Use when no user interaction is intended; i.e. initialization and minibuffer usa
                     (directory-files config-dir nil "\\.el")))))
 
 (provide 'init)
+
+;;; init.el ends here

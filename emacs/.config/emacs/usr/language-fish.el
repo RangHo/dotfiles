@@ -8,9 +8,7 @@
 
 ;; Install fish major mode
 (use-package fish-mode
-  :straight (fish-mode :type git
-                       :host github
-                       :repo "wwwjfy/emacs-fish"))
+  :elpaca (:host github :repo "wwwjfy/emacs-fish"))
 
 ;; Indent fish file before saving
 (add-hook 'fish-mode-hook

@@ -2,6 +2,7 @@
 .config/emacs/*
 
 # ...except custom configuration files
-!.config/emacs/config
+!.config/emacs/early-init.el
 !.config/emacs/init.el
 !.config/emacs/rangho-theme.el
+!.config/emacs/usr

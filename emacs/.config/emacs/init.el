@@ -1,4 +1,4 @@
-;;; init.el --- RangHo's Emacs configurations
+;;; init.el --- RangHo's Emacs configurations.
 
 ;; Copyright (C) 2019-2023 RangHo Lee
 
@@ -24,28 +24,49 @@
 ;; Ususally performance-related and bootstraping stuff.
 ;;-------------------------------------------------------------------------------
 
-;; Emacs 26.2 apparently has a TLS bug
-(if (and (<= emacs-major-version 26)
-         (<= emacs-minor-version 2))
-    (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+;; Initialize elpaca first
+(defvar elpaca-installer-version 0.5)
+(defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
-;; Initialize straight.el first
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-;; Replace use-package with straight-use-package
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+;; Replace use-package with elpaca-use-package
+(elpaca elpaca-use-package
+  (elpaca-use-package-mode)
+  (setq elpaca-use-package-by-default t))
+(elpaca-wait)
 
 ;; Big GC threshold for big brain moments
 (use-package gcmh
@@ -98,20 +119,14 @@
 ;; Apply theme without asking (coz I made it anyways)
 (load-theme 'rangho t)
 
-;; Place custom file in its own file
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(if (file-exists-p custom-file)
-    (load-file custom-file))
+;; Don't litter the emacs directory
+(use-package no-littering
+  :config
+  (no-littering-theme-backups))
 
 ;; Enable Xterm mouse support if no windowing system is found
 (unless (display-graphic-p)
   (xterm-mouse-mode))
-
-;; Move the autosave/backup files out of the way
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
 
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
@@ -133,6 +148,9 @@
 
 ;; Do not show native compilation warnings; they are annoying
 (setq native-comp-async-report-warnings-errors nil)
+
+;; y-or-n instead of yes-or-no
+(defalias 'yes-or-no-p 'y-or-n-p)
 
 
 ;;-------------------------------------------------------------------------------
@@ -182,7 +200,7 @@
 
 ;; Treemacs project explorer
 (use-package treemacs
-  :after hydra
+  :after (hydra god-mode)
   :defer t
   :config (progn (treemacs-follow-mode t)
                  (treemacs-filewatch-mode t)
@@ -226,6 +244,7 @@
 (setq-default tab-stop-list (number-sequence 4 120 4))
 
 ;; Display line number for programming-related modes
+(setq-default display-line-numbers-width 3)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 ;; Flycheck syntax checker
@@ -244,10 +263,8 @@
 
 ;; Undo-tree undo manager
 (use-package undo-tree
-  :config (global-undo-tree-mode)
-  :init
-  (setq undo-tree-history-directory-alist
-        `(("." . ,(concat user-emacs-directory "undo-tree")))))
+  :config
+  (global-undo-tree-mode))
 
 ;; EditorConfig plugin
 (use-package editorconfig
@@ -255,15 +272,16 @@
 
 ;; Use colorful delimiters because Lisp
 (use-package rainbow-delimiters
-  :hook prog-mode)
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Always auto-insert matching delimiters
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 
 ;; Show RGB color codes what they look like
 (use-package rainbow-mode
-  :init (setq rainbow-x-colors nil)
-  :hook prog-mode)
+  :hook (prog-mode . rainbow-mode)
+  :init
+  (setq rainbow-x-colors nil))
 
 
 ;;-------------------------------------------------------------------------------
@@ -272,8 +290,11 @@
 ;; Language-specific configuration or utilities go in a separate file.
 ;;-------------------------------------------------------------------------------
 
+;; Wait for core packages
+(elpaca-wait)
+
 ;; Load non-global configurations
-(let* ((config-dir (concat user-emacs-directory "config"))
+(let* ((config-dir (concat user-emacs-directory "usr"))
        (load-user-config-file
         (lambda (filename)
           (load-file (concat (file-name-as-directory config-dir)
@@ -282,6 +303,10 @@
       (mapc load-user-config-file
             (mapcar 'concat
                     (directory-files config-dir nil "\\.el")))))
+
+;; Load custom file
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 (provide 'init)
 

@@ -6,7 +6,7 @@
 
 ;;; Code:
 
-(deftheme rangho "RangHo's day-to-day Emacs theme")
+(deftheme rangho "RangHo's day-to-day Emacs theme.")
 
 
 ;; ==============

@@ -97,6 +97,7 @@
   (evil-normal-state))
 
 (evil-define-key 'normal global-map "," #'evil-execute-in-hades-state)
+(evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel)
 
 (provide 'core-hades)
 

@@ -6,9 +6,6 @@
 
 ;;; Code:
 
-;; Install SCSS support
-(use-package scss-mode)
-
 (provide 'language-css)
 
 ;;; language-css.el ends here

@@ -1,8 +1,8 @@
-;;; core-modeline.el --- My personal custom modeline.
+;;; core-modeline.el --- My personal custom modeline
 
 ;;; Commentary:
 
-;; My custom modeline.
+;;
 
 ;;; Code:
 
@@ -10,11 +10,8 @@
 ;; Dependencies
 ;; ============
 
-;; all-the-icons *should* be installed by now
-;; unless Emacs is running in a terminal, of course
-(use-package all-the-icons
-  :if (or (daemonp) (display-graphic-p))
-  :ensure t)
+;; Emacs sequence helper
+(require 'seq)
 
 ;; Nyanyanyanyanyanyanya!
 (use-package nyan-mode
@@ -33,17 +30,17 @@
   "Currently selected window.")
 
 (defun rangho/selected-window-active-p (&optional target)
-  "Check if the selected window is active."
+  "Check if TARGET window is active."
   (eq rangho/selected-window (or target
                                  (selected-window))))
 
 (defun rangho/selected-window-graphic-p (&optional target)
-  "Check if the selected window's frame is graphical."
+  "Check if TARGET window's frame is graphical."
   (display-graphic-p (window-frame (or target
                                        (selected-window)))))
 
 (defun rangho/set-selected-window (&rest _)
-  "Function to call when the selected window changes."
+  "Update the selected window cache to a new one."
   (unless (minibuffer-window-active-p (frame-selected-window))
     (setq rangho/selected-window (frame-selected-window))))
 
@@ -56,7 +53,7 @@
 ;; ===================
 
 (defun rangho/faicon (icon-name)
-  "Grab a FontAwesome icon using the `icon-name' string, with the appropriate centering offset."
+  "Grab a FontAwesome icon using the ICON-NAME string, with the appropriate centering offset."
   (if (rangho/selected-window-graphic-p)
       (all-the-icons-faicon icon-name :height 1.0 :v-adjust 0.0)
     " "))
@@ -68,7 +65,7 @@
      :background "#b5bd68" :foreground "#1d1f21")
     ("%" "times-circle" ; read-only
      :background "#cc6666" :foreground "#1d1f21"))
-  "List of icons and faces to indicate the current status of the buffer")
+  "List of icons and faces to indicate the current status of the buffer.")
 
 (defun rangho/mode-line-buffer-status ()
   "Modeline component that indicates the current status of buffer."
@@ -212,9 +209,8 @@
    #'rangho/mode-line-evil-status)
   "Components that are positioned on the right side of mode line.")
 
-(require 'seq)
 (defun rangho/render-mode-line (lhs rhs)
-  "Render the mode line."
+  "Render the mode line with LHS and RHS components."
   (let* ((lhs-rendered (seq-reduce (lambda (acc fun)
                                      (concat acc (funcall fun)))
                                    lhs ""))

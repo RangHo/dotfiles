@@ -33,10 +33,6 @@ end
 # Fix curses-based GPG pinentry screen
 set -gx GPG_TTY (tty)
 
-# Import wal colorscheme, if exists
-test -e ~/.cache/wal/sequences
-and /bin/cat ~/.cache/wal/sequences
-
 # If there is ~/.profile, then source the file
 test -e ~/.profile
 and fenv "source ~/.profile"

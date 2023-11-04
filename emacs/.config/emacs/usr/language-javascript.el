@@ -18,7 +18,11 @@
          ("\\.tsx\\'" . typescript-mode))
   :hook (typescript-mode . eglot-ensure))
 
-(use-package json-mode)
+(use-package json-mode
+  :mode (("\\.json\\'" . json-mode)
+         ("\\.jsonc\\'" . jsonc-mode)
+         ("\\.json5\\'" . jsonc-mode)
+         ("tsconfig\\.json\\'" . jsonc-mode)))
 
 (provide 'language-javascript)
 

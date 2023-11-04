@@ -1,9 +1,9 @@
-<h1>
-  <img align="center" src="verniy-dotfiles.png" />
-  <p align="center">Original image by <a href="https://www.pixiv.net/member_illust.php?id=3180989">キノスケ</a></p>
-</h1>
+<img align="center" src="verniy-dotfiles.png" />
+<p align="center">
+  <small>Original image by <a href="https://www.pixiv.net/member_illust.php?id=3180989">キノスケ</a></small>
+</p>
 
-RangHo's overengineered dotfiles.
+--------------------------------------------------------------------------------
 
 ## What is a _dotfile_?
 

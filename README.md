@@ -18,8 +18,8 @@ starts with a `.`(dot).
 This convention traces its origin back to old UNIX where (by unintentional side
 effect) files starting with `.` became invisible by some programs.
 People exploited this "bug" to make files hidden, and the UNIX community finally
-adopted this as a "feature".
-Remember: *it's not a bug; it's a feature*.[^1]
+adopted this as a "feature".[^1]
+Remember: *it's not a bug; it's a feature*.
 
 [^1]: See [this post by Rob Pike](https://web.archive.org/web/20190211031031/https://plus.google.com/+RobPikeTheHuman/posts/R58WgWwN9jp)
   about this whole shenanigans.

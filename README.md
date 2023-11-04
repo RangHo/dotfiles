@@ -7,13 +7,23 @@
 
 ## What is a _dotfile_?
 
-Dotfiles are similar to what Windows users would call *hidden files*.
-They are often used to customize UNIX systems. The name **dotfiles** comes from
-a UNIX convention where hidden file's name starts with a `.`(dot).
+Dotfiles are similar to what Windows users would call *hidden files*, and they
+are often used to customize UNIX systems.
+Since you're here, surely you know what `.bashrc` or `.profile` files do, right?
+Dotfiles are those files.
+The name **dotfile** comes from a UNIX convention where hidden file's name
+starts with a `.`(dot).
+~~I can hear people going "Wow, no shit, Sherlock!" over this...~~
+
 This convention traces its origin back to old UNIX where (by unintentional side
 effect) files starting with `.` became invisible by some programs.
 People exploited this "bug" to make files hidden, and the UNIX community finally
-adopted this as a "feature". Remember: *it's not a bug; it's a feature*.
+adopted this as a "feature".
+Remember: *it's not a bug; it's a feature*.[^1]
+
+[^1]: See [this post by Rob Pike](https://web.archive.org/web/20190211031031/https://plus.google.com/+RobPikeTheHuman/posts/R58WgWwN9jp)
+  about this whole shenanigans.
+  Well, *kinda*, because Google killed Google+.
 
 ## How to use
 
@@ -23,8 +33,8 @@ But, I, having too much free time that I should've spent doing something far
 more useful, created a "package manager" that installs binary dependencies as
 well.
 
-First, clone the repository into your favorite location. Don't forget to
-initialize submodules as some features depend on submodules.
+First, clone the repository into your favorite location.
+Don't forget to initialize submodules as some features depend on submodules.
 
 ```sh
 git clone --recurse-submodules https://github.com/RangHo/dotfiles ~/Dotfiles

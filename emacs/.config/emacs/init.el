@@ -136,12 +136,6 @@
   (ivy-mode)
   (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
 
-;; Activate uim if available, or fall back to elisp IME
-(setq-default uim-candidate-display-inline t)
-(if (require 'uim nil 'no-error)
-    (add-hook 'prog-mode-hook (lambda () (uim-mode)))
-  (set-input-method "korean-hangul390"))
-
 ;; Show ElDoc documentation in a child frame
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
@@ -246,6 +240,9 @@
 ;; Display line number for programming-related modes
 (setq-default display-line-numbers-width 3)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+;; Enable word wrap for text editing modes
+(add-hook 'text-mode-hook 'visual-line-mode)
 
 ;; Flycheck syntax checker
 (use-package flycheck

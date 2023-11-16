@@ -25,7 +25,7 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Initialize elpaca first
-(defvar elpaca-installer-version 0.5)
+(defvar elpaca-installer-version 0.6)
 (defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -245,8 +245,10 @@
 (add-hook 'text-mode-hook 'visual-line-mode)
 
 ;; Flycheck syntax checker
+(setq flycheck-emacs-lisp-load-path 'inherit)
 (use-package flycheck
-  :init (global-flycheck-mode))
+  :init
+  (global-flycheck-mode))
 
 ;; Language Server Protocol support
 (use-package eglot)
@@ -254,7 +256,8 @@
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion
 (use-package company
-  :config (global-company-mode))
+  :config
+  (global-company-mode))
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
@@ -265,7 +268,8 @@
 
 ;; EditorConfig plugin
 (use-package editorconfig
-  :config (editorconfig-mode))
+  :config
+  (editorconfig-mode 1))
 
 ;; Use colorful delimiters because Lisp
 (use-package rainbow-delimiters

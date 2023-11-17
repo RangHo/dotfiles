@@ -10,6 +10,12 @@
   (require 'treesit))
 
 (when (featurep 'treesit)
+  ;; Change the default loading directory
+  (setq treesit--install-language-grammar-out-dir-history
+        (list (no-littering-expand-var-file-name "tree-sitter")))
+  (setq treesit-extra-load-path
+        (list (no-littering-expand-var-file-name "tree-sitter")))
+
   ;; Build the list of languages and their sources
   (setq treesit-language-source-alist
         '((bash "https://github.com/tree-sitter/tree-sitter-bash")
@@ -38,12 +44,6 @@
             (message "Installing %s" (car lang-assoc))
             (treesit-install-language-grammar (car lang-assoc))))
         treesit-language-source-alist)
-
-  ;; Change the default loading directory
-  (setq treesit--install-language-grammar-out-dir-history
-        (no-littering-expand-var-file-name "tree-sitter"))
-  (setq treesit-extra-load-path
-        (no-littering-expand-var-file-name "tree-sitter"))
 
   ;; Replace existing major modes with the tree-sitter equivalent
   (setq major-mode-remap-alist

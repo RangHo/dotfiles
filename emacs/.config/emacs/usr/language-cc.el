@@ -60,6 +60,11 @@
                                (setq-local indent-tabs-mode (not (string-equal use-tab "Never")))))
                            (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
 
+;; When tree-sitter integration is enabled
+(when (featurep 'treesit)
+  (add-hook 'c-ts-mode-hook #'eglot-ensure)
+  (add-hook 'c++-ts-mode-hook #'eglot-ensure))
+
 (provide 'language-c)
 
 ;;; language-cc.el ends here

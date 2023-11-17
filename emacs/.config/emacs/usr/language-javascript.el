@@ -24,6 +24,11 @@
          ("\\.json5\\'" . jsonc-mode)
          ("tsconfig\\.json\\'" . jsonc-mode)))
 
+;; If tree-sitter support is enabled
+(when (featurep 'treesit)
+  (add-hook 'js-ts-mode-hook #'eglot-ensure)
+  (add-hook 'typescript-ts-mode-hook #'eglot-ensure))
+
 (provide 'language-javascript)
 
 ;;; language-javascript.el ends here

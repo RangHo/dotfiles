@@ -12,6 +12,10 @@
          ("\\.csx\\'" . csharp-mode))
   :hook (csharp-mode . eglot-ensure))
 
+;; When tree-sitter support is available
+(when (featurep 'treesit)
+  (add-hook 'csharp-ts-mode-hook #'eglot-ensure))
+
 (provide 'language-csharp)
 
 ;;; language-csharp.el ends here

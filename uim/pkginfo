@@ -1,7 +1,6 @@
 #!/bin/sh
 
-is platform arch?
-if yes; then
+if is arch platform; then
     depends aur uim
 
     # Provide fonts needed by uim (uim/uim#156)

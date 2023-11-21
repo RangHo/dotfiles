@@ -2,10 +2,15 @@
 
 depends native git
 
+if is arch platform; then
+    depends native git-delta
+else
+    depends cargo git-delta
+fi
+
 pre_install() {
      # Make sure template directory exists
-     is "$HOME/Templates" directory?
-     if no; then
+     if ! is "$HOME/Templates" directory; then
          mkdir -p "$HOME/Templates"
      fi
 }

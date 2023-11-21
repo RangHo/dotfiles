@@ -63,10 +63,10 @@ error() {
 ## Utility functions
 ################################
 
-## Push a new item to stack
+## Push a new item to stack.
+##
+## Usage: stack_push <stack_id> <item>
 stack_push() {
-    # Syntax: stack_push <stack_id> <item>
-
     if [ "$#" -ne 2 ]; then
         error "Usage: stack_push <stack_id> <item>"
         return 1
@@ -79,7 +79,9 @@ stack_push() {
     eval "stack_$stack_id=\"\${stack_$stack_id} $item\""
 }
 
-## Pop an item from stack to stdout
+## Pop an item from stack to stdout.
+##
+## Usage: stack_pop <stack_id>
 stack_pop() {
     # Syntax: stack_pop <stack_id>
 
@@ -105,7 +107,9 @@ stack_pop() {
     echo $result
 }
 
-## Print the content of the stack
+## Print the content of the stack.
+##
+## Usage: stack_print <stack_id>
 stack_print() {
     # Syntax: stack_print <stack_id>
 
@@ -120,7 +124,9 @@ stack_print() {
     eval "echo \${stack_$stack_id}"
 }
 
-## Print the name of the stack
+## Print the name of the stack.
+##
+## Usage: stack_name <stack_id>
 stack_name() {
     # Syntax: stack_name <stack_id>
 
@@ -135,8 +141,13 @@ stack_name() {
     echo "stack_$stack_id"
 }
 
-## Ensure a command succeeds
+## Ensure a command succeeds.
+##
+## Usage: ensure <command> <args...>
+##
+## If the command fails, print an error message and exit the script.
 ensure() {
+    debug "ensure: Making sure that this command succeeds: $*"
     if ! "$@"; then
         error "Command failed: $*"
         error "This command is required. Cannot proceed..."
@@ -144,46 +155,117 @@ ensure() {
     fi
 }
 
-## Maybe a command exists
+## Maybe a command exists.
+##
+## Usage: maybe <command> <args...>
+##
+## If the command exists, run it with the arguments. Otherwise, do nothing.
 maybe() {
-    is $1 command?
-    yes && "$@" || debug "No such command: $1"
+    debug "maybe: Trying this command: $*"
+    if is "$1" command; then
+        shift
+        "$@"
+    else
+        debug "maybe: No such command: $1"
+    fi
 }
 
-## is-checks
+## Query and check information about the current system.
+##
+## Usage: is <subject> <complement>
+##
+## <subject> is the query to check. Its value varies depending on the complement
+## specified below.
+##
+## <complement> can be one of the following:
+##   - platform
+##   - command
+##   - file
+##   - directory
+##   - symlink
+##   - installed
+##
+## This function can be used directly as a boolean value in shell.
+##
+## Example:
+##   if is platform arch; then
+##       echo "This is Arch Linux!"
+##   elif is platform debian; then
+##       echo "This is Debian or its derivatives!"
+##   elif is platform linux; then
+##       echo "This is some sort of Linux!"
+##   else
+##       echo "I'm not sure what this is!"
+##   fi
 is() {
-    # Syntax: is <subject> <complement>?
-
     if [ "$#" -ne 2 ]; then
-        error "Usage: is <subject> <complement>?"
+        error "Usage: is <subject> <complement>"
         return 1
     fi
 
     local subject complement
     subject="$1"
-    complement=$(echo "$2" | sed -e 's/\?$//')
+    complement="$2"
 
-    if [ "$subject" = "platform" ]; then
-        is_platform "$complement" && checks_last_result="yes" || checks_last_result="no"
-        return
+    if ! _is_command "_is_$complement"; then
+        error "Unknown complement: $complement"
+        return 1
     fi
 
-    case "$complement" in
-        command) command -v "$subject" > /dev/null ;;
-        file) [ -e "$subject" ] ;;
-        directory) [ -d "$subject" ] ;;
-        symlink) [ -L "$subject" ] ;;
-
-        installed) [ -e "$DOTFILE_DATA_DIR/$subject" ] ;;
-
-        *)
-            error "<complement> can be either command, file, directory, or symlink."
-            false
-            ;;
-    esac && checks_last_result="yes" || checks_last_result="no"
+    "_is_$complement" "$subject"
 }
 
-is_platform() {
+## Check if the command is available.
+##
+## Usage: _is_command <command>
+##
+## This is the implementation of `is <command> command` syntax.
+_is_command() {
+    command -v "$1" > /dev/null
+}
+
+## Check if the provided path is a file.
+##
+## Usage: _is_file <path>
+##
+## This is the implementation of `is <path> file` syntax.
+_is_file() {
+    [ -f "$1" ]
+}
+
+## Check if the provided path is a directory.
+##
+## Usage: _is_directory <path>
+##
+## This is the implementation of `is <path> directory` syntax.
+_is_directory() {
+    [ -d "$1" ]
+}
+
+## Check if the provided path is a symbolic link.
+##
+## Usage: _is_symlink <path>
+##
+## This is the implementation of `is <path> symlink` syntax.
+_is_symlink() {
+    [ -L "$1" ]
+}
+
+## Check if the provided package is installed.
+##
+## Usage: _is_installed <package>
+##
+## This is the implementation of `is <package> installed` syntax.
+_is_installed() {
+    [ -e "$DOTFILE_DATA_DIR/$1" ]
+}
+
+## Check if the current platform is compatible with the query.
+##
+## Usage: _is_platform <query>
+##
+## This is the implementation of `is <query> platform` syntax.
+_is_platform() {
     local query osname likename
     query="$1"
 
@@ -191,8 +273,8 @@ is_platform() {
 
     # For Linux, query the distro name instead of the kernel
     if [ "$osname" = "Linux" ]; then
-        is "/etc/os-release" file?
-        if yes; then
+        if is "/etc/os-release" file; then
+            # Many distros have /etc/os-release file describing itself
             . /etc/os-release
 
             [ "$ID" ] && osname="$ID"
@@ -201,9 +283,11 @@ is_platform() {
             append linux to likename
 
         elif [ "$(uname -o)" = "Android" ]; then
+            # Android is a whole different beast
             osname=android
 
         else
+            # No idea what it is, slap linux on it and call it a day
             osname=linux
         fi
     fi
@@ -213,24 +297,15 @@ is_platform() {
 }
 
 ## Check if the "array" contains the item
+##
+## Usage: a
 contains() {
-    # Syntax: contains <array> <item>
     local array item occurrence
     array=$1
     item=$2
     occurrence=$(printf "%s\n" $(eval "echo \"\$$array\"") | grep -c "^$item$")
 
     [ "$occurrence" -ne 0 ]
-}
-
-## Yes check
-yes() {
-    [ "$checks_last_result" = "yes" ]
-}
-
-## No check
-no() {
-    [ "$checks_last_result" != "yes" ]
 }
 
 ## Dependency list creator
@@ -284,12 +359,10 @@ install_native() {
     local sudo_command
 
     # Check if sudo exists in the first place
-    is sudo command?
-    if yes; then
+    if is sudo command; then
         # Check if the user can access sudo
         if ! sudo -v -p "Installing native packages requires sudo:"; then
-            is "$DOTFILE_CACHE_DIR" directory?
-            no && mkdir -p "$DOTFILE_CACHE_DIR"
+            is "$DOTFILE_CACHE_DIR" directory || mkdir -p "$DOTFILE_CACHE_DIR"
             
             printf "%s\n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
 
@@ -315,14 +388,12 @@ install_native() {
     fi
     
     # TODO: support other platforms as well
-    is platform debian?
-    if yes; then
+    if is debian platform; then
         $sudo_command apt-get update && $sudo_command apt-get install -y "$@"
         return
     fi
 
-    is platform arch?
-    if yes; then
+    if is arch platform; then
         $sudo_command pacman -Sy --needed --noconfirm "$@"
         return
     fi
@@ -345,8 +416,7 @@ install_pip() {
 
     info "Installing PIP dependencies: $@"
 
-    is pip command?
-    if no; then
+    if ! is pip command; then
         info "pip is not found! Installing that first..."
         install_native python python-pip
     fi
@@ -360,8 +430,7 @@ install_cargo() {
 
     info "Installing Cargo dependencies: $@"
 
-    is cargo command?
-    if no; then
+    if ! is cargo command; then
         info "Cargo is not found! Installing that first..."
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     fi
@@ -375,8 +444,7 @@ install_gem() {
 
     info "Installing Ruby Gem dependencies: $@"
 
-    is gem command?
-    if no; then
+    if ! is gem command; then
         info "gem is not found! Installing that first..."
         install_native ruby rubygems
     fi
@@ -396,8 +464,7 @@ install_aur() {
 
     install_native base-devel
 
-    is platform arch?
-    if no; then
+    if ! is arch platform; then
         error "AUR dependency can be installed in Arch Linux and its derivatives."
         error "Tapping out..."
         error "You may have to check the package's information file to verify"
@@ -405,23 +472,21 @@ install_aur() {
         exit 1
     fi
 
-    is aur command?
-    if no; then
+    if ! is aur command; then
         info "aurutils is not found! Installing that first..."
 
-        debug "Creating a new group for AUR repo..."
+        info "Creating a new group for AUR repo..."
         sudo groupadd aur
 
-        debug "Adding the current user to the new group..."
+        info "Adding the current user to the new group..."
         sudo usermod -aG aur "$USER"
 
-        debug "Building aurutils from AUR..."
+        info "Building aurutils from AUR..."
         local aurdir prevdir
         prevdir="$(pwd)"
         aurdir="/tmp/aurutils-download"
 
-        is "$aurdir" directory?
-        if yes; then
+        if is "$aurdir" directory; then
             rm -rf "$aurdir"
         fi
 
@@ -479,17 +544,13 @@ USAGE:
     $(basename "$0") <command>
 
 COMMANDS:
-    init         Initializes this machine.
-    install      Installs a package to this machine.
-    uninstall    Uninstalls a package from this machine.
-    update       Updates the repository to the most recent version.
-    remove       Remove all packages and try to make as clean as possible.
-    help         Displays this help message.
+    init         Initialize this machine for installation.
+    install      Install a package to this machine.
+    uninstall    Uninstall a package from this machine.
+    update       Update the repository to the most recent version.
+    help         Display this help message.
+    shell        Drop into a shell within this script. (DEBUG only)
 EOF
-
-    if [ "$DOTFILE_DEBUG" -ne 0 ]; then
-        echo "    shell        Create a REPL instance."
-    fi
 }
 
 ## Initialize the dotfile repository
@@ -502,8 +563,8 @@ dotfile_init() {
     # 4. Symbolic link itself to ~/.local/bin
 
     # Create basic configuration file
-    is "$DOTFILE_CONFIG_FILE" file?
-    if no; then
+    debug "init: Checking for the configuration file..."
+    if ! is "$DOTFILE_CONFIG_FILE" file; then
         info "Dotfile configuration file is not found. Creating..."
         ensure mkdir -p "$XDG_CONFIG_HOME"
         ensure touch "$DOTFILE_CONFIG_FILE"
@@ -515,29 +576,29 @@ dotfile_init() {
     fi
 
     # Create directory where package data will be stored
-    is "$DOTFILE_DATA_DIR" directory?
-    if no; then
+    debug "init: Checking for the data storage..."
+    if ! is "$DOTFILE_DATA_DIR" directory; then
         info "Dotfile package storage is not found. Creating..."
         ensure mkdir -p "$DOTFILE_DATA_DIR"
     fi
 
     # git is required to update packages
-    is git command?
-    if no; then
+    debug "init: Checking for git command..."
+    if ! is git command; then
         info "git does not exist. Attempting to install..."
         ensure install_native git
     fi
 
     # stow is required to make symbolic links
-    is stow command?
-    if no; then
+    debug "init: Checking for stow command..."
+    if ! is stow command; then
         info "stow does not exist. Attempting to install..."
         ensure install_native stow
     fi
 
     # This script is going to be installed in local PATH
-    is "$HOME/.local/bin/dotfile" symlink?
-    if no; then
+    debug "init: Checking for dotfile symlink in local binary directory..."
+    if ! is "$HOME/.local/bin/dotfile" symlink; then
         info "Installing dotfile binary to local binary directory..."
         ensure mkdir -p "$HOME/.local/bin"
         ensure ln -s "$(realpath "$0")" "$HOME/.local/bin/dotfile"
@@ -558,21 +619,18 @@ dotfile_install() {
     info "Installing dotfile package $pkg..."
 
     # Check package sanity
-    is "$pkg" directory?
-    if no; then
+    if ! is "$pkg" directory; then
         error "Dotfile package $pkg is not found! Aborting..."
         exit 2
     fi
 
-    is "$pkg/pkginfo" file?
-    if no; then
+    if ! is "$pkg/pkginfo" file; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
     fi
 
     # Check if package is already installed
-    is "$pkg" installed?
-    if yes; then
+    if is "$pkg" installed; then
         info "$pkg seems to be installed already! Skipping..."
         return
     fi
@@ -586,7 +644,7 @@ dotfile_install() {
 
     # If already visited, then do nothing
     if contains "visited" "$pkg"; then
-        debug "Package $pkg is already installed by other package. Skipping..."
+        info "Package $pkg is already installed by other package. Skipping..."
         return
     fi
 
@@ -622,7 +680,7 @@ dotfile_install() {
 
     # Install external dependencies
     for src in $DOTFILE_AVAILABLE_SOURCES; do
-        debug "Installing dependencies from $src..."
+        info "Installing dependencies from $src..."
         eval "install_$src \$depends_$src"
 
         # Clear external dependency list after installation
@@ -630,7 +688,7 @@ dotfile_install() {
     done
 
     # Stow the directory
-    debug "Symlinking the configuration files..."
+    info "Symlinking the configuration files..."
     ensure stow -S -t "$HOME" --ignore=".gitignore" --ignore="pkginfo" "$pkg"
 
     # Copy description file to the data directory
@@ -663,8 +721,7 @@ dotfile_uninstall() {
     info "Uninstalling dotfile package $pkg..."
 
     # Package should be installed before uninstalling
-    is "$DOTFILE_DATA_DIR/$pkg" file?
-    if no; then
+    if ! is "$DOTFILE_DATA_DIR/$pkg" file; then
         error "Package '$pkg' is not installed currently."
         error "Cannot uninstall a nonexistent package. Aborting..."
         return 1
@@ -681,7 +738,7 @@ dotfile_uninstall() {
         # If the package description has the package as dependency,
         # the package will not work so mark it
         if contains "$depends_dotfile" "$pkg"; then
-            debug "$installed depends on $pkg!"
+            warn "$installed depends on $pkg!"
             append "$installed" to broken_pkg
         fi
 
@@ -714,7 +771,7 @@ dotfile_uninstall() {
     maybe pre_uninstall
 
     # Unstow the directory
-    debug "Unstowing the configuration files..."
+    info "Unstowing the configuration files..."
     ensure stow -D "$pkg"
 
     # Remove description file in the data directory
@@ -744,7 +801,7 @@ dotfile_update() {
     local changed_pkgs
     for candidate in $changed_dirs; do
         if [ -e "$candidate/pkginfo" ]; then
-            debug "Package $candidate has changes available."
+            info "Package $candidate has changes available."
             append "$candidate" to changed_pkgs
         fi
     done
@@ -760,18 +817,7 @@ dotfile_update() {
     if ! git merge --ff-only origin/main; then
         error "Unable to fast-forward the update! Tapping out..."
         error "It seems you have unsaved changes in the dotfile repository."
-        error "I'm gonna drop you into a new shell. In there, merge the commmits manually."
-
-        while true; do
-            sh
-
-            if [ -e ".git/MERGE_HEAD" ]; then
-                error "Merging is still in progress!"
-                error "Creating another shell for you..."
-            else
-                break
-            fi
-        done
+        exit 1
     fi
 
     # Reinstall the updated packages
@@ -780,29 +826,6 @@ dotfile_update() {
     done
 
     info "Update completed!"
-
-    return
-}
-
-dotfile_remove() {
-    warn "This program will delete all dotfiles from your computer"
-    warn "and self-destruct itself. Do you wish to continue?"
-    read -p "(yes/no): " choice
-    [ "$choice" != yes ] && return
-
-    # Delete all packages
-    for installed in $(find "$DOTFILE_DATA_DIR" -type f); do
-        dotfile_uninstall --force "$(basename $installed)" 2>/dev/null
-        info "Uninstalled $installed."
-    done
-
-    # Remove dotfile configuration file
-    ensure rm -f "$DOTFILE_CONFIG_FILE"
-    info "Removed dotfile configuration file."
-
-    # Remove itself from local binary directory
-    ensure rm -f "$HOME/.local/bin/dotfile"
-    info "Removed dotfile symbolic link in local binary directory."
 
     return
 }
@@ -845,17 +868,19 @@ fi
 
 # If there is no dotfile configuration file, instruct the user to run
 # `dotfile init` first
-is "$DOTFILE_CONFIG_FILE" file?
-if yes; then
-    # Go to the dotfile home directory
-    ensure . "$DOTFILE_CONFIG_FILE"
-    debug "Changing directory to $dotfile_home..."
-    dotfile_old_pwd="$(pwd)"
-    cd "$dotfile_home"
-elif [ "$action" != init ]; then
+if [ "$action" != "init" ] && ! is "$DOTFILE_CONFIG_FILE" file; then
     error "Dotfile manager is not initialized yet!"
     error "Please run \"dotfile init\" first."
     exit 1
+fi
+
+# Go to the dotfile home directory by emulating `pushd`
+if is "$DOTFILE_CONFIG_FILE" file; then
+    debug "entry: Found dotfile config. Sourcing..."
+    ensure . "$DOTFILE_CONFIG_FILE"
+    debug "entry: Changing directory to $dotfile_home..."
+    dotfile_old_pwd="$(pwd)"
+    cd "$dotfile_home"
 fi
 
 case "$action" in
@@ -890,5 +915,7 @@ case "$action" in
 esac
 
 # Restore the directory
-[ "$dotfile_old_pwd" ] && cd "$dotfile_old_pwd"
-
+if [ "$dotfile_old_pwd" ]; then
+    debug "entry: Changing back to the original directory in $dotfile_old_pwd..."
+    cd "$dotfile_old_pwd"
+fi

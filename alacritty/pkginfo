@@ -2,4 +2,4 @@
 
 depends native alacritty
 
-depends dotfile fontconfig zsh fish
+depends dotfile fontconfig fish

@@ -8,25 +8,17 @@ depends native pulseaudio \
                wmname \
                picom
 
-is platform arch?
-if yes; then depends aur polybar; fi
+is arch platform && depends aur polybar
 
 depends dotfile gtk wal uim fontconfig
 
 pre_install() {
     # Make sure these directories exist
-    is "~/Pictures/Resources" directory?
-    if no; then
+    if ! is "$HOME/Pictures/Resources" directory; then
         mkdir -p ~/Pictures/Resources
     fi
 
-    is "~/.config/systemd/user" directory?
-    if no; then
-        mkdir -p ~/.config/systemd/user
-    fi
+    mkdir -p ~/.config/systemd/user
 
-    is "~/.local/bin" directory?
-    if no; then
-        mkdir -p ~/.local/bin
-    fi
+    mkdir -p ~/.local/bin
 }

@@ -2,8 +2,7 @@
 
 depends native gtk2 gtk-engine-murrine qt5ct
 
-is platform arch?
-if yes; then
+if is arch platform; then
     depends native arc-gtk-theme \
                    papirus-icon-theme \
                    lxappearance
@@ -14,6 +13,6 @@ pre_install() {
     if no; then
         mkdir -p "~/.config/environment.d"
     fi
-    
+
     rm -f ~/.config/gtk{-2.0,-3.0,-4.0,rc,rc-2.0}
 }

@@ -76,6 +76,14 @@ stack_push() {
     stack_id="$1"
     item="$2"
 
+    debug "stack_push: Pushing $item into $stack_id ($(stack_print $stack_id))"
+
+    # Make sure that all items in the stack are unique
+    if stack_contains "$stack_id" "$item"; then
+        debug "stack_push: Stack $stack_id already has $item."
+        return
+    fi
+
     eval "stack_$stack_id=\"\${stack_$stack_id} $item\""
 }
 
@@ -92,11 +100,14 @@ stack_pop() {
 
     local stack_id result
     stack_id="$1"
+
+    debug "stack_pop: Popping the last item from $stack_id ($(stack_print $stack_id))"
+
     result=$(eval "echo \${stack_$stack_id}" | awk -F ' ' '{ print $NF }')
 
     # Check if the result is empty
     if [ -z "$result" ]; then
-        warn "Stack is already empty."
+        warn "Stack $stack_id is already empty."
         return
     fi
 
@@ -105,6 +116,43 @@ stack_pop() {
 
     # Print the last element to stdout
     echo $result
+}
+
+## Clears and unsets the stack variable.
+##
+## Usage: stack_clear <stack_id>
+stack_clear() {
+    if [ "$#" -ne 1 ]; then
+        error "Usage: stack_clear <stack_id>"
+        return 1
+    fi
+
+    local stack_id
+    stack_id="$1"
+
+    unset $(stack_name $stack_id)
+}
+
+## Check if the stack has the item.
+##
+## Usage: stack_contains <stack_id> <item>
+stack_contains() {
+    if [ "$#" -ne 2 ]; then
+        error "Usage: stack_contains <stack_id> <item>"
+        return 1
+    fi
+
+    local stack_id item occurenece
+    stack_id="$1"
+    item="$2"
+
+    debug "stack_contains: Checking $stack_id ($(stack_print $stack_id)) contains $item..."
+
+    occurenece=$(stack_print $stack_id | grep -c "$item")
+
+    [ $? -eq 0 ] && debug "stack_contains: Yes." || debug "stack_contains: No."
+
+    [ "$occurenece" -ne 0 ]
 }
 
 ## Print the content of the stack.
@@ -271,6 +319,9 @@ _is_platform() {
 
     osname="$(uname -s)"
 
+    # Clear the previous likename junk
+    stack_clear likename
+
     # For Linux, query the distro name instead of the kernel
     if [ "$osname" = "Linux" ]; then
         if is "/etc/os-release" file; then
@@ -280,7 +331,7 @@ _is_platform() {
             [ "$ID" ] && osname="$ID"
             [ "$ID_LIKE" ] && likename="$ID_LIKE"
 
-            append linux to likename
+            stack_push likename linux
 
         elif [ "$(uname -o)" = "Android" ]; then
             # Android is a whole different beast
@@ -293,19 +344,7 @@ _is_platform() {
     fi
 
     # Match the result
-    [ "$osname" = "$query" ] || contains likename "$query"
-}
-
-## Check if the "array" contains the item
-##
-## Usage: a
-contains() {
-    local array item occurrence
-    array=$1
-    item=$2
-    occurrence=$(printf "%s\n" $(eval "echo \"\$$array\"") | grep -c "^$item$")
-
-    [ "$occurrence" -ne 0 ]
+    [ "$osname" = "$query" ] || stack_contains likename "$query"
 }
 
 ## Dependency list creator
@@ -321,33 +360,10 @@ depends() {
     shift 2
 
     # Allow packages from arbitrary sources
-    arrayname="depends_$src"
-    append "$package" to "$arrayname"
+    stack_push "depends_$src" "$package"
 
     # If there are more than one packages, recursively add more
     [ $# -ne 0 ] && depends "$src" "$@"
-}
-
-## Append one item to a space-separated list
-append() {
-    # Syntax: append <item> to <array>
-
-    local item to array occurrence
-    item=$1
-    to=$2
-    array=$3
-
-    if [ $# -ne 3 ] || [ "$to" != "to" ]; then
-        error "Usage: append <item> to <array>"
-        exit 1
-    fi
-
-    if contains "$array" "$item"; then
-        debug "$item already exists in $array."
-        return
-    fi
-
-    eval "$array=\"\${$array} $item\""
 }
 
 ## Install native package dependencies
@@ -361,7 +377,7 @@ install_native() {
     # Check if sudo exists in the first place
     if is sudo command; then
         # Check if the user can access sudo
-        if ! sudo -v -p "Installing native packages requires sudo:"; then
+        if ! sudo -v -p "Installing native packages requires sudo: "; then
             is "$DOTFILE_CACHE_DIR" directory || mkdir -p "$DOTFILE_CACHE_DIR"
             
             printf "%s\n" $@ >> $DOTFILE_CACHE_DIR/native_pkgs.txt
@@ -528,13 +544,13 @@ install_dotfile() {
     [ "$#" -eq 0 ] && return
 
     info "Installing dotfile dependencies..."
-    for pkg in $depends_dotfile; do
+    for pkg in $(stack_print depends_dotfile); do
         dotfile_install "$pkg"
     done
 }
 
 
-## Action handlers
+## User CLI interface handlers
 ################################
 
 # Print the usage information
@@ -619,31 +635,36 @@ dotfile_install() {
     info "Installing dotfile package $pkg..."
 
     # Check package sanity
+    debug "install: Checking $pkg is a directory..."
     if ! is "$pkg" directory; then
         error "Dotfile package $pkg is not found! Aborting..."
         exit 2
     fi
 
+    debug "install: Checking $pkg has a pkginfo definition..."
     if ! is "$pkg/pkginfo" file; then
         error "$pkg is not a valid dotfile package. Aborting..."
         exit 2
     fi
 
     # Check if package is already installed
+    debug "install: Checking if package is already installed..."
     if is "$pkg" installed; then
         info "$pkg seems to be installed already! Skipping..."
         return
     fi
 
     # Check circular dependency
-    if contains "$(stack_name ancestors)" "$pkg"; then
+    debug "install: Checking for circular dependency..."
+    if stack_contains ancestors "$pkg"; then
         warn "Circular dependency detected! Ignoring the last attempt to install $pkg..."
         warn "You may want to fix the package description file to resolve this issue."
         return
     fi
 
     # If already visited, then do nothing
-    if contains "visited" "$pkg"; then
+    debug "install: Checking if this package is marked to be installed already..."
+    if stack_contains visited "$pkg"; then
         info "Package $pkg is already installed by other package. Skipping..."
         return
     fi
@@ -652,19 +673,25 @@ dotfile_install() {
     . "$pkg/pkginfo"
 
     # Mark current package as visited
-    append "$pkg" to "visited"
+    debug "install: Marking $pkg as visited..."
+    stack_push visited "$pkg"
 
     # Find out the direct dependencies
+    debug "install: Finding out the direct dependency of $pkg..."
     local difference
-    difference="$depends_dotfile"
-    for visited_pkg in $visited; do
-        difference=$(echo "$difference" | sed -E -e "s/^$visited_pkg | $visited_pkg|$visited_pkg | $visited_pkg\$//g")
+    difference=$(stack_print depends_dotfile)
+    for visited_pkg in $(stack_print visited); do
+        debug "install: Removing $visited_pkg from difference array ($difference)..."
+        difference=$(echo "$difference" | sed -E -e "s/^$visited_pkg | $visited_pkg|$visited_pkg | $visited_pkg\$|^$visited_pkg\$//g")
     done
 
     # Install dependencies first
+    debug "install: Marking $pkg as the ancestor for the next dotfile..."
     stack_push ancestors "$pkg"
     for dependency in $difference; do
-        for src in $DOTFILE_AVAILABLE_SOURCES; do unset "depends_$src"; done
+        for src in $DOTFILE_AVAILABLE_SOURCES; do
+            stack_clear "depends_$src"
+        done
         dotfile_install "$dependency"
     done
     stack_pop ancestors > /dev/null
@@ -681,10 +708,10 @@ dotfile_install() {
     # Install external dependencies
     for src in $DOTFILE_AVAILABLE_SOURCES; do
         info "Installing dependencies from $src..."
-        eval "install_$src \$depends_$src"
+        eval "install_$src $(stack_print depends_$src)"
 
         # Clear external dependency list after installation
-        unset "depends_$src"
+        stack_clear "depends_$src"
     done
 
     # Stow the directory
@@ -737,13 +764,13 @@ dotfile_uninstall() {
 
         # If the package description has the package as dependency,
         # the package will not work so mark it
-        if contains "$depends_dotfile" "$pkg"; then
+        if stack_contains depends_dotfile "$pkg"; then
             warn "$installed depends on $pkg!"
-            append "$installed" to broken_pkg
+            stack_push broken_pkg "$installed"
         fi
 
         # Reset the dotfile dependencies
-        unset depends_dotfile
+        stack_clear depends_dotfile
     done
 
     # If there are to-be-broken packages, address them
@@ -802,7 +829,7 @@ dotfile_update() {
     for candidate in $changed_dirs; do
         if [ -e "$candidate/pkginfo" ]; then
             info "Package $candidate has changes available."
-            append "$candidate" to changed_pkgs
+            stack_push changed_pkgs "$candidate"
         fi
     done
 
@@ -810,7 +837,7 @@ dotfile_update() {
     local installed_pkgs
     for pkg in $changed_pkgs; do
         dotfile_uninstall --force "$pkg"
-        append "$pkg" to installed_pkgs
+        stack_push installed_pkgs "$pkg"
     done
 
     # Try updating the repository...

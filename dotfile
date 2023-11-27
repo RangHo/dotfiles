@@ -236,11 +236,11 @@ maybe() {
 ## This function can be used directly as a boolean value in shell.
 ##
 ## Example:
-##   if is platform arch; then
+##   if is arch platform; then
 ##       echo "This is Arch Linux!"
-##   elif is platform debian; then
+##   elif is debian platform; then
 ##       echo "This is Debian or its derivatives!"
-##   elif is platform linux; then
+##   elif is linux platform; then
 ##       echo "This is some sort of Linux!"
 ##   else
 ##       echo "I'm not sure what this is!"

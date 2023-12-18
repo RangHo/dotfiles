@@ -7,7 +7,10 @@
 ;;; Code:
 
 ;; Use Terraform major mode
-(use-package terraform-mode)
+(use-package terraform-mode
+  :hook (terraform-mode . eglot-ensure)
+  :init
+  (add-to-list 'eglot-server-programs '(terraform-mode . ("terraform-ls" "serve"))))
 
 (provide 'language-terraform)
 

@@ -6,6 +6,10 @@
 
 ;;; Code:
 
+;; Add PostCSS extension to CSS mode
+(add-to-list 'auto-mode-alist '("\\.pcss\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.postcss\\'" . css-mode))
+
 (provide 'language-css)
 
 ;;; language-css.el ends here

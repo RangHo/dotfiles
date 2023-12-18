@@ -22,6 +22,7 @@
 (use-package web-mode
   :hook (web-mode . eglot-ensure)
   :config
+  (setq web-mode-enable-auto-quoting nil)
   (add-to-list 'eglot-server-programs
                '(web-mode . rangho/select-web-mode-server-program)))
 

@@ -1,36 +1,53 @@
-# [<tag>] (If applied, this commit will...) <subject> (Max 72 char)
-# |<----   Preferably using up to 50 chars   --->|<------------------->|
+# <type>(<scope>)!: <description> (72 characters maximum)
+# |<--- preferably using up to 50 characters --->|<------------------->|
 
-# (Optional) Explain why this change is being made
-# |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
+# Optional <body>
+# |<------------- try limiting to 72 characters per line ------------->|
 
-# (Optional) Provide links or keys to any relevant tickets, articles or other resources
-# Example: Issue #123
+# Optional <footer>
 
-# (Optional) Close issues with commit message here
-# Example: Closes Issue #123
-
-# --- COMMIT END ---
-# Tag can be one of the following:
+# ----- END COMMIT MESSAGE -----
 #
-#    feat       (new feature)
-#    fix        (bug fix)
-#    refactor   (refactoring code)
-#    style      (formatting, missing semi colons, etc; no code change)
-#    doc        (changes to documentation)
-#    test       (adding or refactoring tests; no production code change)
-#    version    (version bump/new release; no production code change)
-#    dbg        (Changes in debugging code/frameworks; no production code change)
-#    license    (Edits regarding licensing; no production code change)
-#    hack       (Temporary fix to make things move forward; please avoid it)
-#    wip        (Work In Progress; for intermediate commits to keep patches reasonably sized)
+# Conventional Commits Cheatsheet (https://www.conventionalcommits.org)
 #
-# --------------------
-# Remember to:
-#   * Capitalize the subject line
-#   * Use the imperative mood in the subject line
-#   * Do not end the subject line with a period
-#   * Separate subject from body with a blank line
-#   * Use the body to explain what and why vs. how
-#   * Can use multiple lines with "-" or "*" for bullet points in body
-# --------------------
+# <type> indicates what kind of commit this is.
+# It can be one of:
+#   - feat        for new features introduced (i.e. MINOR in SemVer standard)
+#   - fix         for bug-fixes (i.e. PATCH in SemVer standard)
+#   - build       for changes in build system or environment
+#   - ci          for configuring continuous integration systems
+#   - test        for adding new tests or correcting defective tests
+#   - docs        for changes in documentation only
+#   - refactor    for rewriting or restructuring of code that does not affect API behavior
+#   - perf        for performance-enhancing refactors
+#   - style       for changes in code styles and no changes in logic
+#   - chore       for miscellaneous tasks
+#   - revert      for reverting commits made previously
+#
+# <scope> describes a section of the codebase where this change is applied and is optional.
+# Note that allowed content of this section depends on the specific project.
+# Issue identifiers are not valid scopes.
+#
+# Inserting "!" before the colon indicates that this commit introduces a breaking change.
+# It is equivalent to a bump in MAJOR in SemVer standard.
+# With this, the breaking change indicator in <footer> becomes optional.
+#
+# <description> contains a conceise description of the change.
+# The content should be in imperative mood, as if "This commit will..." is prepended.
+# Do not capitalize the beginning of the sentence, and full stop (.) is omitted.
+#
+# <body> provides additional contextual information about the code changes and is optional.
+# Mutliple paragraphs separated by an empty line are allowed here.
+# Sentences should be in imperative mood with proper capitalization and full stops (.).
+#
+# <footer> is a list of key-value pairs that store "metadata" of a commit.
+# There are three types of a footer:
+#   - Breaking change indicator     verbatim "BREAKING CHANGE:", followed by a <description>
+#   - Automatic issue management    such as "Close #123", "Reference #123", "See #123", etc.
+#   - Email-like metadata           such as "Signed-off-by:", "Co-authored-by", etc.
+#
+# There are three exceptions to the subject line rules:
+#   1. "Initial commit"     for the first commit in a git repository
+#   2. "Merge branch..."    as it is the default commit message for automatic merges
+#   3. "Revert..."          as it is the default commit message for reverting commits
+#

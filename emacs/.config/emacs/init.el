@@ -68,7 +68,6 @@
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
 (use-package ivy
-  :diminish
   :config
   (ivy-mode)
   (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
@@ -92,20 +91,23 @@
 
 ;; Evil mode
 (use-package evil
-  :after undo-tree
+  :after (undo-tree)
   :init
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (setq evil-undo-system 'undo-tree)
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t)
-  :config (evil-mode))
+  :config
+  (evil-mode 1))
 (use-package evil-collection
-  :after evil
-  :init (evil-collection-init))
+  :after (evil)
+  :init
+  (evil-collection-init))
 (use-package evil-surround
-  :after evil
-  :config (global-evil-surround-mode))
+  :after (evil)
+  :config
+  (global-evil-surround-mode))
 
 ;; Hydra keybinding manager
 (use-package hydra)
@@ -115,7 +117,11 @@
 
 ;; View which keybinding is available
 (use-package which-key
-  :config (which-key-mode))
+  :config
+  (which-key-mode))
+
+;; Transient command menus
+(use-package transient)
 
 
 ;;-------------------------------------------------------------------------------
@@ -126,22 +132,30 @@
 
 ;; Projectile project manager
 (use-package projectile
-  :ensure t
-  :config (projectile-mode 1))
+  :config
+  (projectile-mode 1))
+
+;; Magit git repository manager
+(use-package magit
+  :after (hydra projectile transient)
+  :bind (("C-c g" . magit-file-dispatch))
+  :init
+  (if (not (boundp 'project-switch-commands))
+      (setq project-switch-commands nil)))
 
 ;; Treemacs project explorer
 (use-package treemacs
   :after (hydra god-mode)
-  :defer t
-  :config (progn (treemacs-follow-mode t)
-                 (treemacs-filewatch-mode t)
-                 (treemacs-fringe-indicator-mode 'always)
-                 (pcase (cons (not (null (executable-find "git")))
-                              (not (null treemacs-python-executable)))
-                   (`(t . t)
-                    (treemacs-git-mode 'deferred))
-                   (`(t . _)
-                    (treemacs-git-mode 'simple)))))
+  :config
+  (progn (treemacs-follow-mode t)
+         (treemacs-filewatch-mode t)
+         (treemacs-fringe-indicator-mode 'always)
+         (pcase (cons (not (null (executable-find "git")))
+                      (not (null treemacs-python-executable)))
+           (`(t . t)
+            (treemacs-git-mode 'deferred))
+           (`(t . _)
+            (treemacs-git-mode 'simple)))))
 (use-package treemacs-evil
   :after (treemacs evil))
 (use-package treemacs-magit
@@ -155,13 +169,8 @@
 (use-package treemacs-all-the-icons
   :if (or (daemonp) (display-graphic-p))
   :after (treemacs all-the-icons)
-  :config (treemacs-load-theme "all-the-icons"))
-
-;; Magit git repository manager
-(use-package magit
-  :init (if (not (boundp 'project-switch-commands))
-            (setq project-switch-commands nil))
-  :bind (("C-c g" . magit-file-dispatch)))
+  :config
+  (treemacs-load-theme "all-the-icons"))
 
 
 ;;-------------------------------------------------------------------------------

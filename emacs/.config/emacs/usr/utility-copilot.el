@@ -20,7 +20,8 @@
   :after evil
   :hook (prog-mode . copilot-mode)
   :config
-  (evil-define-key 'insert copilot-mode-map (kbd "TAB") #'rangho/copilot-tab))
+  (evil-define-key 'insert copilot-mode-map (kbd "TAB") #'rangho/copilot-tab)
+  (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent)))
 
 (provide 'utility-copilot)
 

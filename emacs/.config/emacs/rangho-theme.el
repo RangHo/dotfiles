@@ -81,6 +81,8 @@
                       'emoji)
                     (font-spec :name "Noto Color Emoji")))
 
+(use-package mixed-pitch)
+
 (defvar rangho/serif-font-ignore-face-list
   '( ;; Texts highlighted with font-lock
     font-lock-builtin-face
@@ -126,6 +128,7 @@
                            (face-remap-add-relative face
                                                     :family default-family
                                                     :height default-height)))
+            (mixed-pitch-mode 1)
             (message "Serif font enabled in the current buffer."))
         (progn
           ;; Serif is enabled; disable it
@@ -134,6 +137,7 @@
             (face-remap-remove-relative face))
           (setq rangho/serif-font-enabled nil)
           (setq rangho/serif-font-preserved nil)
+          (mixed-pitch-mode -1)
           (message "Serif font disabled in the current buffer."))))))
 
 ;; There are three cases:

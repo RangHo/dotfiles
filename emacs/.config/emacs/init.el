@@ -12,67 +12,9 @@
 ;; This file is a part of my personal Emacs configurations.  The init file sets
 ;; up the package manager, load some important packages.  Language-specific and
 ;; other utilities are broken down and loaded from a separate directory.  See
-;; the `config' directory for per-language settings.
+;; the `usr' directory for more specific settings.
 
 ;;; Code:
-
-;;-------------------------------------------------------------------------------
-;; Early init settings
-;;
-;; These values impact the initialization process, so they must be set very early
-;; in the init file.
-;; Ususally performance-related and bootstraping stuff.
-;;-------------------------------------------------------------------------------
-
-;; Initialize elpaca first
-(defvar elpaca-installer-version 0.6)
-(defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil
-                              :files (:defaults (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list 'load-path (if (file-exists-p build) build repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (< emacs-major-version 28) (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (call-process "git" nil buffer t "clone"
-                                       (plist-get order :repo) repo)))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (load "./elpaca-autoloads")))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
-
-;; Replace use-package with elpaca-use-package
-(elpaca elpaca-use-package
-  (elpaca-use-package-mode)
-  (setq elpaca-use-package-by-default t))
-(elpaca-wait)
-
-;; Big GC threshold for big brain moments
-(use-package gcmh
-  :config
-  (gcmh-mode 1))
-
 
 ;;-------------------------------------------------------------------------------
 ;; Constants and helpers
@@ -118,11 +60,6 @@
 
 ;; Apply theme without asking (coz I made it anyways)
 (load-theme 'rangho t)
-
-;; Don't litter the emacs directory
-(use-package no-littering
-  :config
-  (no-littering-theme-backups))
 
 ;; Enable Xterm mouse support if no windowing system is found
 (unless (display-graphic-p)

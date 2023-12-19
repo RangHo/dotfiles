@@ -1,4 +1,4 @@
-;;; language-dard.el --- Language support for Dart and Flutter
+;;; language-dart.el --- Language support for Dart and Flutter
 
 ;;; Commentary:
 

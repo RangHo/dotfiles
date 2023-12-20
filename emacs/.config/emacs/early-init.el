@@ -15,6 +15,12 @@
 
 ;;; Code:
 
+;; Change default eln-cache directory
+(when (fboundp 'startup-redirect-eln-cache)
+  (startup-redirect-eln-cache
+   (convert-standard-filename
+    (expand-file-name  "var/eln-cache/" user-emacs-directory))))
+
 ;; Emacs 26.2 apparently has a TLS bug
 (if (and (<= emacs-major-version 26)
          (<= emacs-minor-version 2))
@@ -33,12 +39,6 @@
 
 ;; Change default custom file
 (setq custom-file (expand-file-name "etc/custom.el" user-emacs-directory))
-
-;; Change default eln-cache directory
-(when (fboundp 'startup-redirect-eln-cache)
-  (startup-redirect-eln-cache
-   (convert-standard-filename
-    (expand-file-name  "var/eln-cache/" user-emacs-directory))))
 
 ;; Bootstrap elpaca
 (defvar elpaca-installer-version 0.6)
@@ -87,7 +87,8 @@
 ;; Do not litter Emacs directory
 (use-package no-littering
   :config
-  (no-littering-theme-backups))
+  (no-littering-theme-backups)
+  (setq flycheck-emacs-lisp-load-path 'inherit))
 
 ;; Replace use-package with elpaca-use-package
 ;; Big GC threshold for big brain moments

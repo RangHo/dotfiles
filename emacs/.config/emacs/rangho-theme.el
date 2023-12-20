@@ -13,10 +13,19 @@
 ;; User Interface
 ;; ==============
 
-;; No stupid startup stuff
+;; No stupid startup stuff...
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-message t)
-(setq inhibit-startup-echo-area-message t)
+(setq inhibit-startup-echo-area-message t)'
+
+;; ...and replace with fancy dashboard thing
+(use-package dashboard
+  :elpaca t
+  :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
+         (elpaca-after-init . dashboard-initialize))
+  :config
+  (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
 ;; Set default frame style
 (setq default-frame-alist

@@ -162,6 +162,9 @@
   :after (treemacs magit))
 (use-package treemacs-projectile
   :after (treemacs projectile))
+(use-package treemacs-icons-dired
+  :after (treemacs dired)
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 ;; All-the-icons and treemacs integration
 (use-package all-the-icons

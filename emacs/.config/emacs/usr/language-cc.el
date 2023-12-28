@@ -31,6 +31,10 @@
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.ixx\\'" . c++-mode))
 
+;; Add HolyC extensions
+(add-to-list 'auto-mode-alist '("\\.HC\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.ZC\\'" . c-mode))
+
 ;; Use language server for C
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)

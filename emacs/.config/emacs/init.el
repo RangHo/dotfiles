@@ -65,6 +65,16 @@
 (unless (display-graphic-p)
   (xterm-mouse-mode))
 
+;; Show fancy dashboard on startup
+(use-package dashboard
+  :elpaca t
+  :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
+         (elpaca-after-init . dashboard-initialize))
+  :config
+  (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+
+
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
 (use-package ivy

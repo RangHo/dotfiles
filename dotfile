@@ -322,26 +322,32 @@ _is_platform() {
     # Clear the previous likename junk
     stack_clear likename
 
-    # For Linux, query the distro name instead of the kernel
-    if [ "$osname" = "Linux" ]; then
-        if is "/etc/os-release" file; then
-            # Many distros have /etc/os-release file describing itself
-            . /etc/os-release
+    case "$osname" in
+        Linux)
+            if is "/etc/os-release" file; then
+                # Many distros have /etc/os-release file describing itself
+                . /etc/os-release
 
-            [ "$ID" ] && osname="$ID"
-            [ "$ID_LIKE" ] && likename="$ID_LIKE"
+                [ "$ID" ] && osname="$ID"
+                [ "$ID_LIKE" ] && likename="$ID_LIKE"
 
-            stack_push likename linux
+                stack_push likename linux
 
-        elif [ "$(uname -o)" = "Android" ]; then
-            # Android is a whole different beast
-            osname=android
+            elif [ "$(uname -o)" = "Android" ]; then
+                # Android is a whole different beast
+                osname=android
 
-        else
-            # No idea what it is, slap linux on it and call it a day
-            osname=linux
-        fi
-    fi
+            else
+                # No idea what it is, slap linux on it and call it a day
+                osname=linux
+            fi
+            ;;
+
+        *)
+            # No clue, unknown it is
+            osname=unknown
+            ;;
+    esac
 
     # Match the result
     [ "$osname" = "$query" ] || stack_contains likename "$query"

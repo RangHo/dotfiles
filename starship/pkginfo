@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Arch Linux and Void Linux has native package available
+# Other distros can install from source with `cargo`
+if is arch platform || is void platform; then
+    depends native starship
+else
+    depends cargo starship
+fi

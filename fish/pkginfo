@@ -1,3 +1,5 @@
 #!/bin/sh
 
 depends native fish
+
+depends dotfile starship

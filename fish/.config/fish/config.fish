@@ -48,3 +48,7 @@ and rtx activate fish | source
 # If thefuck command correction engine is installed, use that
 type -q thefuck
 and thefuck --alias | source
+
+# If starship prompt is installed, use that
+type -q starship
+and starship init fish | source

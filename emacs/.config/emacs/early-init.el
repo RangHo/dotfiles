@@ -29,11 +29,6 @@
 ;; If an `.el' file is newer than its corresponding `.elc' file, prefer the `.el' file.
 (setq load-prefer-newer t)
 
-;; Avoid garbage collection during startup
-;; GCMH will be enabled anyways...
-(setq gc-cons-threshold most-positive-fixnum)
-(setq gc-cons-percentage 0.6)
-
 ;; Disable package.el
 (setq package-enable-at-startup nil)
 
@@ -78,6 +73,7 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
+;; Replace use-package with elpaca-use-package
 (elpaca elpaca-use-package
   (elpaca-use-package-mode)
   (setq elpaca-use-package-by-default t))
@@ -90,7 +86,6 @@
   (no-littering-theme-backups)
   (setq flycheck-emacs-lisp-load-path 'inherit))
 
-;; Replace use-package with elpaca-use-package
 ;; Big GC threshold for big brain moments
 (use-package gcmh
   :config

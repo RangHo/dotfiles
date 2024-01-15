@@ -63,82 +63,34 @@
 (defun rangho/set-fontset-font ()
   "Set the default font to use throughout Emacs."
   (interactive)
-  (set-face-attribute 'default nil
-                      :font "semteulche"
-                      :height 110)
-  (set-face-attribute 'variable-pitch nil
-                      :font "Noto Sans CJK KR"
-                      :height 110)
   (set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
   (set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
   (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK SC"))
   (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK TC"))
   (set-fontset-font t 'unicode (font-spec :name "semteulche"))
-  (set-fontset-font t
-                    ;; The `emoji' charset is introduced in Emacs 28.1
-                    (if (version< emacs-version "28.1")
-                        '(#x1f300 . #x1fad0)
-                      'emoji)
-                    (font-spec :name "Noto Color Emoji")))
+  (set-fontset-font t 'emoji (font-spec :name "Noto Color Emoji"))
 
-(use-package mixed-pitch)
+  (create-fontset-from-fontset-spec
+   (font-xlfd-name
+    (font-spec :name "Noto Sans"
+               :size 13
+               :registry "fontset-variable")))
+  (set-fontset-font "fontset-variable" 'hangul (font-spec :name "Noto Sans CJK KR"))
+  (set-fontset-font "fontset-variable" 'kana (font-spec :name "Noto Sans CJK JP"))
+  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Sans CJK SC"))
+  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Sans CJK TC"))
+  (set-fontset-font "fontset-variable" 'emoji (font-spec :name "Noto Color Emoji"))
 
-(defvar rangho/serif-font-ignore-face-list
-  '( ;; Texts highlighted with font-lock
-    font-lock-builtin-face
-    font-lock-comment-face
-    font-lock-comment-delimiter-face
-    font-lock-constant-face
-    font-lock-doc-face
-    font-lock-function-name-face
-    font-lock-keyword-face
-    font-lock-negation-char-face
-    font-lock-preprocessor-face
-    font-lock-regexp-grouping-backslash
-    font-lock-regexp-grouping-construct
-    font-lock-string-face
-    font-lock-type-face
-    font-lock-variable-name-face
-    font-lock-warning-face
-    font-lock-error-face)
-  "List of faces to ignore when setting serif font.")
-
-(defun rangho/toggle-serif-font ()
-  "Toggle serif font for the current buffer non-code related texts."
-  (interactive)
-  (when (display-graphic-p)
-    (let ((serif-family "Noto Serif CJK KR")
-          (serif-height 120)
-          (default-family (face-attribute 'default :family))
-          (default-height (face-attribute 'default :height)))
-      (if (not (bound-and-true-p rangho/serif-font-enabled))
-          (progn
-            ;; Serif is not enabled now; enable it
-            (make-local-variable 'rangho/serif-font-enabled)
-            (make-local-variable 'rangho/serif-font-preserved)
-            (setq rangho/serif-font-enabled
-                  (face-remap-add-relative 'default
-                                           :family serif-family
-                                           :height serif-height))
-            (setq rangho/serif-font-preserved nil)
-
-            ;; Restore the default font for code-related texts
-            (dolist (face rangho/serif-font-ignore-face-list)
-              (add-to-list 'rangho/serif-font-preserved
-                           (face-remap-add-relative face
-                                                    :family default-family
-                                                    :height default-height)))
-            (mixed-pitch-mode 1)
-            (message "Serif font enabled in the current buffer."))
-        (progn
-          ;; Serif is enabled; disable it
-          (face-remap-remove-relative rangho/serif-font-enabled)
-          (dolist (face rangho/serif-font-preserved)
-            (face-remap-remove-relative face))
-          (setq rangho/serif-font-enabled nil)
-          (setq rangho/serif-font-preserved nil)
-          (mixed-pitch-mode -1)
-          (message "Serif font disabled in the current buffer."))))))
+  (set-face-attribute 'default nil
+                      :font "semteulche"
+                      :height 130)
+  (set-face-attribute 'fixed-pitch nil
+                      :font "semteulche"
+                      :height 130)
+  (set-face-attribute 'variable-pitch nil
+                      :font "Noto Sans"
+                      :fontset "fontset-variable"
+                      :height 130))
 
 ;; There are three cases:
 ;;   1. daemon mode,

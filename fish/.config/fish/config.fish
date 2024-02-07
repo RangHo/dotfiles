@@ -41,9 +41,9 @@ and fenv "source ~/.profile"
 test -e ~/.asdf/asdf.fish
 and source ~/.asdf/asdf.fish
 
-# If rtx version manager is installed, use that
-type -q rtx
-and rtx activate fish | source
+# If mise version manager is installed, use that
+type -q mise
+and mise activate fish | source
 
 # If thefuck command correction engine is installed, use that
 type -q thefuck

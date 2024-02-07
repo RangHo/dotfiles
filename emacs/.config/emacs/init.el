@@ -210,7 +210,9 @@
   (global-flycheck-mode))
 
 ;; Language Server Protocol support
-(use-package eglot)
+(if (< emacs-major-version 29)
+    (use-package eglot)
+  (require 'eglot))
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion

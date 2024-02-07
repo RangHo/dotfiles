@@ -13,11 +13,15 @@
   (or (copilot-accept-completion)
       (indent-for-tab-command)))
 
+;; For Emacs 29, force update default `jsonrpc' feature
+(when (= emacs-major-version 29)
+  (use-package jsonrpc))
+
 ;; Install GitHub Copilot unofficial plugin
 (use-package copilot
-  :elpaca (:host github :repo "zerolfx/copilot.el" :files (:defaults "dist"))
+  :elpaca (:host github :repo "copilot-emacs/copilot.el" :files (:defaults "dist"))
   :defer t
-  :after evil
+  :after (evil jsonrpc)
   :hook (prog-mode . copilot-mode)
   :config
   (evil-define-key 'insert copilot-mode-map (kbd "TAB") #'rangho/copilot-tab)

@@ -48,9 +48,6 @@
                    ".cache/")))
   "Per-user cache directory.")
 
-;; Long-lost Emacs string manipulation library
-(use-package s)
-
 
 ;;-------------------------------------------------------------------------------
 ;; Emacs behavior modification
@@ -74,7 +71,6 @@
   (dashboard-setup-startup-hook))
 (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
 (use-package ivy
@@ -86,11 +82,25 @@
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
-;; Do not show native compilation warnings; they are annoying
+;; Don't show warnings unless it's really important
+(setq warning-minimum-level :emergency)
 (setq native-comp-async-report-warnings-errors nil)
+
+;; Don't make lockfiles
+(setq create-lockfiles nil)
 
 ;; y-or-n instead of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+;; Force upgrade built-in packages
+(setq elpaca-ignored-dependencies
+      (seq-difference elpaca-ignored-dependencies
+                      '(jsonrpc eldoc)))
+(use-package jsonrpc)
+(use-package eldoc)
+
+;; Long-lost Emacs string manipulation library
+(use-package s)
 
 
 ;;-------------------------------------------------------------------------------
@@ -210,9 +220,8 @@
   (global-flycheck-mode))
 
 ;; Language Server Protocol support
-(if (< emacs-major-version 29)
-    (use-package eglot)
-  (require 'eglot))
+(use-package eglot
+  :after (jsonrpc eldoc))
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion

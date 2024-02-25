@@ -86,11 +86,6 @@
   (no-littering-theme-backups)
   (setq flycheck-emacs-lisp-load-path 'inherit))
 
-;; Big GC threshold for big brain moments
-(use-package gcmh
-  :config
-  (gcmh-mode 1))
-
 ;; Wait for the essential packages to be loaded
 (elpaca-wait)
 

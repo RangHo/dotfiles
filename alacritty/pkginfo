@@ -1,5 +1,0 @@
-#!/bin/sh
-
-depends native alacritty
-
-depends dotfile fontconfig fish

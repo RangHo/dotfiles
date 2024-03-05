@@ -8,7 +8,7 @@
 
 (use-package aweshell
   :elpaca (:host github :repo "manateelazycat/aweshell")
-  :bind (("C-c t" . aweshell-new)))
+  :bind (("C-c RET" . aweshell-new)))
 
 (provide 'utility-aweshell)
 

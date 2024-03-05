@@ -7,7 +7,11 @@
 ;;; Code:
 
 (use-package org
+  :bind (("C-c a" . org-agenda)
+         ("C-c t" . org-capture))
   :custom
+  (org-directory "~/Documents/Notes")
+  (org-default-notes-file (concat org-directory "/default.org"))
   (org-id-link-to-org-use-id t))
 
 (use-package org-roam

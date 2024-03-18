@@ -201,13 +201,10 @@
 (use-package impatient-mode)
 
 (use-package markdown-mode
-  :after impatient-mode
+  :after (impatient-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :hook ((markdown-mode . (lambda ()
-                            (setq-local display-fill-column-indicator-column 80)
-                            (display-fill-column-indicator-mode 1))))
   :init
   (setq markdown-command "multimarkdown")
   (setq markdown-fontify-code-blocks-natively t)

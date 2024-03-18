@@ -12,7 +12,10 @@
   :custom
   (org-directory "~/Documents/Notes")
   (org-default-notes-file (concat org-directory "/default.org"))
-  (org-id-link-to-org-use-id t))
+  (org-id-link-to-org-use-id t)
+  (org-startup-indented t)
+  (org-pretty-entities t)
+  (org-startup-with-inline-images t))
 
 (use-package org-roam
   :after org

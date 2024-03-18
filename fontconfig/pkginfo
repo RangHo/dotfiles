@@ -1,29 +1,17 @@
 #!/bin/sh
 
-font_conf_list="30-ttf-liberation-mono.conf 30-ttf-liberation-sans.conf 30-ttf-liberation-serif.conf 60-ttf-droid-sans-mono-fontconfig.conf 65-ttf-droid-kufi-fontconfig.conf 65-ttf-droid-sans-fontconfig.conf 65-ttf-droid-serif-fontconfig.conf 66-noto-mono.conf 66-noto-sans.conf 66-noto-serif.conf 70-noto-cjk.conf 70-yes-bitmaps.conf"
-
 depends native fontconfig
 
 if is arch platform; then
-    depends native noto-fonts \
-                   noto-fonts-cjk \
-                   ttf-droid \
-                   ttf-liberation \
-                   ttf-fira-code \
-                   awesome-terminal-fonts
-    depends aur ttf-d2coding \
-                ttf-neodgm \
-                nerd-fonts-complete
+    depends native \
+            noto-fonts \
+            noto-fonts-cjk \
+            noto-fonts-emoji \
+            ttf-nerd-fonts-symbols
+elif is void platform; then
+    depends native \
+            noto-fonts-ttf \
+            noto-fonts-cjk \
+            noto-fonts-emoji \
+            nerd-fonts-symbols-ttf
 fi
-
-post_install() {
-    for conf in $font_conf_list; do
-        sudo ln -s "/etc/fonts/conf.avail/$conf" "/etc/fonts/conf.d"
-    done
-}
-
-pre_uninstall() {
-     for conf in $font_conf_list; do
-         sudo rm -f "/etc/fonts/conf.d/$conf"
-     done
-}

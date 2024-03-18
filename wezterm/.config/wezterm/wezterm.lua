@@ -15,7 +15,7 @@ return {
    font = wezterm.font_with_fallback {
       'semteulche',
       'Noto Sans Mono',
-      'FontAwesome',
+      'Symbols Nerd Font Mono',
    },
    font_size = 14.0,
 }

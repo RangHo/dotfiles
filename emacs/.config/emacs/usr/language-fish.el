@@ -8,7 +8,9 @@
 
 ;; Install fish major mode
 (use-package fish-mode
-  :elpaca (:host github :repo "wwwjfy/emacs-fish"))
+  :hook (fish-mode . (lambda ()
+                       (add-hook 'before-save-hook
+                                 'fish_indent-before-save))))
 
 ;; Indent fish file before saving
 (add-hook 'fish-mode-hook

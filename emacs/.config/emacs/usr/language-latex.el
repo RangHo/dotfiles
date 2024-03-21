@@ -8,7 +8,7 @@
 
 ;; Install AUCTeX
 (use-package auctex
-  :elpaca (auctex :pre-build (("./autogen.sh")
+  :ensure (auctex :pre-build (("./autogen.sh")
                               ("./configure" "--without-texmf-dir" "--with-lispdir=.")
                               ("make")
                               ("install-info" "doc/auctex.info" "doc/dir")

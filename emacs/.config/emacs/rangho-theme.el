@@ -185,7 +185,7 @@
 
 ;; List of shades to generate for each colors
 (defvar rangho/color-shade-list
-  (number-sequence -20 20 5)
+  (number-sequence -100 100 5)
   "List of percentage values to lighten/darken the original colors.")
 
 ;; Color manipulation utility
@@ -230,8 +230,6 @@
   (custom-theme-set-faces
    'rangho
 
-   ;; Base faces
-
    ;; Basic UI elements
    `(default      ((t (:foreground ,.color/fg :background ,.color/bg))))
    `(cursor       ((t (:foreground ,.color/bg :background ,.color/cursor))))
@@ -251,15 +249,33 @@
    `(mode-line-buffer-id ((t (:weight regular))))
    
    ;; font-lock!
-   `(font-lock-comment-face ((t (:foreground ,.color/green))))
-   `(font-lock-doc-face ((t (:foreground ,.color/greeni))))
-   `(font-lock-keyword-face ((t (:foreground ,.color/bluei))))
-   `(font-lock-builtin-face ((t (:foreground ,.color/blue))))
-   `(font-lock-type-face ((t (:foreground ,.color/cyan))))
-   `(font-lock-string-face ((t (:foreground ,.color/yellowi))))
+   `(font-lock-comment-face       ((t (:foreground ,.color/green))))
+   `(font-lock-doc-face           ((t (:foreground ,.color/greeni))))
+   `(font-lock-keyword-face       ((t (:foreground ,.color/bluei))))
+   `(font-lock-builtin-face       ((t (:foreground ,.color/blue))))
+   `(font-lock-type-face          ((t (:foreground ,.color/cyan))))
+   `(font-lock-string-face        ((t (:foreground ,.color/yellowi))))
    `(font-lock-variable-name-face ((t (:foreground ,.color/yellow))))
-   `(font-lock-constant-face ((t (:foreground ,.color/magentai))))
-   `(font-lock-function-name-face ((t (:foreground ,.color/magenta))))))
+   `(font-lock-constant-face      ((t (:foreground ,.color/magentai))))
+   `(font-lock-function-name-face ((t (:foreground ,.color/magenta))))
+
+   ;; Org-mode
+   `(org-block                 ((t (:background ,.color/bg+20))))
+   `(org-document-info         ((t (:foreground "dark orange" :weight bold))))
+   `(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   `(org-document-title        ((t (:inherit (shadow fixed-pitch)))))
+   `(org-level-1               ((t (:inherit default :weight bold :height 2.0))))
+   `(org-level-2               ((t (:inherit default :weight bold :height 1.75))))
+   `(org-level-3               ((t (:inherit default :weight bold :height 1.5))))
+   `(org-level-4               ((t (:inherit default :weight bold :height 1.25))))
+   `(org-level-5               ((t (:inherit default :weight bold :height 1.125))))
+   `(org-level-6               ((t (:inherit default :weight bold :height 1.0))))
+   `(org-level-7               ((t (:inherit default :weight bold :height 1.0))))
+   `(org-level-8               ((t (:inherit default :weight bold :height 1.0))))
+   `(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   `(org-table                 ((t (:inherit fixed-pitch))))
+   `(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
+   ))
 
 (provide-theme 'rangho)
 

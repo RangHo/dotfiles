@@ -17,6 +17,9 @@
   (org-pretty-entities t)
   (org-startup-with-inline-images t))
 
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
 (use-package org-roam
   :after org
   :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -24,9 +27,18 @@
          ("C-c n g" . org-roam-graph)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture))
+  :custom
+  (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   :config
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode))
+
+(use-package org-roam-ui
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t)
+  (org-roam-ui-follow t)
+  (org-roam-ui-update-on-save t)
+  (org-roam-ui-open-on-start t))
 
 (provide 'language-org)
 

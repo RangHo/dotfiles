@@ -17,8 +17,8 @@
   (org-pretty-entities t)
   (org-startup-with-inline-images t))
 
-(use-package org-bullets
-  :hook (org-mode . org-bullets-mode))
+(use-package org-superstar
+  :hook (org-mode . org-superstar-mode))
 
 (use-package org-roam
   :after org

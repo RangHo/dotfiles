@@ -141,7 +141,10 @@
   (which-key-mode))
 
 ;; Transient command menus
-(use-package transient)
+(use-package transient
+  :bind (:map transient-map ("q" . transient-quit-one)
+         :map transient-edit-map ("q" . transient-quit-one)
+         :map transient-sticky-map ("q" . transient-quit-seq)))
 
 
 ;;-------------------------------------------------------------------------------

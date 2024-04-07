@@ -92,17 +92,21 @@
                       :fontset "fontset-variable"
                       :height 110))
 
-;; There are three cases:
-;;   1. daemon mode,
-;;   2. graphical mode,
-;;   3. terminal mode.
-(cond ((daemonp) (add-hook 'after-make-frame-functions
-                           (lambda (frame)
-                             (select-frame frame)
-                             (if (display-graphic-p frame)
-                                 (rangho/set-fontset-font)))))
-      ((display-graphic-p) (rangho/set-fontset-font))
-      (t nil))
+;; There are three cases to cover:
+(cond
+ ;; 1. daemon mode --- set the font when a new frame is created
+ ((daemonp)
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (select-frame frame)
+              (if (display-graphic-p frame)
+                  (rangho/set-fontset-font)))))
+ ;; 2. graphical mode --- set the font right away
+ ((display-graphic-p)
+  (rangho/set-fontset-font))
+
+ ;; 3. terminal mode --- do nothing
+ (t nil))
 
 ;; Enable font ligatures
 ;; Emacs 27 has a problem dealing with ligatures.

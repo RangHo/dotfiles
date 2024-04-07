@@ -73,7 +73,7 @@
   (create-fontset-from-fontset-spec
    (font-xlfd-name
     (font-spec :name "Noto Sans"
-               :size 13
+               :size 11
                :registry "fontset-variable")))
   (set-fontset-font "fontset-variable" 'hangul (font-spec :name "Noto Sans CJK KR"))
   (set-fontset-font "fontset-variable" 'kana (font-spec :name "Noto Sans CJK JP"))
@@ -83,14 +83,14 @@
 
   (set-face-attribute 'default nil
                       :font "semteulche"
-                      :height 130)
+                      :height 110)
   (set-face-attribute 'fixed-pitch nil
                       :font "semteulche"
-                      :height 130)
+                      :height 110)
   (set-face-attribute 'variable-pitch nil
                       :font "Noto Sans"
                       :fontset "fontset-variable"
-                      :height 130))
+                      :height 110))
 
 ;; There are three cases:
 ;;   1. daemon mode,

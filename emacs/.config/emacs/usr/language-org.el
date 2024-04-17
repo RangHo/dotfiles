@@ -40,6 +40,10 @@
   (org-roam-ui-update-on-save t)
   (org-roam-ui-open-on-start t))
 
+(use-package ox-reveal
+  :custom
+  (org-reveal-root-path "https://cdn.jsdelivr.net/npm/reveal.js"))
+
 (provide 'language-org)
 
 ;;; language-org.el ends here

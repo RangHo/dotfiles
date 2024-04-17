@@ -40,6 +40,9 @@
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'objc-mode-hook 'eglot-ensure)
 
+;; Install CUDA support
+(use-package cuda-mode)
+
 ;; Install CMake support
 (use-package cmake-mode)
 

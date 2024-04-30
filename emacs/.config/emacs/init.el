@@ -216,6 +216,9 @@
 ;; Enable word wrap for text editing modes
 (add-hook 'text-mode-hook 'visual-line-mode)
 
+;; Hunspell is the spell checker
+(setq ispell-program-name "hunspell")
+
 ;; Flycheck syntax checker
 (setq flycheck-emacs-lisp-load-path 'inherit)
 (use-package flycheck

@@ -7,7 +7,9 @@
 ;;; Code:
 
 (use-package dockerfile-mode
-  :mode "Dockerfile\\'")
+  :mode (("Dockerfile\\'" . dockerfile-mode)
+         ("Containerfile\\'" . dockerfile-mode)
+         ("\\.dockerfile\\'" . dockerfile-mode))
 
 (provide 'language-docker)
 

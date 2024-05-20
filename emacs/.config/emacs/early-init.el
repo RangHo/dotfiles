@@ -15,12 +15,6 @@
 
 ;;; Code:
 
-;; Change default eln-cache directory
-(when (fboundp 'startup-redirect-eln-cache)
-  (startup-redirect-eln-cache
-   (convert-standard-filename
-    (expand-file-name  "var/eln-cache/" user-emacs-directory))))
-
 ;; Emacs 26.2 apparently has a TLS bug
 (if (and (<= emacs-major-version 26)
          (<= emacs-minor-version 2))
@@ -31,9 +25,6 @@
 
 ;; Disable package.el
 (setq package-enable-at-startup nil)
-
-;; Change default custom file
-(setq custom-file (expand-file-name "etc/custom.el" user-emacs-directory))
 
 ;; Bootstrap elpaca
 (defvar elpaca-installer-version 0.7)
@@ -83,10 +74,35 @@
 (elpaca-wait)
 
 ;; Do not litter Emacs directory
+(defun rangho/no-littering-theme-custom ()
+  "Theme the Emacs customization feature."
+  (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
+
+(defun rangho/no-littering-theme-eln-cache ()
+  "Theme the Emacs native compilation cache.
+
+This function will move the littered eln-cache directory to the no-littering directory."
+  (let ((old-eln-cache (expand-file-name "eln-cache/" user-emacs-directory))
+        (new-eln-cache (no-littering-expand-var-file-name "eln-cache/")))
+    ;; Set the new eln-cache directory
+    (startup-redirect-eln-cache new-eln-cache)
+
+    ;; Move the contents of the old eln-cache directory to the new eln-cache directory
+    (when (file-exists-p old-eln-cache)
+      (unless (file-exists-p new-eln-cache)
+        (make-directory new-eln-cache t))
+      (dolist (file (directory-files old-eln-cache t))
+        (when (file-regular-p file)
+          (copy-file file (expand-file-name (file-name-nondirectory file) new-eln-cache) t))))
+
+    ;; Delete the old eln-cache directory
+    (delete-directory old-eln-cache 'recursive)))
+
 (use-package no-littering
   :config
   (no-littering-theme-backups)
-  (setq flycheck-emacs-lisp-load-path 'inherit))
+  (rangho/no-littering-theme-custom)
+  (rangho/no-littering-theme-eln-cache))
 
 ;; Wait for the essential packages to be loaded
 (elpaca-wait)

@@ -113,12 +113,11 @@
 
 ;; Evil mode
 (use-package evil
-  :init
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-undo-system 'undo-tree)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-integration t)
+  :custom
+  (evil-vsplit-window-right t)
+  (evil-split-window-below t)
+  (evil-undo-system 'undo-tree)
+  (evil-want-keybinding nil)
   :config
   (evil-mode 1))
 (use-package evil-collection

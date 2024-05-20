@@ -49,12 +49,6 @@
                    ".cache/")))
   "Per-user cache directory.")
 
-(defun rangho/detect-littered-eln-cache (location-hint)
-  "Issue a warning with LOCATION-HINT as a tag if a rogue eln-cache directory was found."
-  (let ((littered-eln-cache (expand-file-name "eln-cache" user-emacs-directory)))
-    (when (file-exists-p littered-eln-cache)
-      (warn "Found rogue eln-cache directory at around %s." littered-eln-cache))))
-
 
 ;;-------------------------------------------------------------------------------
 ;; Emacs behavior modification
@@ -64,7 +58,6 @@
 
 ;; Apply theme without asking (coz I made it anyways)
 (load-theme 'rangho t)
-(rangho/detect-littered-eln-cache "theme")
 
 (use-package mise
   :if (executable-find "mise")
@@ -76,7 +69,6 @@
   (xterm-mouse-mode))
 
 ;; Show fancy dashboard on startup
-(rangho/detect-littered-eln-cache "dashboard")
 (use-package dashboard
   :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
          (elpaca-after-init . dashboard-initialize))
@@ -92,14 +84,12 @@
 
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
-(rangho/detect-littered-eln-cache "ivy")
 (use-package ivy
   :config
   (ivy-mode)
   (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
 
 ;; Show ElDoc documentation in a child frame
-(rangho/detect-littered-eln-cache "eldoc-box")
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
@@ -113,7 +103,6 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; Long-lost Emacs string manipulation library
-(rangho/detect-littered-eln-cache "s)")
 (use-package s)
 
 
@@ -124,7 +113,6 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Evil mode
-(rangho/detect-littered-eln-cache "evil")
 (use-package evil
   :after (undo-tree)
   :init
@@ -135,33 +123,27 @@
   (setq evil-want-integration t)
   :config
   (evil-mode 1))
-(rangho/detect-littered-eln-cache "evil-collection")
 (use-package evil-collection
   :after (evil)
   :init
   (evil-collection-init))
-(rangho/detect-littered-eln-cache "evil-surround")
 (use-package evil-surround
   :after (evil)
   :config
   (global-evil-surround-mode))
 
 ;; Hydra keybinding manager
-(rangho/detect-littered-eln-cache "hydra)")
 (use-package hydra)
 
 ;; God speed!
-(rangho/detect-littered-eln-cache "god-mode)")
 (use-package god-mode)
 
 ;; View which keybinding is available
-(rangho/detect-littered-eln-cache "which-key")
 (use-package which-key
   :config
   (which-key-mode))
 
 ;; Transient command menus
-(rangho/detect-littered-eln-cache "transient")
 (use-package transient
   :bind (:map transient-map ("q" . transient-quit-one)
          :map transient-edit-map ("q" . transient-quit-one)
@@ -175,13 +157,11 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Projectile project manager
-(rangho/detect-littered-eln-cache "projectile")
 (use-package projectile
   :config
   (projectile-mode 1))
 
 ;; Magit git repository manager
-(rangho/detect-littered-eln-cache "magit")
 (use-package magit
   :after (hydra projectile transient)
   :bind (("C-c g" . magit-file-dispatch))
@@ -190,7 +170,6 @@
       (setq project-switch-commands nil)))
 
 ;; Treemacs project explorer
-(rangho/detect-littered-eln-cache "treemacs")
 (use-package treemacs
   :after (hydra god-mode)
   :config
@@ -203,25 +182,19 @@
      (treemacs-git-mode 'deferred))
     (`(t . _)
      (treemacs-git-mode 'simple))))
-(rangho/detect-littered-eln-cache "treemacs-evil")
 (use-package treemacs-evil
   :after (treemacs evil))
-(rangho/detect-littered-eln-cache "treemacs-magit")
 (use-package treemacs-magit
   :after (treemacs magit))
-(rangho/detect-littered-eln-cache "treemacs-projectile")
 (use-package treemacs-projectile
   :after (treemacs projectile))
-(rangho/detect-littered-eln-cache "treemacs-icons-dired")
 (use-package treemacs-icons-dired
   :after (treemacs dired)
   :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 ;; All-the-icons and treemacs integration
-(rangho/detect-littered-eln-cache "all-the-icons")
 (use-package all-the-icons
   :if (or (daemonp) (display-graphic-p)))
-(rangho/detect-littered-eln-cache "treemacs-all-the-icons")
 (use-package treemacs-all-the-icons
   :if (or (daemonp) (display-graphic-p))
   :after (treemacs all-the-icons)
@@ -251,40 +224,33 @@
 
 ;; Flycheck syntax checker
 (setq flycheck-emacs-lisp-load-path 'inherit)
-(rangho/detect-littered-eln-cache "flycheck")
 (use-package flycheck
   :init
   (global-flycheck-mode))
 
 ;; Language Server Protocol support
-(rangho/detect-littered-eln-cache "eglot")
 (use-package eglot
   :ensure nil)
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion
-(rangho/detect-littered-eln-cache "company")
 (use-package company
   :config
   (global-company-mode))
-(rangho/detect-littered-eln-cache "company-box")
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
 ;; Undo-tree undo manager
-(rangho/detect-littered-eln-cache "undo-tree")
 (use-package undo-tree
   :config
   (global-undo-tree-mode))
 
 ;; EditorConfig plugin
-(rangho/detect-littered-eln-cache "editorconfig")
 (use-package editorconfig
   :config
   (editorconfig-mode 1))
 
 ;; Use colorful delimiters because Lisp
-(rangho/detect-littered-eln-cache "rainbow-delimiters")
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
@@ -292,7 +258,6 @@
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 
 ;; Show RGB color codes what they look like
-(rangho/detect-littered-eln-cache "rainbow-mode")
 (use-package rainbow-mode
   :hook (prog-mode . rainbow-mode)
   :init
@@ -313,8 +278,7 @@
        (load-user-config-file
         (lambda (filename)
           (load-file (concat (file-name-as-directory config-dir)
-                             filename))
-          (rangho/detect-littered-eln-cache filename))))
+                             filename)))))
   (if (file-directory-p config-dir)
       (mapc load-user-config-file
             (mapcar 'concat
@@ -322,8 +286,7 @@
 
 ;; Load custom file
 (when (file-exists-p custom-file)
-  (load custom-file)
-  (rangho/detect-littered-eln-cache custom-file))
+  (load custom-file))
 
 (provide 'init)
 

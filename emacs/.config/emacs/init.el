@@ -18,7 +18,7 @@
 ;;; Code:
 
 ;;-------------------------------------------------------------------------------
-;; Constants and helpers
+;; Constants and environments
 ;;
 ;; Useful values that are used throughout the init file.
 ;;-------------------------------------------------------------------------------
@@ -49,6 +49,34 @@
                    ".cache/")))
   "Per-user cache directory.")
 
+;; Use mise if available
+(use-package mise
+  :if (executable-find "mise")
+  :ensure (:host github :repo "liuyinz/mise.el")
+  :init
+  (let ((mise-shims (expand-file-name "mise/shims" user-data-directory)))
+    (setenv "PATH" (concat (getenv "PATH") ":" mise-shims))
+    (add-to-list 'exec-path mise-shims))
+  :config
+  (global-mise-mode))
+
+;; Apply theme without asking (coz I made it anyways)
+(load-theme 'rangho t)
+
+;; Show fancy dashboard on startup
+(use-package dashboard
+  :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
+         (elpaca-after-init . dashboard-initialize))
+  :custom
+  (initial-buffer-choice (lambda ()
+                           (dashboard-refresh-buffer)
+                           (get-buffer-create dashboard-buffer-name)))
+  (dashboard-startup-banner (expand-file-name "usr/share/GNUEmacs.png" user-emacs-directory))
+  (dashboard-image-banner-max-height 400)
+  (dashboard-icon-type 'all-the-icons)
+  :config
+  (dashboard-setup-startup-hook))
+
 
 ;;-------------------------------------------------------------------------------
 ;; Emacs behavior modification
@@ -56,31 +84,9 @@
 ;; Default Emacs has its own quirks. Let's fix that.
 ;;-------------------------------------------------------------------------------
 
-;; Apply theme without asking (coz I made it anyways)
-(load-theme 'rangho t)
-
-(use-package mise
-  :if (executable-find "mise")
-  :ensure (:host github :repo "liuyinz/mise.el")
-  :hook (after-init . global-mise-mode))
-
 ;; Enable Xterm mouse support if no windowing system is found
 (unless (display-graphic-p)
   (xterm-mouse-mode))
-
-;; Show fancy dashboard on startup
-(use-package dashboard
-  :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
-         (elpaca-after-init . dashboard-initialize))
-  :custom
-  (dashboard-startup-banner (expand-file-name "usr/share/GNUEmacs.png" user-emacs-directory))
-  (dashboard-image-banner-max-height 400)
-  (dashboard-icon-type 'all-the-icons)
-  :config
-  (dashboard-setup-startup-hook))
-(setq initial-buffer-choice (lambda ()
-                              (dashboard-refresh-buffer)
-                              (get-buffer-create dashboard-buffer-name)))
 
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion
@@ -88,10 +94,6 @@
   :config
   (ivy-mode)
   (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
-
-;; Show ElDoc documentation in a child frame
-(use-package eldoc-box
-  :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
 ;; Don't show warnings unless it's really important
 (setq native-comp-async-report-warnings-errors nil)
@@ -102,9 +104,6 @@
 ;; y-or-n instead of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;; Long-lost Emacs string manipulation library
-(use-package s)
-
 
 ;;-------------------------------------------------------------------------------
 ;; Keybindings
@@ -114,7 +113,6 @@
 
 ;; Evil mode
 (use-package evil
-  :after (undo-tree)
   :init
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -124,11 +122,9 @@
   :config
   (evil-mode 1))
 (use-package evil-collection
-  :after (evil)
   :init
   (evil-collection-init))
 (use-package evil-surround
-  :after (evil)
   :config
   (global-evil-surround-mode))
 
@@ -163,7 +159,6 @@
 
 ;; Magit git repository manager
 (use-package magit
-  :after (hydra projectile transient)
   :bind (("C-c g" . magit-file-dispatch))
   :init
   (if (not (boundp 'project-switch-commands))
@@ -171,7 +166,6 @@
 
 ;; Treemacs project explorer
 (use-package treemacs
-  :after (hydra god-mode)
   :config
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
@@ -182,14 +176,10 @@
      (treemacs-git-mode 'deferred))
     (`(t . _)
      (treemacs-git-mode 'simple))))
-(use-package treemacs-evil
-  :after (treemacs evil))
-(use-package treemacs-magit
-  :after (treemacs magit))
-(use-package treemacs-projectile
-  :after (treemacs projectile))
+(use-package treemacs-evil)
+(use-package treemacs-magit)
+(use-package treemacs-projectile)
 (use-package treemacs-icons-dired
-  :after (treemacs dired)
   :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 ;; All-the-icons and treemacs integration
@@ -197,7 +187,6 @@
   :if (or (daemonp) (display-graphic-p)))
 (use-package treemacs-all-the-icons
   :if (or (daemonp) (display-graphic-p))
-  :after (treemacs all-the-icons)
   :config
   (treemacs-load-theme "all-the-icons"))
 
@@ -227,6 +216,10 @@
 (use-package flycheck
   :init
   (global-flycheck-mode))
+
+;; Show ElDoc documentation in a child frame
+(use-package eldoc-box
+  :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
 ;; Language Server Protocol support
 (use-package eglot

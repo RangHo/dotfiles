@@ -69,10 +69,13 @@
          (elpaca-after-init . dashboard-initialize))
   :custom
   (dashboard-startup-banner (concat user-emacs-directory "usr/share/GNUEmacs.png"))
-  (dashboard-image-banner-max-height 500)
-  (initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (dashboard-image-banner-max-height 400)
+  (dashboard-icon-type 'all-the-icons)
   :config
   (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda ()
+                              (dashboard-refresh-buffer)
+                              (get-buffer-create dashboard-buffer-name)))
 
 ;; Ivy completion engine
 ;; For future me: this is for M-x completion

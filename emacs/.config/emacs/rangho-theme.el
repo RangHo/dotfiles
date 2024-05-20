@@ -27,9 +27,9 @@
             '(internal-border-width . 10)))
 
 ;; Disable unnecessary UI elements after loading
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(tool-bar-mode 0)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
 
 ;; Disable scrollbars when making new frames
 (defun rangho/disable-scroll-bars (frame)
@@ -42,8 +42,11 @@
 ;; No ugly checkboxes
 (setq widget-image-enable nil)
 
+;; Always highlight current line
+(global-hl-line-mode 1)
+
 ;; Always show matching parentheses
-(show-paren-mode t)
+(show-paren-mode 1)
 
 ;; Enable visual bell
 (setq visual-bell t)
@@ -63,32 +66,43 @@
 (defun rangho/set-fontset-font ()
   "Set the default font to use throughout Emacs."
   (interactive)
-  (set-fontset-font t 'hangul (font-spec :name "Noto Sans Mono CJK KR"))
+  (set-fontset-font t 'hangul (font-spec :name "semteulche"))
   (set-fontset-font t 'kana (font-spec :name "Noto Sans Mono CJK JP"))
   (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK SC"))
   (set-fontset-font t 'han (font-spec :name "Noto Sans Mono CJK TC"))
-  (set-fontset-font t 'unicode (font-spec :name "semteulche"))
   (set-fontset-font t 'emoji (font-spec :name "Noto Color Emoji"))
 
   (create-fontset-from-fontset-spec
    (font-xlfd-name
-    (font-spec :name "Noto Sans"
+    (font-spec :name "Noto Serif CJK KR"
                :size 11
                :registry "fontset-variable")))
-  (set-fontset-font "fontset-variable" 'hangul (font-spec :name "Noto Sans CJK KR"))
-  (set-fontset-font "fontset-variable" 'kana (font-spec :name "Noto Sans CJK JP"))
-  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Sans CJK SC"))
-  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Sans CJK TC"))
+  (set-fontset-font "fontset-variable" 'hangul (font-spec :name "Noto Serif CJK KR"))
+  (set-fontset-font "fontset-variable" 'kana (font-spec :name "Noto Serif CJK JP"))
+  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Serif CJK SC"))
+  (set-fontset-font "fontset-variable" 'han (font-spec :name "Noto Serif CJK TC"))
   (set-fontset-font "fontset-variable" 'emoji (font-spec :name "Noto Color Emoji"))
+
+  (create-fontset-from-fontset-spec
+   (font-xlfd-name
+    (font-spec :name "semteulche"
+               :size 11
+               :registry "fontset-fixed")))
+  (set-fontset-font "fontset-fixed" 'hangul (font-spec :name "semteulche"))
+  (set-fontset-font "fontset-fixed" 'kana (font-spec :name "Noto Sans Mono CJK JP"))
+  (set-fontset-font "fontset-fixed" 'han (font-spec :name "Noto Sans Mono CJK SC"))
+  (set-fontset-font "fontset-fixed" 'han (font-spec :name "Noto Sans Mono CJK TC"))
+  (set-fontset-font "fontset-fixed" 'emoji (font-spec :name "Noto Color Emoji"))
 
   (set-face-attribute 'default nil
                       :font "semteulche"
                       :height 110)
   (set-face-attribute 'fixed-pitch nil
                       :font "semteulche"
+                      :fontset "fontset-fixed"
                       :height 110)
   (set-face-attribute 'variable-pitch nil
-                      :font "Noto Sans"
+                      :font "Noto Serif CJK KR"
                       :fontset "fontset-variable"
                       :height 110))
 
@@ -104,7 +118,6 @@
  ;; 2. graphical mode --- set the font right away
  ((display-graphic-p)
   (rangho/set-fontset-font))
-
  ;; 3. terminal mode --- do nothing
  (t nil))
 
@@ -115,19 +128,18 @@
 (unless (= emacs-major-version 27)
   (use-package ligature
     :config
-    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                                         "\\\\" "://"))
+    (ligature-set-ligatures 'prog-mode
+                            '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>" ":::" "::="
+                              "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!==" "!!." ">=>" ">>="
+                              ">>>" ">>-" ">->" "->>" "-->" "---" "-<<" "<~~" "<~>" "<*>" "<||"
+                              "<|>" "<$>" "<==" "<=>" "<=<" "<->" "<--" "<-<" "<<=" "<<-" "<<<"
+                              "<+>" "</>" "###" "#_(" "..<" "..." "+++" "/==" "///" "_|_" "www"
+                              "&&" "^=" "~~" "~@" "~=" "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|="
+                              "|>" "|-" "{|" "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!"
+                              ">:" ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:" "<$"
+                              "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!" "##" "#(" "#?"
+                              "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:" "?=" "?." "??" ";;" "/*"
+                              "/=" "/>" "//" "__" "~~" "(*" "*)" "\\\\" "://"))
     (global-ligature-mode)))
 
 
@@ -136,52 +148,50 @@
 ;; ===========
 
 ;; Load values from pywal, if available
-;; If colorscheme is not available, use a sensible "grayscale" as default
+;; If colorscheme is not available, use a sensible default
 (if (file-exists-p (concat user-cache-directory "wal/colors.el"))
     (require 'pywal-colors (concat user-cache-directory "wal/colors.el") 'noerror)
-  (setq-default wal/foreground "#f7f7f7"
-                wal/background "#101010"
-                wal/cursor "#f7f7f7"
-                wal/color0 "#101010"
-                wal/color1 "#7c7c7c"
-                wal/color2 "#5c5c5c"
-                wal/color3 "#a0a0a0"
-                wal/color4 "#686868"
-                wal/color5 "#747474"
-                wal/color6 "#868686"
-                wal/color7 "#b9b9b9"
-                wal/color8 "#525252"
-                wal/color9 "#b0b0b0"
-                wal/color10 "#8f8f8f"
-                wal/color11 "#d4d4d4"
-                wal/color12 "#9c9c9c"
-                wal/color13 "#a6a6a6"
-                wal/color14 "#bababa"
-                wal/color15 "#f7f7f7"))
+  (setq-default wal/foreground "#f8f8f2"
+                wal/background "#282a36"
+                wal/cursor     "#44475a"
+                wal/color0     "#21222c"
+                wal/color1     "#ff5555"
+                wal/color2     "#50fa7b"
+                wal/color3     "#f1fa8c"
+                wal/color4     "#bd93f9"
+                wal/color5     "#ff79c6"
+                wal/color6     "#8be9fd"
+                wal/color7     "#f8f8f2"
+                wal/color8     "#6272a4"
+                wal/color9     "#ff6e6e"
+                wal/color10    "#69ff94"
+                wal/color11    "#ffffa5"
+                wal/color12    "#d6acff"
+                wal/color13    "#ff92df"
+                wal/color14    "#a4ffff"
+                wal/color15    "#ffffff"))
 
 ;; Map color values to their representative colors
-;; Note: An `i' next to color name represents that
-;; it is the "intense" variant of the color
 (defvar rangho/color-name-alist
-  `((color/fg        . ,wal/foreground)
-    (color/bg        . ,wal/background)
-    (color/cursor    . ,wal/cursor)
-    (color/black     . ,wal/color0)
-    (color/blacki    . ,wal/color8)
-    (color/red       . ,wal/color1)
-    (color/redi      . ,wal/color9)
-    (color/green     . ,wal/color2)
-    (color/greeni    . ,wal/color10)
-    (color/yellow    . ,wal/color3)
-    (color/yellowi   . ,wal/color11)
-    (color/blue      . ,wal/color4)
-    (color/bluei     . ,wal/color12)
-    (color/magenta   . ,wal/color5)
-    (color/magentai  . ,wal/color13)
-    (color/cyan      . ,wal/color6)
-    (color/cyani     . ,wal/color14)
-    (color/white     . ,wal/color7)
-    (color/whitei    . ,wal/color15))
+  `((color/foreground      . ,wal/foreground)
+    (color/background      . ,wal/background)
+    (color/cursor          . ,wal/cursor)
+    (color/black           . ,wal/color0)
+    (color/intense-black   . ,wal/color8)
+    (color/red             . ,wal/color1)
+    (color/intense-red     . ,wal/color9)
+    (color/green           . ,wal/color2)
+    (color/intense-green   . ,wal/color10)
+    (color/yellow          . ,wal/color3)
+    (color/intense-yellow  . ,wal/color11)
+    (color/blue            . ,wal/color4)
+    (color/intense-blue    . ,wal/color12)
+    (color/magenta         . ,wal/color5)
+    (color/intense-magenta . ,wal/color13)
+    (color/cyan            . ,wal/color6)
+    (color/intense-cyan    . ,wal/color14)
+    (color/white           . ,wal/color7)
+    (color/intense-white   . ,wal/color15))
   "Association list to map wal colors to friendly names.")
 
 ;; Load color utility
@@ -235,50 +245,128 @@
    'rangho
 
    ;; Basic UI elements
-   `(default      ((t (:foreground ,.color/fg :background ,.color/bg))))
-   `(cursor       ((t (:foreground ,.color/bg :background ,.color/cursor))))
-   `(region       ((t (:foreground ,.color/bg :background ,.color/fg))))
-   `(highlight    ((t (:background ,.color/blacki))))
-   `(button       ((t (:underline t))))
-   `(link         ((t (:foreground ,.color/bluei :underline t :weight bold))))
-   `(link-visited ((t (:foreground ,.color/blue :underline t :weight normal))))
-   `(success      ((t (:foreground ,.color/green :weight bold))))
-   `(warning      ((t (:foreground ,.color/yellow :weight bold))))
-
-   ;; Modeline configuration
-   `(mode-line           ((t (:foreground ,.color/bg-10 :background ,.color/fg+10 :box (:line-width 3 :color ,.color/fg+10 :style nil)))))
-   `(mode-line-inactive  ((t (:foreground ,.color/fg-10 :background ,.color/bg+10 :box (:line-width 3 :color ,.color/bg+10 :style nil)))))
+   `(border              ((t (:foreground ,.color/foreground+10))))
+   `(button              ((t (:underline t))))
+   `(cursor              ((t (:foreground ,.color/background :background ,.color/foreground))))
+   `(default             ((t (:foreground ,.color/foreground :background ,.color/background))))
+   `(default-italic      ((t (:slant italic))))
+   `(error               ((t (:foreground ,.color/red :weight bold))))
+   `(ffap                ((t (:foreground ,.color/foreground-20))))
+   `(fringe              ((t (:background ,.color/background-10))))
+   `(header-line         ((t (:inherit mode-line))))
+   `(highlight           ((t (:foreground ,.color/intense-white :background ,.color/intense-black))))
+   `(hl-line             ((t (:background ,.color/cursor :extend t))))
+   `(info-quoted-name    ((t (:foreground ,.color/intense-red))))
+   `(info-string         ((t (:foreground ,.color/intense-yellow))))
+   `(line-number         ((t (:foreground ,.color/intense-black :slant italic))))
+   `(link                ((t (:foreground ,.color/cyan :underline t :weight bold))))
+   `(link-visited        ((t (:foreground ,.color/blue :underline t :weight normal))))
+   `(match               ((t (:foreground ,.color/background :background ,.color/yellow))))
+   `(menu                ((t (:background ,.color/current :inverse-video nil))))
+   `(minibuffer-prompt   ((t (:foreground ,.color/intense-magenta :weight bold))))
+   `(mode-line           ((t (:foreground
+                              ,.color/background-20
+                              :background
+                              ,.color/foreground+20
+                              :box
+                              (:line-width 3 :color ,.color/foreground+10 :style nil)))))
+   `(mode-line-inactive  ((t (:foreground
+                              ,.color/foreground-20
+                              :background
+                              ,.color/background+20
+                              :box
+                              (:line-width 3 :color ,.color/background+10 :style nil)))))
    `(mode-line-highlight ((t (:inherit highlight))))
    `(mode-line-emphasis  ((t (:weight regular))))
    `(mode-line-buffer-id ((t (:weight regular))))
+   `(region              ((t (:inherit highlight))))
+   `(shadow              ((t (:foreground ,.color/intense-black))))
+   `(success             ((t (:foreground ,.color/green :weight bold))))
+   `(tooltip             ((t (:foregroud ,.color/foreground :background ,.color/cursor))))
+   `(trailing-whitespace ((t (:background ,.color/intense-yellow))))
+   `(vertical-border     ((t (:foreground ,.color/foreground-10))))
+   `(warning             ((t (:foreground ,.color/yellow :weight bold))))
    
    ;; font-lock!
-   `(font-lock-comment-face       ((t (:foreground ,.color/green))))
-   `(font-lock-doc-face           ((t (:foreground ,.color/greeni))))
-   `(font-lock-keyword-face       ((t (:foreground ,.color/bluei))))
-   `(font-lock-builtin-face       ((t (:foreground ,.color/blue))))
-   `(font-lock-type-face          ((t (:foreground ,.color/cyan))))
-   `(font-lock-string-face        ((t (:foreground ,.color/yellowi))))
-   `(font-lock-variable-name-face ((t (:foreground ,.color/yellow))))
-   `(font-lock-constant-face      ((t (:foreground ,.color/magentai))))
-   `(font-lock-function-name-face ((t (:foreground ,.color/magenta))))
+   `(font-lock-builtin-face           ((t (:foreground ,.color/cyan :slant italic))))
+   `(font-lock-comment-face           ((t (:foreground ,.color/intense-black))))
+   `(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face))))
+   `(font-lock-constant-face          ((t (:foreground ,.color/intense-magenta))))
+   `(font-lock-doc-face               ((t (:foreground ,.color/intense-black+20))))
+   `(font-lock-function-name-face     ((t (:foreground ,.color/green))))
+   `(font-lock-keyword-face           ((t (:foreground ,.color/magenta))))
+   `(font-lock-negation-char-face     ((t (:foreground ,.color/cyan))))
+   `(font-lock-number-face            ((t (:inherit font-lock-constant-face))))
+   `(font-lock-operator-face          ((t (:inherit font-lock-keyword-face))))
+   `(font-lock-preprocessor-face      ((t (:foreground ,.color/intense-red))))
+   `(font-lock-string-face            ((t (:foreground ,.color/intense-yellow))))
+   `(font-lock-type-face              ((t (:inherit font-lock-builtin-face))))
+   `(font-lock-variable-name-face     ((t (:foreground ,.color/yellow))))
+   `(font-lock-warning-face           ((t (:inherit warining))))
 
-   ;; Org-mode
-   `(org-block                 ((t (:background ,.color/bg+20))))
-   `(org-document-info         ((t (:foreground "dark orange" :weight bold))))
-   `(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   `(org-document-title        ((t (:inherit (shadow fixed-pitch)))))
-   `(org-level-1               ((t (:inherit default :weight bold :height 2.0))))
-   `(org-level-2               ((t (:inherit default :weight bold :height 1.75))))
-   `(org-level-3               ((t (:inherit default :weight bold :height 1.5))))
-   `(org-level-4               ((t (:inherit default :weight bold :height 1.25))))
-   `(org-level-5               ((t (:inherit default :weight bold :height 1.125))))
-   `(org-level-6               ((t (:inherit default :weight bold :height 1.0))))
-   `(org-level-7               ((t (:inherit default :weight bold :height 1.0))))
-   `(org-level-8               ((t (:inherit default :weight bold :height 1.0))))
+   ;; ANSI colors
+   `(ansi-color-black          ((t (:foreground ,.color/black :background ,.color/black))))
+   `(ansi-color-blue           ((t (:foreground ,.color/blue :background ,.color/blue))))
+   `(ansi-color-cyan           ((t (:foreground ,.color/cyan :background ,.color/cyan))))
+   `(ansi-color-green          ((t (:foreground ,.color/green :background ,.color/green))))
+   `(ansi-color-magenta        ((t (:foreground ,.color/magenta :background ,.color/magenta))))
+   `(ansi-color-red            ((t (:foreground ,.color/red :background ,.color/red))))
+   `(ansi-color-white          ((t (:foreground ,.color/white :background ,.color/white))))
+   `(ansi-color-yellow         ((t (:foreground ,.color/yellow :background ,.color/yellow))))
+   `(ansi-color-bright-black   ((t (:foreground ,.color/intense-black :background ,.color/intense-black))))
+   `(ansi-color-bright-blue    ((t (:foreground ,.color/intense-blue :background ,.color/intense-blue))))
+   `(ansi-color-bright-cyan    ((t (:foreground ,.color/intense-cyan :background ,.color/intense-cyan))))
+   `(ansi-color-bright-green   ((t (:foreground ,.color/intense-green :background ,.color/intense-green))))
+   `(ansi-color-bright-magenta ((t (:foreground ,.color/intense-magenta :background ,.color/intense-magenta))))
+   `(ansi-color-bright-red     ((t (:foreground ,.color/intense-red :background ,.color/intense-red))))
+   `(ansi-color-bright-white   ((t (:foreground ,.color/intense-white :background ,.color/intense-white))))
+   `(ansi-color-bright-yellow  ((t (:foreground ,.color/intense-yellow :background ,.color/intense-yellow))))
+
+   ;; Company
+   `(company-echo-common ((t (:foreground ,.color/background :background ,.color/foreground))))
+
+   ;; Diff
+   `(diff-added             ((t (:foreground ,.color/foreground :background ,.color/green-40 :extend t))))
+   `(diff-removed           ((t (:foreground ,.color/foreground :background ,.color/red-40 :extend t))))
+   `(diff-refine-added      ((t (:foreground ,.color/background :background ,.color/green))))
+   `(diff-refine-removed    ((t (:foreground ,.color/background :background ,.color/red))))
+   `(diff-indicator-added   ((t (:foreground ,.color/green))))
+   `(diff-indicator-removed ((t (:foreground ,.color/red))))
+   `(diff-indicator-changed ((t (:foreground ,.color/yellow))))
+   `(diff-error             ((t (:foreground ,.color/red :background ,.color/background :weight bold))))
+
+   ;; Org
+   `(org-block                 ((t (:background ,.color/background+40))))
+   `(org-code                  ((t (:foreground ,.color/intense-green))))
+   `(org-document-info         ((t (:foreground ,.color/intense-blue))))
+   `(org-document-info-keyword ((t (:foreground ,.color/intense-black))))
+   `(org-document-title        ((t (:foreground ,.color/intense-red :weight bold :height 1.44))))
+   `(org-ellipsis              ((t (:foreground ,.color/intense-black))))
+   `(org-footnote              ((t (:foreground ,.color/intense-blue))))
+   `(org-formula               ((t (:foreground ,.color/intense-magenta))))
+   `(org-level-1               ((t (:foreground ,.color/foreground-40 :weight bold :height 1.3))))
+   `(org-level-2               ((t (:foreground ,.color/foreground-20 :weight bold :height 1.1))))
+   `(org-level-3               ((t (:foreground ,.color/foreground10  :weight bold :height 1.0))))
+   `(org-level-4               ((t (:foreground ,.color/foreground-5 :weight bold :height 1.0))))
+   `(org-level-5               ((t (:foreground ,.color/foreground :weight bold :height 1.0))))
+   `(org-level-6               ((t (:foreground ,.color/foreground :height 1.0))))
+   `(org-level-7               ((t (:foreground ,.color/foreground :height 1.0))))
+   `(org-level-8               ((t (:foreground ,.color/foreground :height 1.0))))
+   `(org-link                  ((t (:inherit link))))
    `(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   `(org-table                 ((t (:inherit fixed-pitch))))
-   `(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
+   `(org-table                 ((t ()))))
+   `(org-verbatim              ((t (:foreground ,.color/green)))
+   `(org-warning               ((t (:foreground ,.color/yellow :weight bold))))
+
+   ;; Outline
+   `(outline-1 ((t (:foreground ,.color/foreground-40 :weight bold :height 1.3))))
+   `(outline-2 ((t (:foreground ,.color/foreground-20 :weight bold :height 1.1))))
+   `(outline-3 ((t (:foreground ,.color/foreground10  :weight bold :height 1.0))))
+   `(outline-4 ((t (:foreground ,.color/foreground-5 :weight bold :height 1.0))))
+   `(outline-5 ((t (:foreground ,.color/foreground :weight bold :height 1.0))))
+   `(outline-6 ((t (:foreground ,.color/foreground :height 1.0))))
+   `(outline-7 ((t (:foreground ,.color/foreground :height 1.0))))
+   `(outline-8 ((t (:foreground ,.color/foreground :height 1.0))))
    ))
 
 (provide-theme 'rangho)

@@ -224,8 +224,11 @@
 
 ;; Show ElDoc documentation in a child frame
 (use-package eldoc
-  :ensure nil)
+  :ensure nil
+  :custom
+  (eldoc-echo-area-prefer-doc-buffer t))
 (use-package eldoc-box
+  :if (or (daemonp) (display-graphic-p))
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
 
 ;; Company in-buffer completion engine

@@ -1,9 +1,11 @@
-<img align="center" src="verniy-dotfiles.png" />
-<p align="center">
-  <small>Original image by <a href="https://www.pixiv.net/member_illust.php?id=3180989">キノスケ</a></small>
-</p>
-
---------------------------------------------------------------------------------
+<hgroup>
+    <h1>
+        <img align="center" src="verniy-dotfiles.png" />
+    </h1>
+    <p align="center">
+        <small>Original image by <a href="https://www.pixiv.net/member_illust.php?id=3180989">キノスケ</a></small>
+    </p>
+</hgroup>
 
 ## What is a _dotfile_?
 

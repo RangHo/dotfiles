@@ -4,6 +4,7 @@
 
 ;; Author: RangHo Lee <hello@rangho.me>
 ;; URL: https://github.com/RangHo/dotfiles
+;; Package-Requires: ((emacs "29.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -14,11 +15,6 @@
 ;; in the init file.  Usually performance-related and bootstrapping stuff.
 
 ;;; Code:
-
-;; Emacs 26.2 apparently has a TLS bug
-(if (and (<= emacs-major-version 26)
-         (<= emacs-minor-version 2))
-    (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
 ;; If an `.el' file is newer than its corresponding `.elc' file, prefer the `.el' file.
 (setq load-prefer-newer t)

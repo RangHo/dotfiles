@@ -262,7 +262,7 @@
    `(link                ((t (:foreground ,.color/cyan :underline t :weight bold))))
    `(link-visited        ((t (:foreground ,.color/blue :underline t :weight normal))))
    `(match               ((t (:foreground ,.color/background :background ,.color/yellow))))
-   `(menu                ((t (:background ,.color/current :inverse-video nil))))
+   `(menu                ((t (:inverse-video nil))))
    `(minibuffer-prompt   ((t (:foreground ,.color/intense-magenta :weight bold))))
    `(mode-line           ((t (:foreground
                               ,.color/background-20
@@ -344,14 +344,6 @@
    `(org-ellipsis              ((t (:foreground ,.color/intense-black))))
    `(org-footnote              ((t (:foreground ,.color/intense-blue))))
    `(org-formula               ((t (:foreground ,.color/intense-magenta))))
-   `(org-level-1               ((t (:foreground ,.color/foreground-40 :weight bold :height 1.3))))
-   `(org-level-2               ((t (:foreground ,.color/foreground-20 :weight bold :height 1.1))))
-   `(org-level-3               ((t (:foreground ,.color/foreground10  :weight bold :height 1.0))))
-   `(org-level-4               ((t (:foreground ,.color/foreground-5 :weight bold :height 1.0))))
-   `(org-level-5               ((t (:foreground ,.color/foreground :weight bold :height 1.0))))
-   `(org-level-6               ((t (:foreground ,.color/foreground :height 1.0))))
-   `(org-level-7               ((t (:foreground ,.color/foreground :height 1.0))))
-   `(org-level-8               ((t (:foreground ,.color/foreground :height 1.0))))
    `(org-link                  ((t (:inherit link))))
    `(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
    `(org-table                 ((t ()))))

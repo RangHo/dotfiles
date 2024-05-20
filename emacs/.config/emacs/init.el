@@ -77,6 +77,9 @@
   :config
   (dashboard-setup-startup-hook))
 
+;; Wait for packages
+(elpaca-wait)
+
 
 ;;-------------------------------------------------------------------------------
 ;; Emacs behavior modification
@@ -88,13 +91,6 @@
 (unless (display-graphic-p)
   (xterm-mouse-mode))
 
-;; Ivy completion engine
-;; For future me: this is for M-x completion
-(use-package ivy
-  :config
-  (ivy-mode)
-  (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
-
 ;; Don't show warnings unless it's really important
 (setq native-comp-async-report-warnings-errors nil)
 
@@ -103,6 +99,10 @@
 
 ;; y-or-n instead of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+;; Fix calls to the deprecated cl libraries
+;; Wait for packages
+(elpaca-wait)
 
 
 ;;-------------------------------------------------------------------------------
@@ -144,6 +144,9 @@
   :bind (:map transient-map ("q" . transient-quit-one)
          :map transient-edit-map ("q" . transient-quit-one)
          :map transient-sticky-map ("q" . transient-quit-seq)))
+
+;; Wait for packages
+(elpaca-wait)
 
 
 ;;-------------------------------------------------------------------------------
@@ -190,6 +193,9 @@
   :config
   (treemacs-load-theme "all-the-icons"))
 
+;; Wait for packages
+(elpaca-wait)
+
 
 ;;-------------------------------------------------------------------------------
 ;; Editing support
@@ -218,12 +224,10 @@
   (global-flycheck-mode))
 
 ;; Show ElDoc documentation in a child frame
+(use-package eldoc
+  :ensure nil)
 (use-package eldoc-box
   :hook (prog-mode . eldoc-box-hover-at-point-mode))
-
-;; Language Server Protocol support
-(use-package eglot
-  :ensure nil)
 
 ;; Company in-buffer completion engine
 ;; For future me: this is for code completion
@@ -232,6 +236,17 @@
   (global-company-mode))
 (use-package company-box
   :hook (company-mode . company-box-mode))
+
+;; Ivy completion engine
+;; For future me: this is for M-x completion
+(use-package ivy
+  :config
+  (ivy-mode)
+  (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
+
+;; Language Server Protocol support
+(use-package eglot
+  :ensure nil)
 
 ;; Undo-tree undo manager
 (use-package undo-tree
@@ -243,6 +258,12 @@
   :config
   (editorconfig-mode 1))
 
+;; Show RGB color codes what they look like
+(use-package rainbow-mode
+  :hook (prog-mode . rainbow-mode)
+  :init
+  (setq rainbow-x-colors nil))
+
 ;; Use colorful delimiters because Lisp
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -250,11 +271,8 @@
 ;; Always auto-insert matching delimiters
 (add-hook 'prog-mode-hook 'electric-pair-mode)
 
-;; Show RGB color codes what they look like
-(use-package rainbow-mode
-  :hook (prog-mode . rainbow-mode)
-  :init
-  (setq rainbow-x-colors nil))
+;; Wait for packages
+(elpaca-wait)
 
 
 ;;-------------------------------------------------------------------------------
@@ -262,9 +280,6 @@
 ;;
 ;; Language-specific configuration or utilities go in a separate file.
 ;;-------------------------------------------------------------------------------
-
-;; Wait for core packages
-(elpaca-wait)
 
 ;; Load non-global configurations
 (let* ((config-dir (concat user-emacs-directory "usr"))

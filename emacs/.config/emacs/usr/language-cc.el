@@ -35,13 +35,13 @@
 (add-to-list 'auto-mode-alist '("\\.HC\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.ZC\\'" . c-mode))
 
+;; Add CUDA extensions
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+
 ;; Use language server for C
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'objc-mode-hook 'eglot-ensure)
-
-;; Install CUDA support
-(use-package cuda-mode)
 
 ;; Install CMake support
 (use-package cmake-mode)

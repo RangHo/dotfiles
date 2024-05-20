@@ -58,7 +58,7 @@
     (setenv "PATH" (concat (getenv "PATH") ":" mise-shims))
     (add-to-list 'exec-path mise-shims))
   :config
-  (global-mise-mode))
+  (global-mise-mode 1))
 
 ;; Apply theme without asking (coz I made it anyways)
 (load-theme 'rangho t)
@@ -89,7 +89,7 @@
 
 ;; Enable Xterm mouse support if no windowing system is found
 (unless (display-graphic-p)
-  (xterm-mouse-mode))
+  (xterm-mouse-mode 1))
 
 ;; Don't show warnings unless it's really important
 (setq native-comp-async-report-warnings-errors nil)
@@ -125,7 +125,7 @@
   (evil-collection-init))
 (use-package evil-surround
   :config
-  (global-evil-surround-mode))
+  (global-evil-surround-mode 1))
 
 ;; Hydra keybinding manager
 (use-package hydra)
@@ -136,7 +136,7 @@
 ;; View which keybinding is available
 (use-package which-key
   :config
-  (which-key-mode))
+  (which-key-mode 1))
 
 ;; Transient command menus
 (use-package transient
@@ -169,8 +169,8 @@
 ;; Treemacs project explorer
 (use-package treemacs
   :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1)
   (treemacs-fringe-indicator-mode 'always)
   (pcase (cons (not (null (executable-find "git")))
                (not (null treemacs-python-executable)))
@@ -203,7 +203,7 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Fuck tabs because reasons
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode -1)
 (setq-default tab-stop-list (number-sequence 4 120 4))
 
 ;; Display line number for programming-related modes
@@ -214,13 +214,17 @@
 (add-hook 'text-mode-hook 'visual-line-mode)
 
 ;; Hunspell is the spell checker
-(setq ispell-program-name "hunspell")
+(use-package ispell
+  :ensure nil
+  :custom
+  (ispell-program-name (executable-find "hunspell")))
 
 ;; Flycheck syntax checker
-(setq flycheck-emacs-lisp-load-path 'inherit)
 (use-package flycheck
-  :init
-  (global-flycheck-mode))
+  :custom
+  (flycheck-emacs-lisp-load-path 'inherit)
+  :config
+  (global-flycheck-mode 1))
 
 ;; Show ElDoc documentation in a child frame
 (use-package eldoc
@@ -235,7 +239,7 @@
 ;; For future me: this is for code completion
 (use-package company
   :config
-  (global-company-mode))
+  (global-company-mode 1))
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
@@ -243,7 +247,7 @@
 ;; For future me: this is for M-x completion
 (use-package ivy
   :config
-  (ivy-mode)
+  (ivy-mode 1)
   (ivy-define-key ivy-minibuffer-map (kbd "<S-return>") #'ivy-immediate-done))
 
 ;; Language Server Protocol support
@@ -253,7 +257,7 @@
 ;; Undo-tree undo manager
 (use-package undo-tree
   :config
-  (global-undo-tree-mode))
+  (global-undo-tree-mode 1))
 
 ;; EditorConfig plugin
 (use-package editorconfig

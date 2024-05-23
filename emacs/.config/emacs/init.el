@@ -71,7 +71,7 @@
   (initial-buffer-choice (lambda ()
                            (dashboard-refresh-buffer)
                            (get-buffer-create dashboard-buffer-name)))
-  (dashboard-startup-banner (expand-file-name "usr/share/GNUEmacs.png" user-emacs-directory))
+  (dashboard-startup-banner (expand-file-name "usr/share/gnu-emacs.png" user-emacs-directory))
   (dashboard-image-banner-max-height 400)
   (dashboard-icon-type 'all-the-icons)
   :config

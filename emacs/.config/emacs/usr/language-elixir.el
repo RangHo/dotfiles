@@ -9,7 +9,7 @@
 ;; Add Elixir syntax highlight support
 (use-package elixir-mode
   :hook (elixir-mode . eglot-ensure)
-  :init
+  :config
   (add-to-list 'eglot-server-programs '(elixir-mode . ("elixir-ls"))))
 
 ;; Use `web-mode' for EEx templates

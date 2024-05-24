@@ -100,15 +100,11 @@ This function will move the littered eln-cache directory to the no-littering dir
   (rangho/no-littering-theme-custom)
   (rangho/no-littering-theme-eln-cache))
 
-;; Apply magical GC settings
-(use-package gcmh
-  :custom
-  (gcmh-verbose t)
-  :config
-  (gcmh-mode 1))
-
 ;; Wait for the essential packages to be loaded
 (elpaca-wait)
+
+;; Incrase GC threshold to reduce GC frequency
+(setq gc-cons-threshold most-positive-fixnum)
 
 (provide 'early-init)
 

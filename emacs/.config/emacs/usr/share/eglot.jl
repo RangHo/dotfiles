@@ -1,0 +1,26 @@
+# Wrapper of Julia language and symbol server for Eglot
+
+import Pkg
+
+# Initialize the environment
+Pkg.instantiate()
+Pkg.add(["LanguageServer", "SymbolServer"])
+
+# Find the root directories
+source_root = length(ARGS) > 0 ? ARGS[1] : pwd()
+project_root = something(
+    Base.current_project(source_root),
+    Base.load_path_expand(LOAD_PATH[2]),
+) |> dirname
+depot_root = get(ENV, "JULIA_DEPOT_PATH", joinpath(homedir(), ".julia"))
+
+# Normalize the load path
+empty!(LOAD_PATH)
+push!(LOAD_PATH, "@")
+
+# Load the server
+using LanguageServer
+using SymbolServer
+
+server = LanguageServerInstance(stdin, stdout, project_root, depot_root)
+run(server)

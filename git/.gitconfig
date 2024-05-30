@@ -4,6 +4,7 @@
 [core]
 	pager = delta
 	editor = nvim
+	autocrlf = input
 [color]
 	ui = true
 [color "diff-highlight"]

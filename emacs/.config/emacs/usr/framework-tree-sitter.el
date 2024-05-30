@@ -7,7 +7,8 @@
 ;;; Code:
 
 (unless (< emacs-major-version 29)
-  (require 'treesit))
+  (use-package treesit
+    :ensure nil))
 
 (when (featurep 'treesit)
   ;; Change the default loading directory

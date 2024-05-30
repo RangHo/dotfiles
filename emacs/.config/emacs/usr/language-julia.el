@@ -37,6 +37,13 @@
   (add-to-list 'eglot-server-programs
 	       '(julia-mode . rangho/julia-language-server-contact)))
 
+(use-package julia-ts-mode
+  :if nil ; (featurep 'treesit)
+  :hook (julia-ts-mode . eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs
+	       '(julia-ts-mode . rangho/julia-language-server-contact)))
+
 (provide 'language-julia)
 
 ;;; language-julia.el ends here

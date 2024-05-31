@@ -2,7 +2,10 @@
 
 ;;; Commentary:
 
-;;
+;; These keybindings do not belong to any specific package, but are
+;; rather general keybindings that are useful to have in any context.
+;; Package-specific keybindings should be defined in their respective
+;; `use-package' declarations.
 
 ;;; Code:
 

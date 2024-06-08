@@ -302,7 +302,7 @@
    `(font-lock-string-face            ((t (:foreground ,.color/intense-yellow))))
    `(font-lock-type-face              ((t (:inherit font-lock-builtin-face))))
    `(font-lock-variable-name-face     ((t (:foreground ,.color/yellow))))
-   `(font-lock-warning-face           ((t (:inherit warining))))
+   `(font-lock-warning-face           ((t (:inherit warning))))
 
    ;; ANSI colors
    `(ansi-color-black          ((t (:foreground ,.color/black :background ,.color/black))))

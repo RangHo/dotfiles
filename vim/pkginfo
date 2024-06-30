@@ -1,16 +1,8 @@
 #!/bin/sh
 
-depends native neovim
+depends native vim
 
 post_install() {
-    # Support legacy vim config directory as well
-    ln -s ~/.config/nvim/init.vim ~/.vimrc
-
     # Install plugins
-    nvim +PlugInstall +qall
-}
-
-post_uninstall() {
-    # Remove legacy vimrc
-    rm -rf ~/.vimrc ~/.vim
+    vim +PlugInstall
 }

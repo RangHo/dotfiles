@@ -4,5 +4,5 @@
 # ...except custom configuration files
 !.config/emacs/early-init.el
 !.config/emacs/init.el
-!.config/emacs/rangho-theme.el
+!.config/emacs/config.org
 !.config/emacs/usr

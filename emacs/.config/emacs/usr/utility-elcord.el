@@ -6,39 +6,19 @@
 
 ;;; Code:
 
-(defvar rangho/elcord-focus-out-timer nil
-  "Timer to automatically disconnect from Discord after a period of inactivity.")
+(defconst rangho/elcord-grace-period 60
+  "Time in seconds to wait before disconnecting from Discord.")
 
-(defun rangho/elcord-focus-out ()
-  "Disconnect from Discord after a period of inactivity."
-  (interactive)
-  (when (and (bound-and-true-p elcord-mode)
-             (not rangho/elcord-focus-out-timer))
-    (setq rangho/elcord-focus-out-timer
-          (run-with-timer 60
-                          nil
-                          (lambda ()
-                            (elcord-mode -1)
-                            (setq rangho/elcord-focus-out-timer nil))))))
+(defun rangho/connect-elcord-on-focus-change ()
+  "Connect to Discord when Emacs notices a focus change event."
+  (when elcord-mode
+    (if (frame-focus-state)
+	(elcord--enable)
+      (run-with-idle-timer rangho/elcord-grace-period nil #'elcord--disable))))
 
-(defun rangho/elcord-focus-in ()
-  "Reconnect to Discord when Emacs is focused."
-  (interactive)
-  (cond
-   ;; If elcord is running and the timer is active, cancel it
-   ((and (bound-and-true-p elcord-mode)
-         rangho/elcord-focus-out-timer)
-    (cancel-timer rangho/elcord-focus-out-timer)
-    (setq rangho/elcord-focus-out-timer nil))
-
-   ;; If elcord is not running, start it
-   ((not elcord-mode)
-    (elcord-mode 1)
-    (setq rangho/elcord-focus-out-timer nil))))
-
-;; Register focus hooks
-(add-hook 'focus-out-hook #'rangho/elcord-focus-out)
-(add-hook 'focus-in-hook #'rangho/elcord-focus-in)
+;; Register focus hook
+(add-function :after after-focus-change-function
+	      #'rangho/connect-elcord-on-focus-change)
 
 ;; Install Discord integration
 (use-package elcord

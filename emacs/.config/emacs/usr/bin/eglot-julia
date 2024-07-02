@@ -1,4 +1,5 @@
-# Wrapper of Julia language and symbol server for Eglot
+#!/usr/bin/env julia
+# -*- mode: julia -*-
 
 import Pkg
 

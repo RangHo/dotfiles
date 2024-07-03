@@ -1743,3 +1743,14 @@ This is especially useful for stylesheets, etc.
     (rainbow-r-colors nil)
     (rainbow-x-colors nil))
 #+end_src
+
+** Terminal Emulator
+Emacs has an ANSI terminal emulator, but it is rather slow.
+~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
+
+#+begin_src emacs-lisp
+  (use-package eat
+    :bind (("C-c RET" . eat))
+    :hook ((eshell-load . eat-eshell-mode)
+           (eshell-load . eat-eshell-visual-command-mode)))
+#+end_src

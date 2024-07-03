@@ -10,7 +10,7 @@ if not type -q fisher
 
     # Change XDG_CONFIG_HOME temporarily to prevent nonexistent commmands
     # from being executed
-    set tmpdir (mktemp --directory)
+    set tmpdir (mktemp -d)
     set xdg_config_home_backup $XDG_CONFIG_HOME
     set -x XDG_CONFIG_HOME $tmpdir
 

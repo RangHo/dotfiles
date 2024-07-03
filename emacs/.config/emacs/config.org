@@ -12,7 +12,6 @@ These are some constants that are used throughout the configuration.
 
 ** Name and Email
 My name and email address.
-These are defined with ~defvar~ because I might want to change this depending on the project I am working on.
 
 #+begin_src emacs-lisp
   (defconst user-full-name
@@ -260,8 +259,8 @@ If Emacs is running in a CLI mode, we can enable mouse support for Xterm.
 The default scroll movement is pretty aggressive, so we need to tone it down a bit.
 
 #+begin_src emacs-lisp
+  (setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
   (setq mouse-wheel-progressive-speed nil)
-  (setq scroll-conservatively 101)
 #+end_src
 
 ** Simple Questions
@@ -347,39 +346,62 @@ Fonts are super important, not because they're pretty, but because it greatly af
 Here is a set of fonts I use.
 
 #+begin_src emacs-lisp
-  ;; Sample sentences to check font support:
-  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
-  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
-  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
-  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee🐦 da📘 ba💙 dai🌊
+    ;; Sample sentences to check font support:
+    ;;   - Latin:  The quick brown fox jumps over the lazy dog.
+    ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
+    ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
+    ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
 
-  (defconst rangho/fixed-font-alist
-    '((nil "hesalche" "semteulche" "Noto Sans Mono")
-      (hangul "hesalche" "semteulche" "Noto Sans Mono CJK KR")
-      (kana "Noto Sans Mono CJK JP")
-      (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC"))
-      (emoji "Noto Color Emoji"))
-    "List of fixed-pitch fonts, in order of preference.")
+    (defconst rangho/fixed-font-alist
+      '((nil "hesalche" "semteulche"
+             "Noto Sans Mono"
+             "Cascadia Code" "Consolas" "Courier New"
+             "monospace")
+        (hangul "hesalche" "semteulche"
+                "Noto Sans Mono CJK KR"
+                "DotumChe" "GulimChe"
+                "monospace")
+        (kana "Noto Sans Mono CJK JP"
+              "GulimChe" "DotumChe"
+              "monospace")
+        (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
+             "GulimChe" "DotumChe"
+             "monospace")
+        (emoji "Noto Color Emoji")
+               "Segoe UI Emoji")
+      "List of fixed-pitch fonts, in order of preference.")
 
-  (defconst rangho/variable-font-alist
-    '((nil "Noto Sans" "Noto Serif")
-      (hangul "Noto Sans CJK KR" "Noto Serif CJK KR")
-      (kana "Noto Sans CJK JP" "Noto Serif CJK JP")
-      (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
-           ("Noto Sans CJK TC" "Noto Serif CJK TC"))
-      (emoji "Noto Color Emoji"))
-    "List of variable-pitch fonts, in order of preference.")
+    (defconst rangho/variable-font-alist
+      '((nil "Noto Sans" "Noto Serif"
+             "Segoe UI" "Arial"
+             "sans-serif")
+        (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
+                "Malgun Gothic" "Dotum" "Gulim"
+                "sans-serif")
+        (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
+              "Meiryo" "Yu Gothic" "Yu Mincho"
+              "sans-serif")
+        (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
+             ("Noto Sans CJK TC" "Noto Serif CJK TC")
+             "Microsoft YaHei" "Microsoft JhengHei"
+             "sans-serif")
+        (emoji "Noto Color Emoji"
+               "Segoe UI Emoji"))
+      "List of variable-pitch fonts, in order of preference.")
 #+end_src
 
 Emacs has weird ways of implementing font lookup.
-
 There are two different concepts:
 
 - Face font :: They govern the fonts for ASCII characters. They *cannot* be overriden by fontsets.
 - Fontsets :: Set of fonts used to show Unicode characters. While they are not documented, one can define a brand-new fontset with ~create-fontset-from-fontset-spec~.
 
 #+begin_notes
-There is a problem in CJK font rendering where creating 
+On Linux, dual-width CJK fonts are not aligned correctly if the font height does not match with its intended DPI settings.
+For =hesalche=, the correct height is 120 while for =semteulche=, it is 110.
+
+On Windows, dual-width fonts are not rendered well as all characters are rendered as if they were full-width.
+For now, do not install =hesalche= and =semteulche= on Windows until I find a way to detect dual-width fonts.
 #+end_notes
 
 #+begin_src emacs-lisp
@@ -1685,6 +1707,9 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
 This is especially useful for stylesheets, etc.
 
 #+begin_src emacs-lisp
-(use-package rainbow-mode
-  :hook (prog-mode))
+  (use-package rainbow-mode
+    :hook (prog-mode)
+    :custom
+    (rainbow-r-colors nil)
+    (rainbow-x-colors nil))
 #+end_src

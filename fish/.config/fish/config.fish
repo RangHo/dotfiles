@@ -37,9 +37,11 @@ set -gx GPG_TTY (tty)
 test -e ~/.profile
 and fenv "source ~/.profile"
 
-# If asdf version manager is installed, use that
-test -e ~/.asdf/asdf.fish
-and source ~/.asdf/asdf.fish
+# If there is ~/.config/profile.d, then source the files under that
+test -d ~/.config/profile.d
+and for f in ~/.config/profile.d/*
+    fenv "source $f"
+end
 
 # If mise version manager is installed, use that
 type -q mise

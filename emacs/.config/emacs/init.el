@@ -17,6 +17,9 @@
 
 ;;; Code:
 
+;; Set the default encoding as UTF-8
+(set-language-environment "utf-8")
+
 ;; Load configurations
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 

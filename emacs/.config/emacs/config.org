@@ -346,48 +346,52 @@ Fonts are super important, not because they're pretty, but because it greatly af
 Here is a set of fonts I use.
 
 #+begin_src emacs-lisp
-    ;; Sample sentences to check font support:
-    ;;   - Latin:  The quick brown fox jumps over the lazy dog.
-    ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
-    ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
-    ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
+  ;; Sample sentences to check font support:
+  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
+  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
+  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
+  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
 
-    (defconst rangho/fixed-font-alist
-      '((nil "hesalche" "semteulche"
-             "Noto Sans Mono"
-             "Cascadia Code" "Consolas" "Courier New"
-             "monospace")
-        (hangul "hesalche" "semteulche"
-                "Noto Sans Mono CJK KR"
-                "DotumChe" "GulimChe"
-                "monospace")
-        (kana "Noto Sans Mono CJK JP"
-              "GulimChe" "DotumChe"
+  (defconst rangho/fixed-font-alist
+    '((nil "hesalche" "semteulche"
+           "Noto Sans Mono"
+           "Cascadia Code" "Consolas" "Courier New"
+           "monospace")
+      (hangul "hesalche" "semteulche"
+              "Noto Sans Mono CJK KR"
+              "DotumChe" "GulimChe"
               "monospace")
-        (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
-             "GulimChe" "DotumChe"
-             "monospace")
-        (emoji "Noto Color Emoji")
-               "Segoe UI Emoji")
-      "List of fixed-pitch fonts, in order of preference.")
+      (kana "Noto Sans Mono CJK JP"
+            "GulimChe" "DotumChe"
+            "monospace")
+      (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
+           "GulimChe" "DotumChe"
+           "monospace")
+      (symbol "Noto Sans Symbols" "Noto Sans Symbols 2"
+              "Segoe UI Symbol")
+      (emoji "Noto Color Emoji"
+             "Segoe UI Emoji"))
+    "List of fixed-pitch fonts, in order of preference.")
 
-    (defconst rangho/variable-font-alist
-      '((nil "Noto Sans" "Noto Serif"
-             "Segoe UI" "Arial"
-             "sans-serif")
-        (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
-                "Malgun Gothic" "Dotum" "Gulim"
-                "sans-serif")
-        (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
-              "Meiryo" "Yu Gothic" "Yu Mincho"
+  (defconst rangho/variable-font-alist
+    '((nil "Noto Sans" "Noto Serif"
+           "Segoe UI" "Arial"
+           "sans-serif")
+      (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
+              "Malgun Gothic" "Dotum" "Gulim"
               "sans-serif")
-        (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
-             ("Noto Sans CJK TC" "Noto Serif CJK TC")
-             "Microsoft YaHei" "Microsoft JhengHei"
-             "sans-serif")
-        (emoji "Noto Color Emoji"
-               "Segoe UI Emoji"))
-      "List of variable-pitch fonts, in order of preference.")
+      (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
+            "Meiryo" "Yu Gothic" "Yu Mincho"
+            "sans-serif")
+      (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
+           ("Noto Sans CJK TC" "Noto Serif CJK TC")
+           "Microsoft YaHei" "Microsoft JhengHei"
+           "sans-serif")
+      (symbol "Noto Sans Symbols" "Noto Sans Symbols 2"
+              "Segoe UI Symbol")
+      (emoji "Noto Color Emoji"
+             "Segoe UI Emoji"))
+    "List of variable-pitch fonts, in order of preference.")
 #+end_src
 
 Emacs has weird ways of implementing font lookup.
@@ -439,19 +443,19 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
     (let ((fixed-font (rangho/find-first-available-font rangho/fixed-font-alist nil))
           (variable-font (rangho/find-first-available-font rangho/variable-font-alist nil)))
       ;; Default fontset
-      (rangho/set-fontset-fonts t '(hangul kana han emoji) rangho/fixed-font-alist)
+      (rangho/set-fontset-fonts t '(hangul kana han symbol emoji) rangho/fixed-font-alist)
       ;; Fixed-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name fixed-font
                    :registry "fontset-fixed")))
-      (rangho/set-fontset-fonts "fontset-fixed" '(hangul kana han emoji) rangho/fixed-font-alist)
+      (rangho/set-fontset-fonts "fontset-fixed" '(hangul kana han symbol emoji) rangho/fixed-font-alist)
       ;; Variable-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name variable-font
                    :registry "fontset-variable")))
-      (rangho/set-fontset-fonts "fontset-variable" '(hangul kana han emoji) rangho/variable-font-alist)
+      (rangho/set-fontset-fonts "fontset-variable" '(hangul kana han symbol emoji) rangho/variable-font-alist)
       ;; Frame-wide face attributes
       (set-face-attribute 'default nil
                           :family fixed-font

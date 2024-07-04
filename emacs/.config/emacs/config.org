@@ -1552,6 +1552,13 @@ Emacs C# with Roslyn literally trashes VS Code.
     :hook ((csharp-mode . eglot-ensure)))
 #+end_src
 
+** Crystal
+Crystal is a native programming language that looks exactly like Ruby.
+
+#+begin_src emacs-lisp
+  (use-package crystal-mode)
+#+end_src
+
 ** Dockerfile
 Docker is /de facto/ standard container technology these days.
 

@@ -13,9 +13,9 @@ return {
 
    -- Font-related
    font = wezterm.font_with_fallback {
+      'hesalche',
       'semteulche',
       'Noto Sans Mono',
-      'Symbols Nerd Font Mono',
    },
    font_size = 14.0,
 }

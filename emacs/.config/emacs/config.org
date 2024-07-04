@@ -1730,6 +1730,16 @@ It primarily targets HTML, but it also supports other HTMLx templates.
     (add-to-list 'eglot-server-programs '(web-mode . rangho/web-mode-contact)))
 #+end_src
 
+** YAML
+[[https://yaml.org/][YAML]] is a human-readable data format with colon (=:=) as the separator and significant whitespaces.
+While there are a lot of criticisms, it is still widely used to represent data in a human-readable format.
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :mode ((("\\.yml\\'" "\\.yaml\\'") . yaml-mode)
+           ("\\.bu\\’" . yaml-mode)))
+#+end_src
+
 * Utilities
 These are some external utilities for Emacs.
 

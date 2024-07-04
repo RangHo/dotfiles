@@ -1552,6 +1552,15 @@ Emacs C# with Roslyn literally trashes VS Code.
     :hook ((csharp-mode . eglot-ensure)))
 #+end_src
 
+** Dockerfile
+Docker is /de facto/ standard container technology these days.
+
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode
+    :mode ((("Dockerfile\\’" "Containerfile\\’" "\\.dockerfile\\’")
+            . dockerfile-mode)))
+#+end_src
+
 ** Haskell
 Haskell, being a purely functional language, has an exceptional support for Emacs.
 So much so that it doesn't even require LSP!

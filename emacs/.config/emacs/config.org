@@ -1568,6 +1568,17 @@ Docker is /de facto/ standard container technology these days.
             . dockerfile-mode)))
 #+end_src
 
+** Elixir
+Elixir is a functional programming langauge based on the great Erlang/OTP BEAM virtual machine.
+It keeps the great part of the virtual machine while providing highly extensible grammar.
+
+#+begin_src emacs-lisp
+  (use-package elixir-mode
+    :hook ((elixir-mode . eglot-ensure))
+    :config
+    (add-to-list 'eglot-server-programs '(elixir-mode . ("elixir-ls"))))
+#+end_src
+
 ** Haskell
 Haskell, being a purely functional language, has an exceptional support for Emacs.
 So much so that it doesn't even require LSP!

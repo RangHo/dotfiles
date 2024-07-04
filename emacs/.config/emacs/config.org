@@ -1573,6 +1573,16 @@ Both of them suck, and Julia performs pretty well.
   
 #+end_src
 
+** Python
+Python is overrated.
+Still I need to use it, so...
+
+#+begin_src emacs-lisp
+  (use-package python
+    :ensure nil
+    :hook ((python-base-mode . eglot-ensure)))
+#+end_src
+
 ** TeX
 TeX is a great typesetting engine.
 It is also complicated as fuck.

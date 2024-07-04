@@ -1647,6 +1647,19 @@ Still I need to use it, so...
     :hook ((python-base-mode . eglot-ensure)))
 #+end_src
 
+** Rust
+Rust is a modern system programming language that ensures memory safety by language design.
+
+#+begin_src emacs-lisp
+  (defun rangho/add-rust-mode-before-save-hook ()
+    "Add a hook to format Rust code before saving."
+    (add-hook 'before-save-hook #'eglot-format-buffer nil t))
+
+  (use-package rust-mode
+    :hook ((rust-mode . eglot-ensure)
+           (rust-mode . rangho/rust-add-format-hook)))
+#+end_src
+
 ** TeX
 TeX is a great typesetting engine.
 It is also complicated as fuck.

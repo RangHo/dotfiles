@@ -1773,9 +1773,11 @@ This is especially useful for stylesheets, etc.
 ** Terminal Emulator
 Emacs has an ANSI terminal emulator, but it is rather slow.
 ~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
+It doesn’t work on WIndows, though.
 
 #+begin_src emacs-lisp
   (use-package eat
+    :unless (eq system-type 'windows-nt)
     :bind (("C-c RET" . eat))
     :hook ((eshell-load . eat-eshell-mode)
            (eshell-load . eat-eshell-visual-command-mode)))

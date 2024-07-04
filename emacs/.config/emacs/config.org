@@ -1629,6 +1629,14 @@ Both of them suck, and Julia performs pretty well.
                  '(julia-mode . rangho/julia-mode-contact)))
 #+end_src
 
+** Lua
+Lua is a small, yet full-featured embedded language that works with C really well.
+
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :hook ((lua-mode . eglot-ensure)))
+#+end_src
+
 ** Python
 Python is overrated.
 Still I need to use it, so...

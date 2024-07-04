@@ -1190,7 +1190,6 @@ It's really good.
     :config
     (treemacs-follow-mode +1)
     (treemacs-filewatch-mode +1)
-    (treemacs-indent-guide-mode +1)
     (pcase (cons (not (null (executable-find "git")))
                  (not (null treemacs-python-executable)))
       (`(t . t)

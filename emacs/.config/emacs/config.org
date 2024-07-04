@@ -29,7 +29,7 @@ These constants resolve to user directories akin to the XDG Base Directory speci
 #+begin_src emacs-lisp
   (defconst user-home-directory
     (cond ((eq system-type 'windows-nt)
-           (file-name-as-directory (getenv "HOMEPATH")))
+           (file-name-as-directory (getenv "UserProfile")))
           ((getenv "HOME")
            (file-name-as-directory (getenv "HOME")))
           (t (file-name-as-directory "~")))
@@ -1301,6 +1301,7 @@ There are two sub-modes available for this package:
 
 #+begin_src emacs-lisp
   (use-package flyspell
+    :if (executable-find "hunspell")
     :ensure nil
     :hook ((text-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode)))
@@ -1611,7 +1612,7 @@ The syntax is... questionable, at best, though.
            ("C-c t" . org-capture))
     :custom
     (org-directory (file-truename
-                    (expand-file-name "/Documents/Notes" user-home-directory)))
+                    (expand-file-name "Documents/Notes" user-home-directory)))
     (org-default-notes-file (concat org-directory "/default.org"))
     (org-use-sub-superscripts '{})
     (org-id-link-to-org-use-id t)

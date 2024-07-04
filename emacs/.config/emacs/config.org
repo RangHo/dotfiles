@@ -27,13 +27,22 @@ My name and email address.
 These constants resolve to user directories akin to the XDG Base Directory specifications, independent of the platform.
 
 #+begin_src emacs-lisp
+  (defconst user-home-directory
+    (cond ((eq system-type 'windows-nt)
+           (file-name-as-directory (getenv "HOMEPATH")))
+          ((getenv "HOME")
+           (file-name-as-directory (getenv "HOME")))
+          (t (file-name-as-directory "~")))
+    "Per-user home directory.")
+
   (defconst user-config-directory
     (cond ((eq system-type 'windows-nt)
            (file-name-as-directory (getenv "AppData")))
           ((getenv "XDG_CONFIG_HOME")
            (file-name-as-directory (getenv "XDG_CONFIG_HOME")))
-          (t (concat (file-name-as-directory (getenv "HOME"))
-                     ".config/")))
+          (t
+           (file-name-as-directory
+            (expand-file-name ".config" user-home-directory))))
     "Per-user configuration directory.")
 
   (defconst user-data-directory
@@ -41,8 +50,9 @@ These constants resolve to user directories akin to the XDG Base Directory speci
            (file-name-as-directory (getenv "AppData")))
           ((getenv "XDG_DATA_HOME")
            (file-name-as-directory (getenv "XDG_DATA_HOME")))
-          (t (concat (file-name-as-directory (getenv "HOME"))
-                     ".local/share/")))
+          (t
+           (file-name-as-directory
+            (expand-file-name ".local/share" user-home-directory))))
     "Per-user data directory.")
 
   (defconst user-cache-directory
@@ -50,8 +60,9 @@ These constants resolve to user directories akin to the XDG Base Directory speci
            (file-name-as-directory (concat user-data-directory "Cache")))
           ((getenv "XDG_CACHE_HOME")
            (file-name-as-directory (getenv "XDG_CACHE_HOME")))
-          (t (concat (file-name-as-directory (getenv "HOME"))
-                     ".cache/")))
+          (t
+           (file-name-as-directory
+            (expand-file-name ".cache" user-home-directory))))
     "Per-user cache directory.")
 #+end_src
 
@@ -822,8 +833,8 @@ Let's customize that.
       (add-face-text-property 0
                               (length status-str)
                               `(:foreground ,status-fore
-                                :background ,status-back
-                                :box (:color ,status-back))
+                                            :background ,status-back
+                                            :box (:color ,status-back))
                               nil
                               status-str)
       status-str))
@@ -1342,20 +1353,20 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
                   corfu-popupinfo-delay nil)
       (corfu-mode +1)))
 
-    (use-package corfu
-      :hook ((minibuffer-setup . rangho/enable-corfu-in-minibuffer))
-      :custom
-      (corfu-auto t)
-      (corfu-cycle t)
-      (corfu-popupinfo-delay '(1 . 0.2))
-      :config
-      (global-corfu-mode +1)
-      (corfu-popupinfo-mode +1))
+  (use-package corfu
+    :hook ((minibuffer-setup . rangho/enable-corfu-in-minibuffer))
+    :custom
+    (corfu-auto t)
+    (corfu-cycle t)
+    (corfu-popupinfo-delay '(1 . 0.2))
+    :config
+    (global-corfu-mode +1)
+    (corfu-popupinfo-mode +1))
 
-    (use-package nerd-icons-corfu
-      :after (corfu)
-      :config
-      (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+  (use-package nerd-icons-corfu
+    :after (corfu)
+    :config
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
 
 While it /can/ utilize the built-in completion functions, ~cape~ can provide far more "backends".
@@ -1599,7 +1610,8 @@ The syntax is... questionable, at best, though.
     :bind (("C-c a" . org-agenda)
            ("C-c t" . org-capture))
     :custom
-    (org-directory (file-truename "~/Documents/Notes"))
+    (org-directory (file-truename
+                    (expand-file-name "/Documents/Notes" user-home-directory)))
     (org-default-notes-file (concat org-directory "/default.org"))
     (org-use-sub-superscripts '{})
     (org-id-link-to-org-use-id t)

@@ -1324,9 +1324,15 @@ Emacs comes with a few "electric" modes that intervenes and edits text on-the-fl
 - ~electric-quote-mode~ :: Replace =`= and ='= with opening and closing quotes, respectively.
 
 #+begin_src emacs-lisp
-  (electric-pair-mode +1)
-  (electric-indent-mode +1)
-  (electric-quote-mode +1)
+  (use-package electric
+    :custom
+    (electric-quote-comment nil)
+    (electric-quote-paragraph t)
+    (electric-quote-string nil)
+    :config
+    (electric-pair-mode +1)
+    (electric-indent-mode +1)
+    (electric-quote-mode +1))
 #+end_src
 
 ** Rainbow Delimiters

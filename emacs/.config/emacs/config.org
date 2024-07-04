@@ -1325,6 +1325,7 @@ Emacs comes with a few "electric" modes that intervenes and edits text on-the-fl
 
 #+begin_src emacs-lisp
   (use-package electric
+    :ensure nil
     :custom
     (electric-quote-comment nil)
     (electric-quote-paragraph t)

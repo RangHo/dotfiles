@@ -1,1 +1,3 @@
-nvim/autoload/*
+# Installation files
+.vim/autoload/*
+.vim/plugged/*

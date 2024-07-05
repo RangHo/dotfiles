@@ -1795,7 +1795,10 @@ It primarily targets HTML, but it also supports other HTMLx templates.
 
 #+begin_src emacs-lisp
   (defconst rangho/web-mode-server-program-alist
-    '(("svelte" . ("svelteserver" "--stdio")))
+    `(("php" . ,(eglot-alternatives
+                 '(("phpactor" "language-server")
+                   ("php" "vendor/felixfbecker/language-server/bin/php-language-server.php"))))
+      ("svelte" . ("svelteserver" "--stdio")))
     "Alist of language servers for `web-mode'.")
 
   (defun rangho/web-mode-contact (_)

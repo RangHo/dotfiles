@@ -517,11 +517,11 @@ Ligatures provide alternative combined glyphs for commonly used character combin
       "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
       ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
       "<:<" ";;;")
-    "List of ligatures to enable in ‘prog-mode’ buffers.")
+    "List of ligatures to enable in `prog-mode' buffers.")
 
   (defconst rangho/text-mode-ligatures
     '("ff" "fi" "ffi" "ffl" "fl" "st" "ct" "sp" "Th" "Qu" "qu" "rt")
-    "List of ligatures to enable in ‘text-mode’ buffers.")
+    "List of ligatures to enable in `text-mode' buffers.")
 
   (use-package ligature
     :config
@@ -1323,19 +1323,13 @@ Emacs comes with a few "electric" modes that intervenes and edits text on-the-fl
 
 - ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
 - ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
-- ~electric-quote-mode~ :: Replace =`= and ='= with opening and closing quotes, respectively.
 
 #+begin_src emacs-lisp
   (use-package electric
     :ensure nil
-    :custom
-    (electric-quote-comment nil)
-    (electric-quote-paragraph t)
-    (electric-quote-string nil)
     :config
-    (electric-pair-mode +1)
     (electric-indent-mode +1)
-    (electric-quote-mode +1))
+    (electric-pair-mode +1))
 #+end_src
 
 ** Rainbow Delimiters
@@ -1355,7 +1349,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
 
 #+begin_src emacs-lisp
   (defun rangho/enable-corfu-in-minibuffer ()
-    "Enable ‘corfu-mode’ in the minibuffer, if supported."
+    "Enable `corfu-mode' in the minibuffer, if supported."
     (when (local-variable-p 'completion-at-point-functions)
       (setq-local corfu-auto nil
                   corfu-echo-display nil
@@ -1469,7 +1463,7 @@ Both protocols use JSON-RPC to communicate with their respective servers, and we
 
 ** Tree-sitter Integration
 Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
-It is usually much faster than Emacs’s built-in parsing facility.
+It is usually much faster than Emacs's built-in parsing facility.
 
 #+begin_src emacs-lisp
   (use-package treesit
@@ -1694,7 +1688,8 @@ The syntax is... questionable, at best, though.
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
-    :mode ((("\\.md\\'" "\\.markdown\\'") . markdown-mode)
+    :mode (("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode)
            ("README\\.md\\'" . gfm-mode))
     :custom
     (markdown-fontify-code-block-natively t))
@@ -1817,13 +1812,13 @@ It primarily targets HTML, but it also supports other HTMLx templates.
                '("echo" "No language server available")))
 
   (use-package web-mode
-    :mode ("\\.php\\’"                      ; PHP
-           "\\.rhtml\\’" "\\.html\\.erb\\’" ; Ruby on Rails
-           "\\.html\\.heex\\’"              ; Phoenix
-           "\\.ejs\\’"                      ; EJS
-           "\\.svelte\\’"                   ; Svelte
-           "\\.vue\\’"                      ; Vue.js
-           "\\.html\\’")                    ; plain HTML (ofc)
+    :mode ("\\.php\\'"                      ; PHP
+           "\\.rhtml\\'" "\\.html\\.erb\\'" ; Ruby on Rails
+           "\\.html\\.heex\\'"              ; Phoenix
+           "\\.ejs\\'"                      ; EJS
+           "\\.svelte\\'"                   ; Svelte
+           "\\.vue\\'"                      ; Vue.js
+           "\\.html\\'")                    ; plain HTML (ofc)
     :hook ((web-mode . eglot-ensure))
     :custom
     (web-mode-enable-auto-quoting nil)
@@ -1844,7 +1839,7 @@ These are some external utilities for Emacs.
 
 ** Discord Integration
 Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
-Emacs has an unofficial plugin for that, to show off what I’m doing.
+Emacs has an unofficial plugin for that, to show off what I'm doing.
 
 #+begin_src emacs-lisp
   (defconst rangho/elcord-grace-period
@@ -1852,10 +1847,10 @@ Emacs has an unofficial plugin for that, to show off what I’m doing.
     "Time in seconds to wait before disconnecting from Discord.")
 
   (defun rangho/toggle-elcord-mode-on-focus-change ()
-    "Toggle ‘elcord-mode’ based on the current focus state.
+    "Toggle `elcord-mode' based on the current focus state.
 
-  If the frame is focused (gains focus), enable ‘elcord-mode’.  If the frame is
-  not focused (loses focus), disable ‘elcord-mode’ with the grade period."
+  If the frame is focused (gains focus), enable `elcord-mode'.  If the frame is
+  not focused (loses focus), disable `elcord-mode' with the grade period."
     (if (frame-focus-state)
         (elcord-mode +1)
       (run-with-idle-timer
@@ -1903,7 +1898,7 @@ This is especially useful for stylesheets, etc.
 ** Terminal Emulator
 Emacs has an ANSI terminal emulator, but it is rather slow.
 ~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
-It doesn’t work on WIndows, though.
+It doesn't work on WIndows, though.
 
 #+begin_src emacs-lisp
   (use-package eat

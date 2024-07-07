@@ -1179,7 +1179,7 @@ We can prettify it with Nerd Fonts.
 
 #+begin_src emacs-lisp
   (use-package nerd-icons-dired
-    :hook (dired-mode))
+    :hook dired-mode)
 #+end_src
 
 ~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
@@ -1278,7 +1278,7 @@ For rergular texts, usually they are more of an annoyance.
 #+begin_src emacs-lisp
   (use-package evil-line-numbers
     :ensure nil
-    :hook (prog-mode)
+    :hook prog-mode
     :custom
     (display-line-numbers-width 3))
 #+end_src
@@ -1315,7 +1315,7 @@ They collect diagnostic information from multiple sources and display them in a 
 #+begin_src emacs-lisp
   (use-package flymake
     :ensure nil
-    :hook (prog-mode))
+    :hook prog-mode)
 #+end_src
 
 ** Electric Modes
@@ -1344,7 +1344,7 @@ Basically, a must-have for Lisp.
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :hook (prog-mode))
+    :hook prog-mode)
 #+end_src
 
 ** Completions
@@ -1363,7 +1363,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
       (corfu-mode +1)))
 
   (use-package corfu
-    :hook ((minibuffer-setup . rangho/enable-corfu-in-minibuffer))
+    :hook (minibuffer-setup . rangho/enable-corfu-in-minibuffer)
     :custom
     (corfu-auto t)
     (corfu-cycle t)
@@ -1373,7 +1373,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
     (corfu-popupinfo-mode +1))
 
   (use-package nerd-icons-corfu
-    :after (corfu)
+    :after corfu
     :config
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
@@ -1447,7 +1447,7 @@ Elpaca seems to have some [[https://github.com/progfolio/elpaca/issues/236][trou
 
   (use-package eldoc-box
     :if (or (daemonp) (display-graphic-p))
-    :hook ((prog-mode . eldoc-box-hover-at-point-mode))
+    :hook (prog-mode . eldoc-box-hover-at-point-mode)
     :custom
     (eldoc-echo-area-prefer-doc-buffer t))
 #+end_src
@@ -1499,14 +1499,11 @@ While BASIC is not used a lot, some exotic environments like Microsoft Excel sti
 There is no official support for Visual Basic in =basic-mode=, so we need to define our own.
 
 #+begin_src emacs-lisp
-  (use-package basic-mode
-    :mode (("\\.vb\\'" . visual-basic-mode)
-           ("\\.vba\\'" . visual-basic-mode)
-           ("\\.vbs\\'" . visual-basic-mode))
-    :config
-    (define-derived-mode visual-basic-mode basic-qb45-mode "Visual Basic"
-      "Major mode for editing Visual Basic code."
-      (basic-mode-initialize)))
+  (use-package basic-mode)
+
+  (use-package visual-basic-mode
+    :ensure nil
+    :after basic-mode)
 #+end_src
 
 ** C, C++, Objective-C
@@ -1554,6 +1551,14 @@ Emacs C# with Roslyn literally trashes VS Code.
     :hook ((csharp-mode . eglot-ensure)))
 #+end_src
 
+** Caddyfile
+Caddy is a simple and easy to use reverse proxy application.
+Perfect solution for small web servers like in a homelab.
+
+#+begin_src emacs-lisp
+  (use-package caddyfile-mode)
+#+end_src
+
 ** Crystal
 Crystal is a native programming language that looks exactly like Ruby.
 
@@ -1565,9 +1570,7 @@ Crystal is a native programming language that looks exactly like Ruby.
 Docker is /de facto/ standard container technology these days.
 
 #+begin_src emacs-lisp
-  (use-package dockerfile-mode
-    :mode ((("Dockerfile\\’" "Containerfile\\’" "\\.dockerfile\\’")
-            . dockerfile-mode)))
+  (use-package dockerfile-mode)
 #+end_src
 
 ** Elixir
@@ -1638,6 +1641,8 @@ Lua is a small, yet full-featured embedded language that works with C really wel
   (use-package lua-mode
     :hook ((lua-mode . eglot-ensure)))
 #+end_src
+
+** PowerShell
 
 ** Python
 Python is overrated.
@@ -1826,9 +1831,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
 While there are a lot of criticisms, it is still widely used to represent data in a human-readable format.
 
 #+begin_src emacs-lisp
-  (use-package yaml-mode
-    :mode ((("\\.yml\\'" "\\.yaml\\'") . yaml-mode)
-           ("\\.bu\\’" . yaml-mode)))
+  (use-package yaml-mode)
 #+end_src
 
 * Utilities

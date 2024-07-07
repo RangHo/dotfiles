@@ -1643,6 +1643,11 @@ Lua is a small, yet full-featured embedded language that works with C really wel
 #+end_src
 
 ** PowerShell
+PowerShell is the new shell script language for Windows and .NET platform.
+
+#+begin_src emacs-lisp
+  (use-package powershell)
+#+end_src
 
 ** Python
 Python is overrated.

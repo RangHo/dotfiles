@@ -833,8 +833,8 @@ Let's customize that.
       (add-face-text-property 0
                               (length status-str)
                               `(:foreground ,status-fore
-                                            :background ,status-back
-                                            :box (:color ,status-back))
+                                :background ,status-back
+                                :box (:color ,status-back))
                               nil
                               status-str)
       status-str))
@@ -1551,6 +1551,21 @@ Perfect solution for small web servers like in a homelab.
 
 #+begin_src emacs-lisp
   (use-package caddyfile-mode)
+#+end_src
+
+** Conf-mode
+~conf-mode~ provides support for INI-like files, such as UNIX =*.conf= files or Java =*.properties= files.
+
+#+begin_src emacs-lisp
+  (use-package conf-mode
+    :ensure nil
+    :mode ( ; systemd units
+           "\\.service\\'" "\\.socket\\'" "\\.device\\'" "\\.mount\\'"
+           "\\.automount\\'" "\\.swap\\'" "\\.target\\'" "\\.path\\'"
+           "\\.timer\\'" "\\.slice\\'" "\\.scope\\'"
+           ;; podman quadlets
+           "\\.container\\'" "\\.network\\'" "\\.volume\\'" "\\.pod\\'"
+           "\\.kube\\'" "\\.build\\'"))
 #+end_src
 
 ** Crystal

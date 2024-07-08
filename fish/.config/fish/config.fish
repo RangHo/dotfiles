@@ -33,6 +33,10 @@ end
 # Fix curses-based GPG pinentry screen
 set -gx GPG_TTY (tty)
 
+# If there is /etc/profile, then source the file
+test -e /etc/profile
+and fenv "source /etc/profile"
+
 # If there is ~/.profile, then source the file
 test -e ~/.profile
 and fenv "source ~/.profile"

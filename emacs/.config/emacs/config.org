@@ -1800,9 +1800,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
 
 #+begin_src emacs-lisp
   (defconst rangho/web-mode-server-program-alist
-    `(("php" . ,(eglot-alternatives
-                 '(("phpactor" "language-server")
-                   ("php" "vendor/felixfbecker/language-server/bin/php-language-server.php"))))
+    `(("php" . '("phpactor" "language-server"))
       ("svelte" . ("svelteserver" "--stdio")))
     "Alist of language servers for `web-mode'.")
 
@@ -1819,7 +1817,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
            "\\.svelte\\'"                   ; Svelte
            "\\.vue\\'"                      ; Vue.js
            "\\.html\\'")                    ; plain HTML (ofc)
-    :hook ((web-mode . eglot-ensure))
+    :hook (web-mode . eglot-ensure)
     :custom
     (web-mode-enable-auto-quoting nil)
     :config

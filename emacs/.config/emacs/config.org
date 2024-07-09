@@ -550,8 +550,9 @@ It also generates color codes based on a template file, and places them in =XDG_
 Load that if available; if not, pick a sensible colorscheme based on [[https://draculatheme.com/][Dracula]].
 
 #+begin_src emacs-lisp
-  (if (file-exists-p (concat user-cache-directory "wal/colors.el"))
-      (require 'pywal-colors (concat user-cache-directory "wal/colors.el") 'noerror)
+  (if-let* ((pywal-colors-file (expand-file-name "wal/colors.el" user-cache-directory))
+            ((file-exists-p pywal-colors-file)))
+      (load-file pywal-colors-file)
     (setq wal/foreground "#f8f8f2"
           wal/background "#282a36"
           wal/cursor     "#44475a"
@@ -622,20 +623,65 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
            (rgb2 (apply 'color-hsl-to-rgb hsl2)))
       (apply 'color-rgb-to-hex (nconc rgb2 '(2)))))
 
-  (defun rangho/create-color-matrix-alist (color-alist lighten-list)
-    "Create a matrix of colors based on a COLOR-ALIST and LIGHTEN-LIST."
-    ;; For each color association...
+(defun rangho/light-theme-p (color-alist)
+  "Return t if the colors in COLOR-ALIST looks like a light theme."
+  (let* ((color-hex-to-luminance
+          (lambda (hex)
+            (nth 2 (apply #'color-rgb-to-hsl (color-hex-to-rgb hex)))))
+         (foreground-luminance
+          (funcall color-hex-to-luminance
+                   (cdr (assoc 'color/foreground color-alist))))
+         (background-luminance
+          (funcall color-hex-to-luminance
+                   (cdr (assoc 'color/background color-alist)))))
+    (< foreground-luminance background-luminance)))
+
+(defun rangho/create-color-matrix-alist (color-alist shade-list)
+  "Create a matrix of colors based on a COLOR-ALIST and SHADE-LIST.
+
+COLOR-ALIST is a list of cons cells where the car is a symbol, and the cdr is a
+hex color string.  SHADE-LIST is a list of integers that represent the amount to
+\"intensify\" the color by.
+
+It returns a \"matrix\" of colors where each color in COLOR-ALIST is associated
+with each value in SHADE-LIST.  It \"intensifies\" the colors, i.e. based on the
+theme, it will either lighten or darken the colors so that it stands out more."
+  (let* ((prefix-value
+          (lambda (value)
+            (pcase (cons (rangho/light-theme-p color-alist)
+                         (>= value 0))
+              (`(t . t)
+               ;; Making it lighter on light theme => diminishing
+               ;; Value is positive, so append a minus sign to it
+               (concat "-" (number-to-string value)))
+              (`(t . nil)
+               ;; Making it darker on light theme => intensifying
+               ;; Value is negative, so replace minus with plus
+               (concat "+" (number-to-string (abs value))))
+              (`(nil . t)
+               ;; Making it lighter on dark theme => intensifying
+               ;; Value is positive, so prefix with plus sign
+               (concat "+" (number-to-string value)))
+              (`(nil . nil)
+               ;; Making it darker on dark theme => diminishing
+               ;; Value is negative, so minus sign is already there
+               (number-to-string value)))))
+         (lighten-color-by-value
+          (lambda (color value)
+            (cons (intern (concat
+                           (symbol-name (car color))
+                           (funcall prefix-value value)))
+                  (color-lighten-hex (cdr color) value))))
+         (lighten-color-for-values
+          (lambda (color)
+            (mapcar (lambda (value)
+                      (funcall lighten-color-by-value color value))
+                    shade-list)))
+         (lighten-colors
+          (lambda ()
+            (mapcan lighten-color-for-values color-alist))))
     (append color-alist
-            (mapcan (lambda (original-color)
-                      ;; And then for each lighten value...
-                      (mapcar (lambda (lighten-value)
-                                ;; Create a list of...
-                                (cons (intern (concat (symbol-name (car original-color))
-                                                      (if (>= lighten-value 0) "+" "")
-                                                      (number-to-string lighten-value)))
-                                      (color-lighten-hex (cdr original-color) lighten-value)))
-                              lighten-list))
-                    color-alist)))
+            (funcall lighten-colors))))
 
   (defvar rangho/color-matrix-alist
     (rangho/create-color-matrix-alist rangho/color-name-alist
@@ -663,7 +709,7 @@ This can be done by defining a theme.
      `(fringe              ((t (:background ,.color/background-10))))
      `(header-line         ((t (:inherit mode-line))))
      `(highlight           ((t (:foreground ,.color/intense-white :background ,.color/intense-black))))
-     `(hl-line             ((t (:background ,.color/cursor :extend t))))
+     `(hl-line             ((t (:background ,.color/background+15 :extend t))))
      `(info-quoted-name    ((t (:foreground ,.color/intense-red))))
      `(info-string         ((t (:foreground ,.color/intense-yellow))))
      `(line-number         ((t (:foreground ,.color/intense-black :slant italic))))
@@ -672,18 +718,12 @@ This can be done by defining a theme.
      `(match               ((t (:foreground ,.color/background :background ,.color/yellow))))
      `(menu                ((t (:inverse-video nil))))
      `(minibuffer-prompt   ((t (:foreground ,.color/intense-magenta :weight bold))))
-     `(mode-line           ((t (:foreground
-                                ,.color/background-20
-                                :background
-                                ,.color/foreground+20
-                                :box
-                                (:line-width 3 :color ,.color/foreground+10 :style nil)))))
-     `(mode-line-inactive  ((t (:foreground
-                                ,.color/foreground-20
-                                :background
-                                ,.color/background+20
-                                :box
-                                (:line-width 3 :color ,.color/background+10 :style nil)))))
+     `(mode-line           ((t (:foreground ,.color/background-20
+                                :background ,.color/foreground+20
+                                :box (:line-width 3 :color ,.color/foreground+10 :style nil)))))
+     `(mode-line-inactive  ((t (:foreground ,.color/foreground-20
+                                :background ,.color/background+20
+                                :box (:line-width 3 :color ,.color/background+10 :style nil)))))
      `(mode-line-highlight ((t (:inherit highlight))))
      `(mode-line-emphasis  ((t (:weight regular))))
      `(mode-line-buffer-id ((t (:weight regular))))
@@ -744,7 +784,7 @@ This can be done by defining a theme.
      `(diff-error             ((t (:foreground ,.color/red :background ,.color/background :weight bold))))
 
      ;; Org
-     `(org-block                 ((t (:background ,.color/background+40))))
+     `(org-block                 ((t (:background ,.color/background+10))))
      `(org-code                  ((t (:foreground ,.color/intense-green))))
      `(org-document-info         ((t (:foreground ,.color/intense-blue))))
      `(org-document-info-keyword ((t (:foreground ,.color/intense-black))))
@@ -754,7 +794,6 @@ This can be done by defining a theme.
      `(org-formula               ((t (:foreground ,.color/intense-magenta))))
      `(org-link                  ((t (:inherit link))))
      `(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-     `(org-table                 ((t ())))
      `(org-verbatim              ((t (:foreground ,.color/green))))
      `(org-warning               ((t (:foreground ,.color/yellow :weight bold))))
 

@@ -606,7 +606,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
   (require 'color)
 
   (defvar rangho/color-shade-list
-    (number-sequence -100 100 5)
+    (number-sequence -50 50 1)
     "List of percentage values to lighten/darken the original colors.")
 
   (defun color-hex-to-rgb (color)
@@ -615,73 +615,74 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
           (/ (string-to-number (substring color 3 5) 16) 255.0)
           (/ (string-to-number (substring color 5) 16) 255.0)))
 
-  (defun color-lighten-hex (color percent)
-    "Lighten or darken an RGB color string COLOR by PERCENT."
+  (defun rangho/add-color-luminance (color delta)
+    "Return a new color from COLOR with the luminance adjusted by DELTA / 100."
     (let* ((rgb (color-hex-to-rgb color))
-           (hsl (apply 'color-rgb-to-hsl rgb))
-           (hsl2 (apply 'color-lighten-hsl (nconc hsl `(,percent))))
-           (rgb2 (apply 'color-hsl-to-rgb hsl2)))
-      (apply 'color-rgb-to-hex (nconc rgb2 '(2)))))
+           (hsl (apply #'color-rgb-to-hsl rgb))
+           (new-luminance (min 1.0 (max 0.0 (+ (nth 2 hsl) (/ delta 100.0)))))
+           (new-hsl `(,(nth 0 hsl) ,(nth 1 hsl) ,new-luminance))
+           (new-rgb (apply #'color-hsl-to-rgb new-hsl)))
+      (apply #'color-rgb-to-hex (nconc new-rgb '(2)))))
 
-(defun rangho/light-theme-p (color-alist)
-  "Return t if the colors in COLOR-ALIST looks like a light theme."
-  (let* ((color-hex-to-luminance
-          (lambda (hex)
-            (nth 2 (apply #'color-rgb-to-hsl (color-hex-to-rgb hex)))))
-         (foreground-luminance
-          (funcall color-hex-to-luminance
-                   (cdr (assoc 'color/foreground color-alist))))
-         (background-luminance
-          (funcall color-hex-to-luminance
-                   (cdr (assoc 'color/background color-alist)))))
-    (< foreground-luminance background-luminance)))
+  (defun rangho/light-theme-p (color-alist)
+    "Return t if the colors in COLOR-ALIST looks like a light theme."
+    (let* ((color-hex-to-luminance
+            (lambda (hex)
+              (nth 2 (apply #'color-rgb-to-hsl (color-hex-to-rgb hex)))))
+           (foreground-luminance
+            (funcall color-hex-to-luminance
+                     (cdr (assoc 'color/foreground color-alist))))
+           (background-luminance
+            (funcall color-hex-to-luminance
+                     (cdr (assoc 'color/background color-alist)))))
+      (< foreground-luminance background-luminance)))
 
-(defun rangho/create-color-matrix-alist (color-alist shade-list)
-  "Create a matrix of colors based on a COLOR-ALIST and SHADE-LIST.
+  (defun rangho/create-color-matrix-alist (color-alist shade-list)
+    "Create a matrix of colors based on a COLOR-ALIST and SHADE-LIST.
 
-COLOR-ALIST is a list of cons cells where the car is a symbol, and the cdr is a
-hex color string.  SHADE-LIST is a list of integers that represent the amount to
-\"intensify\" the color by.
+    COLOR-ALIST is a list of cons cells where the car is a symbol, and the cdr is a
+    hex color string.  SHADE-LIST is a list of integers that represent the amount to
+    \"intensify\" the color by.
 
-It returns a \"matrix\" of colors where each color in COLOR-ALIST is associated
-with each value in SHADE-LIST.  It \"intensifies\" the colors, i.e. based on the
-theme, it will either lighten or darken the colors so that it stands out more."
-  (let* ((prefix-value
-          (lambda (value)
-            (pcase (cons (rangho/light-theme-p color-alist)
-                         (>= value 0))
-              (`(t . t)
-               ;; Making it lighter on light theme => diminishing
-               ;; Value is positive, so append a minus sign to it
-               (concat "-" (number-to-string value)))
-              (`(t . nil)
-               ;; Making it darker on light theme => intensifying
-               ;; Value is negative, so replace minus with plus
-               (concat "+" (number-to-string (abs value))))
-              (`(nil . t)
-               ;; Making it lighter on dark theme => intensifying
-               ;; Value is positive, so prefix with plus sign
-               (concat "+" (number-to-string value)))
-              (`(nil . nil)
-               ;; Making it darker on dark theme => diminishing
-               ;; Value is negative, so minus sign is already there
-               (number-to-string value)))))
-         (lighten-color-by-value
-          (lambda (color value)
-            (cons (intern (concat
-                           (symbol-name (car color))
-                           (funcall prefix-value value)))
-                  (color-lighten-hex (cdr color) value))))
-         (lighten-color-for-values
-          (lambda (color)
-            (mapcar (lambda (value)
-                      (funcall lighten-color-by-value color value))
-                    shade-list)))
-         (lighten-colors
-          (lambda ()
-            (mapcan lighten-color-for-values color-alist))))
-    (append color-alist
-            (funcall lighten-colors))))
+    It returns a \"matrix\" of colors where each color in COLOR-ALIST is associated
+    with each value in SHADE-LIST.  It \"intensifies\" the colors, i.e. based on the
+    theme, it will either lighten or darken the colors so that it stands out more."
+    (let* ((prefix-value
+            (lambda (value)
+              (pcase (cons (rangho/light-theme-p color-alist)
+                           (>= value 0))
+                (`(t . t)
+                 ;; Making it lighter on light theme => diminishing
+                 ;; Value is positive, so append a minus sign to it
+                 (concat "-" (number-to-string value)))
+                (`(t . nil)
+                 ;; Making it darker on light theme => intensifying
+                 ;; Value is negative, so replace minus with plus
+                 (concat "+" (number-to-string (abs value))))
+                (`(nil . t)
+                 ;; Making it lighter on dark theme => intensifying
+                 ;; Value is positive, so prefix with plus sign
+                 (concat "+" (number-to-string value)))
+                (`(nil . nil)
+                 ;; Making it darker on dark theme => diminishing
+                 ;; Value is negative, so minus sign is already there
+                 (number-to-string value)))))
+           (lighten-color-by-value
+            (lambda (color value)
+              (cons (intern (concat
+                             (symbol-name (car color))
+                             (funcall prefix-value value)))
+                    (rangho/add-color-luminance (cdr color) value))))
+           (lighten-color-for-values
+            (lambda (color)
+              (mapcar (lambda (value)
+                        (funcall lighten-color-by-value color value))
+                      shade-list)))
+           (lighten-colors
+            (lambda ()
+              (mapcan lighten-color-for-values color-alist))))
+      (append color-alist
+              (funcall lighten-colors))))
 
   (defvar rangho/color-matrix-alist
     (rangho/create-color-matrix-alist rangho/color-name-alist
@@ -705,11 +706,11 @@ This can be done by defining a theme.
      `(default             ((t (:foreground ,.color/foreground :background ,.color/background))))
      `(default-italic      ((t (:slant italic))))
      `(error               ((t (:foreground ,.color/red :weight bold))))
-     `(ffap                ((t (:foreground ,.color/foreground-20))))
-     `(fringe              ((t (:background ,.color/background-10))))
+     `(ffap                ((t (:foreground ,.color/foreground+20))))
+     `(fringe              ((t (:background ,.color/background+10))))
      `(header-line         ((t (:inherit mode-line))))
      `(highlight           ((t (:foreground ,.color/intense-white :background ,.color/intense-black))))
-     `(hl-line             ((t (:background ,.color/background+15 :extend t))))
+     `(hl-line             ((t (:background ,.color/background+5 :extend t))))
      `(info-quoted-name    ((t (:foreground ,.color/intense-red))))
      `(info-string         ((t (:foreground ,.color/intense-yellow))))
      `(line-number         ((t (:foreground ,.color/intense-black :slant italic))))
@@ -718,11 +719,11 @@ This can be done by defining a theme.
      `(match               ((t (:foreground ,.color/background :background ,.color/yellow))))
      `(menu                ((t (:inverse-video nil))))
      `(minibuffer-prompt   ((t (:foreground ,.color/intense-magenta :weight bold))))
-     `(mode-line           ((t (:foreground ,.color/background-20
-                                :background ,.color/foreground+20
+     `(mode-line           ((t (:foreground ,.color/background-10
+                                :background ,.color/foreground+10
                                 :box (:line-width 3 :color ,.color/foreground+10 :style nil)))))
-     `(mode-line-inactive  ((t (:foreground ,.color/foreground-20
-                                :background ,.color/background+20
+     `(mode-line-inactive  ((t (:foreground ,.color/foreground-10
+                                :background ,.color/background+10
                                 :box (:line-width 3 :color ,.color/background+10 :style nil)))))
      `(mode-line-highlight ((t (:inherit highlight))))
      `(mode-line-emphasis  ((t (:weight regular))))
@@ -784,11 +785,11 @@ This can be done by defining a theme.
      `(diff-error             ((t (:foreground ,.color/red :background ,.color/background :weight bold))))
 
      ;; Org
-     `(org-block                 ((t (:background ,.color/background+10))))
+     `(org-block                 ((t (:background ,.color/background+5))))
      `(org-code                  ((t (:foreground ,.color/intense-green))))
      `(org-document-info         ((t (:foreground ,.color/intense-blue))))
      `(org-document-info-keyword ((t (:foreground ,.color/intense-black))))
-     `(org-document-title        ((t (:foreground ,.color/intense-red :weight bold :height 1.44))))
+     `(org-document-title        ((t (:foreground ,.color/intense-red :weight bold :height 1.5))))
      `(org-ellipsis              ((t (:foreground ,.color/intense-black))))
      `(org-footnote              ((t (:foreground ,.color/intense-blue))))
      `(org-formula               ((t (:foreground ,.color/intense-magenta))))
@@ -798,14 +799,14 @@ This can be done by defining a theme.
      `(org-warning               ((t (:foreground ,.color/yellow :weight bold))))
 
      ;; Outline
-     `(outline-1 ((t (:foreground ,.color/foreground-40 :weight bold :height 1.3))))
-     `(outline-2 ((t (:foreground ,.color/foreground-20 :weight bold :height 1.1))))
-     `(outline-3 ((t (:foreground ,.color/foreground10  :weight bold :height 1.0))))
-     `(outline-4 ((t (:foreground ,.color/foreground-5 :weight bold :height 1.0))))
-     `(outline-5 ((t (:foreground ,.color/foreground :weight bold :height 1.0))))
-     `(outline-6 ((t (:foreground ,.color/foreground :height 1.0))))
-     `(outline-7 ((t (:foreground ,.color/foreground :height 1.0))))
-     `(outline-8 ((t (:foreground ,.color/foreground :height 1.0))))
+     `(outline-1 ((t (:foreground ,.color/foreground+20 :weight bold :height 1.3))))
+     `(outline-2 ((t (:foreground ,.color/foreground+15 :weight bold :height 1.1))))
+     `(outline-3 ((t (:foreground ,.color/foreground+10 :weight bold :height 1.0))))
+     `(outline-4 ((t (:foreground ,.color/foreground+5 :weight bold :height 1.0))))
+     `(outline-5 ((t (:foreground ,.color/foreground+4 :weight bold :height 1.0))))
+     `(outline-6 ((t (:foreground ,.color/foreground+3 :height 1.0))))
+     `(outline-7 ((t (:foreground ,.color/foreground+2 :height 1.0))))
+     `(outline-8 ((t (:foreground ,.color/foreground+1 :height 1.0))))
      ))
 #+end_src
 

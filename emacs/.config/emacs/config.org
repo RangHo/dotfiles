@@ -1494,7 +1494,14 @@ Both protocols use JSON-RPC to communicate with their respective servers, and we
 #+begin_src emacs-lisp
   (use-package jsonrpc)
 
-  (use-package eglot)
+  (defun rangho/enable-eglot-if-possible (&optional mode)
+    "Enable eglot for MODE if it is supported."
+    (setq mode (or mode major-mode))
+    (when (eglot--lookup-mode mode)
+      (eglot-ensure)))
+
+  (use-package eglot
+    :hook (prog-mode . rangho/enable-eglot-if-possible))
 
   (use-package dape
     :config
@@ -1567,8 +1574,7 @@ Also, while we're at it, let's enable Language Server support.
            ("\\.txx\\'" . c++-mode)
            ("\\.cxx\\'" . c++-mode)
            ("\\.inl\\'" . c++-mode)
-           ("\\.ixx\\'" . c++-mode))
-    :hook (c-mode-common . eglot-ensure))
+           ("\\.ixx\\'" . c++-mode)))
 #+end_src
 
 Emacs doesn't come with support for build systems, except for Makefile.
@@ -1594,8 +1600,7 @@ We can add support for =clang-format= formatter with a bit of RegExp magic.
 Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
-  (use-package csharp-mode
-    :hook (csharp-mode . eglot-ensure))
+  (use-package csharp-mode)
 #+end_src
 
 ** Caddyfile
@@ -1641,8 +1646,7 @@ It keeps the great part of the virtual machine while providing highly extensible
 
 #+begin_src emacs-lisp
   (use-package elixir-mode
-    :hook (elixir-mode . eglot-ensure)
-    :config
+    :init
     (add-to-list 'eglot-server-programs
                  '(elixir-mode . ("elixir-ls"))))
 #+end_src
@@ -1691,8 +1695,7 @@ Both of them suck, and Julia performs pretty well.
           (file-name-directory (buffer-file-name))))
 
   (use-package julia-mode
-    :hook (julia-mode . eglot-ensure)
-    :config
+    :init
     (add-to-list 'eglot-server-programs
                  '(julia-mode . rangho/julia-mode-contact)))
 #+end_src
@@ -1701,8 +1704,7 @@ Both of them suck, and Julia performs pretty well.
 Lua is a small, yet full-featured embedded language that works with C really well.
 
 #+begin_src emacs-lisp
-  (use-package lua-mode
-    :hook (lua-mode . eglot-ensure))
+  (use-package lua-mode)
 #+end_src
 
 ** PowerShell
@@ -1718,8 +1720,7 @@ Still I need to use it, so...
 
 #+begin_src emacs-lisp
   (use-package python
-    :ensure nil
-    :hook (python-base-mode . eglot-ensure))
+    :ensure nil)
 #+end_src
 
 ** Rust
@@ -1731,8 +1732,7 @@ Rust is a modern system programming language that ensures memory safety by langu
     (add-hook 'before-save-hook #'eglot-format-buffer nil t))
 
   (use-package rust-mode
-    :hook ((rust-mode . eglot-ensure)
-           (rust-mode . rangho/add-rust-mode-before-save-hook)))
+    :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
 #+end_src
 
 ** TeX
@@ -1848,7 +1848,9 @@ There are three different ways to edit JavaScript in Emacs:
 #+begin_src emacs-lisp
   (use-package js2-mode
     :mode ("\\.js\\'" "\\.cjs\\'" "\\.mjs\\'")
-    :hook (js2-mode . eglot-ensure))
+    :init
+    (add-to-list 'eglot-server-programs
+                 '(js2-mode . ("typescript-language-server" "--stdio"))))
 #+end_src
 
 *** TypeScript
@@ -1856,8 +1858,7 @@ TypeScript is ever-so-slightly better, but not by much.
 
 #+begin_src emacs-lisp
   (use-package typescript-mode
-    :mode ("\\.ts\\'" "\\.cts\\'" "\\.mts\\'")
-    :hook (typescript-mode . eglot-ensure))
+    :mode ("\\.ts\\'" "\\.cts\\'" "\\.mts\\'"))
 #+end_src
 
 *** Web-mode
@@ -1865,14 +1866,14 @@ Web-mode integrates all web-related languages into a single package nicely.
 It primarily targets HTML, but it also supports other HTMLx templates.
 
 #+begin_src emacs-lisp
-  (defconst rangho/web-mode-server-program-alist
+  (defconst rangho/web-mode-server-programs
     `(("php" . '("phpactor" "language-server"))
       ("svelte" . ("svelteserver" "--stdio")))
     "Alist of language servers for `web-mode'.")
 
   (defun rangho/web-mode-contact (_)
     "Return the language server program for the current buffer."
-    (alist-get web-mode-engine rangho/web-mode-server-program-alist
+    (alist-get web-mode-engine rangho/web-mode-server-programs
                '("echo" "No language server available")))
 
   (use-package web-mode
@@ -1884,11 +1885,11 @@ It primarily targets HTML, but it also supports other HTMLx templates.
            "\\.svelte\\'"                   ; Svelte
            "\\.vue\\'"                      ; Vue.js
            "\\.html\\'")                    ; plain HTML (ofc)
-    :hook (web-mode . eglot-ensure)
     :custom
     (web-mode-enable-auto-quoting nil)
-    :config
-    (add-to-list 'eglot-server-programs '(web-mode . rangho/web-mode-contact)))
+    :init
+    (add-to-list 'eglot-server-programs
+                 '(web-mode . rangho/web-mode-contact)))
 #+end_src
 
 ** YAML

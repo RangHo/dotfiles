@@ -1549,13 +1549,26 @@ Also, while we're at it, let's enable Language Server support.
 #+begin_src emacs-lisp
   (use-package cc-mode
     :ensure nil
-    :mode ((("\\.c\\'" "\\.h\\'" "\\.HC\\'" "\\.ZC\\'")
-            . c-mode)
-           (("\\.cpp\\'" "\\.cppm\\'" "\\.hpp\\'" "\\.tpp\\'" "\\.ipp\\'"
-             "\\.cc\\'" "\\.hh\\'" "\\.tcc\\'" "\\.h++\\'" "\\.c++\\'"
-             "\\.hxx\\'" "\\.txx\\'" "\\.cxx\\'" "\\.inl\\'" "\\.ixx\\'")
-            . c++-mode))
-    :hook ((c-mode-common . eglot-ensure)))
+    :mode (("\\.c\\'" . c-mode)
+           ("\\.h\\'" . c-mode)
+           ("\\.HC\\'" . c-mode)
+           ("\\.ZC\\'" . c-mode)
+           ("\\.cpp\\'" . c++-mode)
+           ("\\.cppm\\'" . c++-mode)
+           ("\\.hpp\\'" . c++-mode)
+           ("\\.tpp\\'" . c++-mode)
+           ("\\.ipp\\'" . c++-mode)
+           ("\\.cc\\'" . c++-mode)
+           ("\\.hh\\'" . c++-mode)
+           ("\\.tcc\\'" . c++-mode)
+           ("\\.h++\\'" . c++-mode)
+           ("\\.c++\\'" . c++-mode)
+           ("\\.hxx\\'" . c++-mode)
+           ("\\.txx\\'" . c++-mode)
+           ("\\.cxx\\'" . c++-mode)
+           ("\\.inl\\'" . c++-mode)
+           ("\\.ixx\\'" . c++-mode))
+    :hook (c-mode-common . eglot-ensure))
 #+end_src
 
 Emacs doesn't come with support for build systems, except for Makefile.
@@ -1582,7 +1595,7 @@ Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
   (use-package csharp-mode
-    :hook ((csharp-mode . eglot-ensure)))
+    :hook (csharp-mode . eglot-ensure))
 #+end_src
 
 ** Caddyfile
@@ -1628,9 +1641,10 @@ It keeps the great part of the virtual machine while providing highly extensible
 
 #+begin_src emacs-lisp
   (use-package elixir-mode
-    :hook ((elixir-mode . eglot-ensure))
+    :hook (elixir-mode . eglot-ensure)
     :config
-    (add-to-list 'eglot-server-programs '(elixir-mode . ("elixir-ls"))))
+    (add-to-list 'eglot-server-programs
+                 '(elixir-mode . ("elixir-ls"))))
 #+end_src
 
 ** Haskell
@@ -1648,7 +1662,7 @@ If =fourmolu= binary is available, integrate it.
 #+begin_src emacs-lisp
   (use-package ormolu
     :if (executable-find "fourmolu")
-    :hook ((haskell-mode . ormolu-format-on-save-mode))
+    :hook (haskell-mode . ormolu-format-on-save-mode)
     :custom
     (ormolu-process-path "fourmolu"))
 #+end_src
@@ -1677,7 +1691,7 @@ Both of them suck, and Julia performs pretty well.
           (file-name-directory (buffer-file-name))))
 
   (use-package julia-mode
-    :hook ((julia-mode . eglot-ensure))
+    :hook (julia-mode . eglot-ensure)
     :config
     (add-to-list 'eglot-server-programs
                  '(julia-mode . rangho/julia-mode-contact)))
@@ -1688,7 +1702,7 @@ Lua is a small, yet full-featured embedded language that works with C really wel
 
 #+begin_src emacs-lisp
   (use-package lua-mode
-    :hook ((lua-mode . eglot-ensure)))
+    :hook (lua-mode . eglot-ensure))
 #+end_src
 
 ** PowerShell
@@ -1705,7 +1719,7 @@ Still I need to use it, so...
 #+begin_src emacs-lisp
   (use-package python
     :ensure nil
-    :hook ((python-base-mode . eglot-ensure)))
+    :hook (python-base-mode . eglot-ensure))
 #+end_src
 
 ** Rust
@@ -1833,11 +1847,8 @@ There are three different ways to edit JavaScript in Emacs:
 
 #+begin_src emacs-lisp
   (use-package js2-mode
-    :mode (("\\.js\\'" . js2-mode)
-           ("\\.cjs\\'" . js2-mode)
-           ("\\.mjs\\'" . js2-mode)
-           ("\\.jsx\\'" . js2-jsx-mode))
-    :hook ((js2-mode . eglot-ensure)))
+    :mode ("\\.js\\'" "\\.cjs\\'" "\\.mjs\\'")
+    :hook (js2-mode . eglot-ensure))
 #+end_src
 
 *** TypeScript
@@ -1845,8 +1856,8 @@ TypeScript is ever-so-slightly better, but not by much.
 
 #+begin_src emacs-lisp
   (use-package typescript-mode
-    :mode ("\\.ts\\'" "\\.cts\\'" "\\.mts\\'" "\\.tsx\\'")
-    :hook ((typescript-mode . eglot-ensure)))
+    :mode ("\\.ts\\'" "\\.cts\\'" "\\.mts\\'")
+    :hook (typescript-mode . eglot-ensure))
 #+end_src
 
 *** Web-mode
@@ -1869,6 +1880,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
            "\\.rhtml\\'" "\\.html\\.erb\\'" ; Ruby on Rails
            "\\.html\\.heex\\'"              ; Phoenix
            "\\.ejs\\'"                      ; EJS
+           "\\.jsx\\'" "\\.tsx\\'"          ; React
            "\\.svelte\\'"                   ; Svelte
            "\\.vue\\'"                      ; Vue.js
            "\\.html\\'")                    ; plain HTML (ofc)

@@ -378,7 +378,8 @@ Here is a set of fonts I use.
       (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
            "GulimChe" "DotumChe"
            "monospace")
-      (symbol "Noto Sans Symbols" "Noto Sans Symbols 2"
+      (symbol "Symbols Nerd Font Mono"
+              "Noto Sans Symbols" "Noto Sans Symbols 2"
               "Segoe UI Symbol")
       (emoji "Noto Color Emoji"
              "Segoe UI Emoji"))
@@ -398,11 +399,18 @@ Here is a set of fonts I use.
            ("Noto Sans CJK TC" "Noto Serif CJK TC")
            "Microsoft YaHei" "Microsoft JhengHei"
            "sans-serif")
-      (symbol "Noto Sans Symbols" "Noto Sans Symbols 2"
+      (symbol "Symbols Nerd Font"
+              "Noto Sans Symbols" "Noto Sans Symbols 2"
               "Segoe UI Symbol")
       (emoji "Noto Color Emoji"
              "Segoe UI Emoji"))
     "List of variable-pitch fonts, in order of preference.")
+
+  (defconst rangho/unicode-private-use-areas
+    '((#xe000 . #xf8ff) ; Private Use Area
+      (#xf0000 . #xffffd) ; Supplementary Private Use Area-A
+      (#x100000 . #x10fffd)) ; Supplementary Private Use Area-B
+    "List of Unicode private use areas.")
 #+end_src
 
 Emacs has weird ways of implementing font lookup.
@@ -442,11 +450,13 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
     (when-let ((candidates (alist-get charset alist)))
       (cl-find-if #'rangho/font-available-p candidates)))
 
-  (defun rangho/set-fontset-fonts (fontset charsets alist)
-    "Set fonts for CHARSETS in FONTSET using ALIST."
-    (dolist (charset charsets)
-      (dolist (font (rangho/find-font-specs alist charset))
-        (set-fontset-font fontset charset font))))
+  (defun rangho/set-fontset-fonts (fontset alist)
+    "Set fonts in FONTSET using ALIST."
+    (dolist (item alist)
+      (dolist (font (rangho/find-font-specs alist (car item)))
+        (set-fontset-font fontset (car item) font)))
+    (dolist (area rangho/unicode-private-use-areas)
+      (set-fontset-font fontset area (car (rangho/find-font-specs alist 'symbol)))))
 
   (defun rangho/set-default-font ()
     "Set the default font to use throughout Emacs."
@@ -454,19 +464,19 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
     (let ((fixed-font (rangho/find-first-available-font rangho/fixed-font-alist nil))
           (variable-font (rangho/find-first-available-font rangho/variable-font-alist nil)))
       ;; Default fontset
-      (rangho/set-fontset-fonts t '(hangul kana han symbol emoji) rangho/fixed-font-alist)
+      (rangho/set-fontset-fonts t rangho/fixed-font-alist)
       ;; Fixed-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name fixed-font
                    :registry "fontset-fixed")))
-      (rangho/set-fontset-fonts "fontset-fixed" '(hangul kana han symbol emoji) rangho/fixed-font-alist)
+      (rangho/set-fontset-fonts "fontset-fixed" rangho/fixed-font-alist)
       ;; Variable-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name variable-font
                    :registry "fontset-variable")))
-      (rangho/set-fontset-fonts "fontset-variable" '(hangul kana han symbol emoji) rangho/variable-font-alist)
+      (rangho/set-fontset-fonts "fontset-variable" rangho/variable-font-alist)
       ;; Frame-wide face attributes
       (set-face-attribute 'default nil
                           :family fixed-font

@@ -1,0 +1,130 @@
+/* -*- mode: css -*- */
+
+@import "~/.cache/wal/colors-rofi-dark"
+
+configuration {
+    modes: "window,drun,run,ssh";
+    drun-display-format: "{name}";
+}
+
+* {
+    --translucent: #28282895;
+    --active: #a9b665;
+    --urgent: #fb4934;
+
+    background-color:  transparent;
+}
+
+window {
+    fullscreen: true;
+    padding: 30% 20%;
+    transparency: "real";
+    background-color: @--translucent;
+    border-color: transparent;
+}
+
+listview {
+    background-color: transparent;
+    border: 0 0 0 0;
+    padding: 23 0 0;
+    scrollbar: true;
+}
+
+scrollbar {
+    width:        4px;
+    border:       0;
+    handle-color: @foreground;
+    handle-width: 8px;
+    padding:      0 5;
+}
+
+entry {
+    placeholder: "";
+}
+
+textbox {
+    text-color: @foreground;
+    background-color: @--translucent;
+}
+
+element {
+    border:  0;
+    padding: 2px;
+}
+
+element.normal.normal {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+element.normal.urgent {
+    background-color: transparent;
+    text-color:       @--urgent;
+}
+
+element.normal.active {
+    background-color: transparent;
+    text-color:       @--active;
+}
+
+element.selected.normal {
+    background-color: @foreground;
+    text-color:       @background;
+}
+
+element.selected.urgent {
+    background-color: @foreground;
+    text-color:       @--urgent;
+}
+
+element.selected.active {
+    background-color: @foreground;
+    text-color:       @background;
+}
+
+element.alternate.normal {
+    background-color: transparent;
+    text-color:       @foreground;
+}
+
+element.alternate.urgent {
+    background-color: transparent;
+    text-color:       @--urgent;
+}
+
+element.alternate.active {
+    background-color: transparent;
+    text-color:       @--active;
+}
+
+sidebar {
+    border:       0;
+}
+
+inputbar {
+    spacing:    0;
+    padding:    2px;
+    text-color: @foreground;
+    background-color: transparent;
+    children:   [ prompt, textbox-prompt-sep, entry, case-indicator ];
+}
+
+case-indicator,
+entry,
+prompt,
+button {
+    spacing:    0;
+    text-color: @foreground;
+}
+
+button.selected {
+    background-color: @background;
+    text-color:       @foreground;
+}
+
+textbox-prompt-sep {
+    expand:     false;
+    str:        ":";
+    text-color: @foreground;
+    margin:     0 0.3em 0 0;
+}

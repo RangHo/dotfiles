@@ -272,7 +272,7 @@ myStartupHook = do
 
     -- Eye candies
     spawnOnce "picom"
-    spawnOnce "xwallpaper --daemon --zoom $HOME/Pictures/Wallpapers/6th-destroyer-division.jpg"
+    spawnOnce "wal -R"
 
     -- Utilities
     spawnOnce "eww daemon"

@@ -1793,7 +1793,9 @@ The syntax is... questionable, at best, though.
     (org-startup-with-inline-images t))
 
   (use-package org-superstar
-    :hook (org-mode))
+    :hook (org-mode)
+    :custom
+    (org-superstar-headline-bullets-list '("" "" "" "" "")))
 #+end_src
 
 ~org-roam~ brings the Zettelkasten method of notetaking into Emacs.

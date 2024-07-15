@@ -57,8 +57,7 @@ myWorkspaces =
 -- ---------------------------------------------------------------------
 -- Applications
 myBrowser = "firefox"
-myFastEditor = "emacsclient -c"
-mySlowEditor = "emacs"
+myEditor = "emacs"
 myEmailClient = "thunderbird"
 myFileExplorer = "Thunar"
 myLauncher = "rofi -show drun"
@@ -92,13 +91,12 @@ myDragWindow w = do
     ws <- gets windowset
     if isFloating w ws
         then dragFloating w
-        else dragTiled w
+        else dragWindow w
   where
     dragFloating w = do
         focus w
         mouseMoveWindow w
         windows W.shiftMaster
-    dragTiled w = dragWindow w
 
 -- | Resize the window with the mouse, depending on the floating state.
 myResizeWindow :: Window -> X ()
@@ -124,8 +122,7 @@ myKeys conf =
             , ((superMask, xK_w), spawn myBrowser) -- run [w]eb browser
             , ((superMask, xK_e), spawn myFileExplorer) -- run file [e]xplorer (windows compatible)
             , ((superMask, xK_r), spawn myLauncher) -- [r]un a program (windows compatible)
-            , ((superMask, xK_t), spawn myFastEditor) -- run [t]ext editor
-            , ((superMask .|. shiftMask, xK_t), spawn mySlowEditor) -- run [t]ext editor, but slower
+            , ((superMask, xK_t), spawn myEditor) -- run [t]ext editor
             , ((superMask, xK_y), return ())
             , ((superMask, xK_u), return ())
             , ((superMask, xK_i), return ())
@@ -276,7 +273,6 @@ myStartupHook = do
 
     -- Utilities
     spawnOnce "eww daemon"
-    spawnOnce "emacs --fg-daemon"
 
 -- ---------------------------------------------------------------------
 -- Entrypoint

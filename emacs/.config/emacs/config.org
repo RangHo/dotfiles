@@ -1745,6 +1745,13 @@ Rust is a modern system programming language that ensures memory safety by langu
     :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
 #+end_src
 
+** Terraform
+Terraform is a cloud provisioning software from Hashicorp.
+
+#+begin_src emacs-lisp
+  (use-package terraform-mode)
+#+end_src
+
 ** TeX
 TeX is a great typesetting engine.
 It is also complicated as fuck.

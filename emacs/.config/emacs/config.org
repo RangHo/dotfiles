@@ -1222,6 +1222,14 @@ Let's keep things nice and organized.
     :ensure nil)
 #+end_src
 
+** Git Integration
+~magit~ is the greatest Git client.
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :hook (git-commit-setup . (lambda () (setq fill-column 72))))
+#+end_src
+
 ** Navigation
 ~dired~ stands for DIRectory EDitor.
 Basically a file explorer in Emacs.

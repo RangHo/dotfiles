@@ -1781,6 +1781,13 @@ The syntax is... questionable, at best, though.
     (markdown-fontify-code-block-natively t))
 #+end_src
 
+** OpenSCAD
+OpenSCAD allows me to make 3D models in code.
+
+#+begin_src emacs-lisp
+  (use-package scad-mode)
+#+end_src
+
 ** Org-mode
 ~org-mode~ is a built-in package in Emacs, and is the best markup language.
 

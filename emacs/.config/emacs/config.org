@@ -1784,6 +1784,7 @@ The syntax is... questionable, at best, though.
   (use-package markdown-mode
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode)
+           ("\\.mdx\\'". markdown-mode)
            ("README\\.md\\'" . gfm-mode))
     :custom
     (markdown-fontify-code-block-natively t))

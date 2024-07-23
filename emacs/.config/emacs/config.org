@@ -1618,7 +1618,8 @@ We can add support for =clang-format= formatter with a bit of RegExp magic.
 Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
-  (use-package csharp-mode)
+  (use-package csharp-mode
+    :ensure nil)
 #+end_src
 
 ** Caddyfile

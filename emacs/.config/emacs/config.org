@@ -1819,7 +1819,7 @@ OpenSCAD allows me to make 3D models in code.
   (use-package org-superstar
     :hook (org-mode)
     :custom
-    (org-superstar-headline-bullets-list '("" "" "" "" "")))
+    (org-superstar-headline-bullets-list '("" "" "" "" "")))
 #+end_src
 
 ~org-roam~ brings the Zettelkasten method of notetaking into Emacs.
@@ -1856,6 +1856,13 @@ OpenSCAD allows me to make 3D models in code.
   (use-package org-re-reveal-citeproc
     :config
     (add-to-list 'org-export-filter-paragraph-functions #'org-re-reveal-citeproc-filter-cite))
+#+end_src
+
+~ob-mermaid~ uses Mermaid to display graphs in Org documents.
+
+#+begin_src emacs-lisp
+  (use-package ob-mermaid
+    :if (executable-find "mmdc"))
 #+end_src
 
 ** Web Development

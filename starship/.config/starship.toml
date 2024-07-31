@@ -57,11 +57,11 @@ $gcloud\
 $openstack\
 $azure\
 $direnv\
-$crystal
+$crystal\
+$cmd_duration
 $character\
 $status
 """
-right_format = '$cmd_duration'
 add_newline = true
 
 [username]
@@ -79,20 +79,20 @@ format = 'in [$path]($style)[$read_only]($read_only_style)'
 format = 'with [$symbol$version]($style) '
 
 [character]
-success_symbol = '[\(✿ •⌄•\) ~](green)'
-error_symbol = '[\(✿ ˃⌓˂\) ~](red)'
+success_symbol = '[\(✿ •⌄•\)](green)'
+error_symbol = '[\(✿ ›_‹\)](red)'
 
 [status]
 disabled = false
-format = '[$symbol$common_meaning]($style) '
+format = '[$common_meaning$symbol]($style) '
 style = 'bold red'
 map_symbol = true
 success_symbol = '[ ](bold green)'
-symbol = ' '
-not_executable_symbol = ' '
-not_found_symbol = ' '
-sigint_symbol = ' '
-signal_symbol = ' '
+symbol = '  '
+not_executable_symbol = '  '
+not_found_symbol = '  '
+sigint_symbol = '  '
+signal_symbol = '  '
 
 [cmd_duration]
-format = 'I worked hard for [$duration]($style)!'
+format = 'after [$duration]($style)'

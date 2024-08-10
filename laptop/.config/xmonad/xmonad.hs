@@ -1,17 +1,23 @@
 import System.Exit
 
 import Control.Monad
+import Data.List
 import qualified Data.Map as M
+import Data.Maybe
 import Graphics.X11.ExtraTypes.XF86
 
 import XMonad hiding (mouseResizeWindow)
 
+import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.FlexibleResize
 import XMonad.Actions.Navigation2D
 import XMonad.Actions.TiledWindowDragging
 import XMonad.Config.Desktop
+import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.StatusBar
+import XMonad.Hooks.StatusBar.PP
 import XMonad.Layout.BinarySpacePartition
 import XMonad.Layout.BorderResize
 import XMonad.Layout.DraggingVisualizer
@@ -20,6 +26,7 @@ import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Spacing
 import XMonad.Layout.ToggleLayouts
 import qualified XMonad.StackSet as W
+import XMonad.Util.Hacks
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.SpawnOnce
 
@@ -33,25 +40,21 @@ superMask = mod4Mask
 myBorderWidth = 0
 myFocusFollowsMouse = True
 myFocusedBorderColor = "#eeeeee"
-myGapSize = 20
+myGapSize = 10
 myModMask = superMask
 myNormalBorderColor = "#222222"
 myScratchpads =
-    [ NS "terminal" "wezterm start --class scratchpad" (className =? "scratchpad") focusedFloating
+    [ NS "terminal" "alacritty --class scratchpad" (className =? "scratchpad") focusedFloating
     ]
   where
     focusedFloating = customFloating $ W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3)
-myTerminal = "wezterm"
+myTerminal = "alacritty"
 myWorkspaces =
     [ "default"
     , "code"
     , "chat"
     , "media"
-    , "misc1"
-    , "misc2"
-    , "misc3"
-    , "misc4"
-    , "misc5"
+    , "misc"
     ]
 
 -- ---------------------------------------------------------------------
@@ -106,6 +109,10 @@ myResizeWindow w = do
         focus w
         mouseResizeWindow w
         windows W.shiftMaster
+
+-- | Find the index of a workspace by its name.
+findWorkspaceIndex :: WorkspaceId -> Int
+findWorkspaceIndex ws = fromMaybe 0 $ elemIndex ws myWorkspaces
 
 -- ---------------------------------------------------------------------
 -- Key bindings
@@ -228,6 +235,28 @@ myMouseBindings _ =
     doNothing _ = return ()
 
 -- ---------------------------------------------------------------------
+-- Status bar
+myPP =
+    filterOutWsPP [scratchpadWorkspaceTag] $
+        def
+            { ppCurrent = gotoWorkspace $ xmobarColor "yellow" ""
+            , ppVisible = gotoWorkspace $ xmobarColor "white" ""
+            , ppHidden = gotoWorkspace $ xmobarColor "white" ""
+            , ppHiddenNoWindows = gotoWorkspace $ xmobarColor "gray" ""
+            , ppSep = " "
+            , ppWsSep = xmobarColor "gray" "" " | "
+            , ppOrder = \(ws : l : t : _) -> [ws]
+            }
+  where
+    gotoWorkspace style wid =
+        xmobarAction
+            ("xdotool set_desktop " ++ show (findWorkspaceIndex wid))
+            "1"
+            (style wid)
+
+mySB = statusBarProp "xmobar" (pure myPP)
+
+-- ---------------------------------------------------------------------
 -- Layout hook
 myLayoutHook =
     avoidStruts
@@ -272,23 +301,29 @@ myStartupHook = do
     spawnOnce "wal -R"
 
     -- Utilities
+    spawnOnce "dunst"
     spawnOnce "eww daemon"
 
 -- ---------------------------------------------------------------------
 -- Entrypoint
 main :: IO ()
 main =
-    xmonad $
-        withNavigation2DConfig def $
-            desktopConfig
-                { borderWidth = myBorderWidth
-                , focusFollowsMouse = myFocusFollowsMouse
-                , focusedBorderColor = myFocusedBorderColor
-                , keys = myKeys
-                , layoutHook = myLayoutHook
-                , manageHook = myManageHook
-                , mouseBindings = myMouseBindings
-                , normalBorderColor = myNormalBorderColor
-                , startupHook = myStartupHook
-                , workspaces = myWorkspaces
-                }
+    xmonad
+        . ewmh
+        . ewmhFullscreen
+        . docks
+        . javaHack
+        . withSB mySB
+        . withNavigation2DConfig def
+        $ def
+            { borderWidth = myBorderWidth
+            , focusFollowsMouse = myFocusFollowsMouse
+            , focusedBorderColor = myFocusedBorderColor
+            , keys = myKeys
+            , layoutHook = myLayoutHook
+            , manageHook = myManageHook
+            , mouseBindings = myMouseBindings
+            , normalBorderColor = myNormalBorderColor
+            , startupHook = myStartupHook
+            , workspaces = myWorkspaces
+            }

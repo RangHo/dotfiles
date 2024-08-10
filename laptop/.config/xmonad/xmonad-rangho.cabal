@@ -1,0 +1,13 @@
+cabal-version:                  3.0
+name:                           xmonad-rangho
+version:                        0.0.0
+
+executable xmonad
+    hs-source-dirs:             .
+    main-is:                    xmonad.hs
+    build-depends:              base >= 4.19.0 && < 5
+                              , X11 >= 1.10.0 && < 2
+                              , containers >= 0.6.8
+                              , xmonad >= 0.18.0
+                              , xmonad-contrib >= 0.18.0
+    default-language:           Haskell2010

@@ -32,12 +32,12 @@
 # It is equivalent to a bump in MAJOR in SemVer standard.
 # With this, the breaking change indicator in <footer> becomes optional.
 #
-# <description> contains a conceise description of the change.
+# <description> contains a concise description of the change.
 # The content should be in imperative mood, as if "This commit will..." is prepended.
 # Do not capitalize the beginning of the sentence, and full stop (.) is omitted.
 #
 # <body> provides additional contextual information about the code changes and is optional.
-# Mutliple paragraphs separated by an empty line are allowed here.
+# Multiple paragraphs separated by an empty line are allowed here.
 # Sentences should be in imperative mood with proper capitalization and full stops (.).
 #
 # <footer> is a list of key-value pairs that store "metadata" of a commit.

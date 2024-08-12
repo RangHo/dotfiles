@@ -6,10 +6,10 @@ import Xmobar
 wrap :: String -> String -> String -> String
 wrap l r m = l ++ m ++ r
 
-action :: String -> String -> String -> String
+action :: String -> Int -> String -> String
 action command button =
     wrap
-        ("<action=" ++ command ++ " button=" ++ button ++ ">")
+        ("<action=" ++ command ++ " button=" ++ show button ++ ">")
         "</action>"
 
 command :: String -> String
@@ -44,7 +44,7 @@ config =
             , 0
             , 0
             ]
-        , iconRoot = ".config/xmobar/icons"
+        , iconRoot = ".config/xmonad/icons"
         , iconOffset = 0
         , bgColor = "black"
         , fgColor = "white"
@@ -53,44 +53,50 @@ config =
         , commands =
             [ Run UnsafeXMonadLog
             , Run $
-                Date "<icon=clock.xpm/> %H:%M" "clock" 10
+                Date (icon "clock.xpm" ++ " %H:%M") "clock" 10
             , Run $
                 Battery
-                    ( args
-                        [ "-t <leftipat> <left>%"
-                        , "--"
-                        , "--on-icon-pattern <icon=battery-charging.xpm/>"
-                        , "--idle-icon-pattern <icon=battery-charging.xpm/>"
-                        , "--off-icon-pattern <icon=battery-%%.xpm/>"
-                        ]
-                    )
+                    [ "-t"
+                    , "<leftipat> <left>%"
+                    , "--"
+                    , "--on-icon-pattern"
+                    , icon "battery-charging.xpm"
+                    , "--idle-icon-pattern"
+                    , icon "battery-charging.xpm"
+                    , "--off-icon-pattern"
+                    , icon "battery-%%.xpm"
+                    ]
                     100
             , Run $
                 Mpris2
                     "spotify"
-                    (args ["-t <icon=music.xpm/> <fn=1><artist> - <title></fn>"])
+                    [ "-t"
+                    , fontIndex 1 $ icon "music.xpm" ++ " <artist> - <title>"
+                    ]
                     10
             , Run $
                 Alsa
                     "default"
                     "Master"
-                    ( args
-                        [ "-t <status> <volume>%"
-                        , "--"
-                        , "-O <volumeipat> "
-                        , "-o <icon=volume-x.xpm/> "
-                        , "--volume-icon-pattern <icon=volume-%%.xpm/>"
-                        ]
-                    )
+                    [ "-t"
+                    , "<status> <volume>%"
+                    , "--"
+                    , "-O"
+                    , "<volumeipat>"
+                    , "-o"
+                    , icon "volume-x.xpm"
+                    , "--volume-icon-pattern"
+                    , icon "volume-%%.xpm"
+                    ]
             , Run $
                 Wireless
                     ""
-                    ( args
-                        [ "-t <qualityipat> <ssid>"
-                        , "--"
-                        , "--quality-icon-pattern <icon=radio-%%.xpm/>"
-                        ]
-                    )
+                    [ "-t"
+                    , "<qualityipat> <essid>"
+                    , "--"
+                    , "--quality-icon-pattern"
+                    , icon "radio-%%.xpm"
+                    ]
                     100
             ]
         , template =
@@ -110,18 +116,12 @@ config =
                 , command "battery"
                 , sep
                 , command "clock"
+                , sep
+                , action "rofi" 1 $ icon "power.xpm"
                 , hspace 20
                 ]
         }
   where
-    args =
-        foldr
-            ( \arg acc ->
-                case words arg of
-                    a : b -> a : unwords b : acc
-                    [a] -> a : acc
-            )
-            []
     sep = hspace 10 ++ fontColor "gray" "┃┃" ++ hspace 10
 
 main :: IO ()

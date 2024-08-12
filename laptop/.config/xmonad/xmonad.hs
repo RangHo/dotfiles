@@ -254,7 +254,7 @@ myPP =
             "1"
             (style wid)
 
-mySB = statusBarProp "xmobar" (pure myPP)
+mySB = statusBarProp "~/.cache/xmonad/xmobar" (pure myPP)
 
 -- ---------------------------------------------------------------------
 -- Layout hook

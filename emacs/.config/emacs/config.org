@@ -1910,14 +1910,15 @@ It primarily targets HTML, but it also supports other HTMLx templates.
 
 #+begin_src emacs-lisp
   (defconst rangho/web-mode-server-programs
-    `(("php" . '("phpactor" "language-server"))
+    '(("php" . ("phpactor" "language-server"))
       ("svelte" . ("svelteserver" "--stdio")))
     "Alist of language servers for `web-mode'.")
 
   (defun rangho/web-mode-contact (_)
     "Return the language server program for the current buffer."
-    (alist-get web-mode-engine rangho/web-mode-server-programs
-               '("echo" "No language server available")))
+    (if-let ((contact (assoc web-mode-engine rangho/web-mode-server-programs)))
+        (cdr contact)
+      '("echo" "No language server available")))
 
   (use-package web-mode
     :mode ("\\.php\\'"                      ; PHP

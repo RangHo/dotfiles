@@ -3,7 +3,7 @@
 	name = RangHo Lee
 [core]
 	pager = delta
-	editor = nvim
+	editor = vim
 	autocrlf = input
 [color]
 	ui = true
@@ -34,3 +34,8 @@
 	colorMoved = default
 [pull]
 	rebase = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

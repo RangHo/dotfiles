@@ -1936,6 +1936,15 @@ It primarily targets HTML, but it also supports other HTMLx templates.
                  '(web-mode . rangho/web-mode-contact)))
 #+end_src
 
+** X Resource Database
+X11 uses similar syntax for most of its configurations.
+
+#+begin_src emacs-lisp
+  (use-package xrdb-mode
+    :ensure nil
+    :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'")
+#+end_src
+
 ** YAML
 [[https://yaml.org/][YAML]] is a human-readable data format with colon (=:=) as the separator and significant whitespaces.
 While there are a lot of criticisms, it is still widely used to represent data in a human-readable format.

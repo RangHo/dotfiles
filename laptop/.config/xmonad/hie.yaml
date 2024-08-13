@@ -2,3 +2,5 @@ cradle:
   cabal:
     - path: "./xmonad.hs"
       component: "xmonad-rangho:exe:xmonad"
+    - path: "./xmobar.hs"
+      component: "xmonad-rangho:exe:xmobar"

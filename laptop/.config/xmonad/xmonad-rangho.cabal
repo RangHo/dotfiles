@@ -5,10 +5,10 @@ version:                        0.0.0
 executable xmonad
     hs-source-dirs:             .
     main-is:                    xmonad.hs
-    build-depends:              base >= 4 && < 5
-                              , containers >= 0.6.8
-                              , stm >= 2.5.3
-                              , X11 >= 1.10.0 && < 2
+    build-depends:              base
+                              , containers
+                              , stm
+                              , X11
                               , xmonad >= 0.18.0
                               , xmonad-contrib >= 0.18.0
     default-language:           Haskell2010
@@ -16,6 +16,7 @@ executable xmonad
 executable xmobar
     hs-source-dirs:             .
     main-is:                    xmobar.hs
-    build-depends:              base >= 4 && < 5
+    build-depends:              base
+                              , process
                               , xmobar >= 0.48.0
     default-language:           Haskell2010

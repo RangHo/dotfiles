@@ -302,7 +302,7 @@ myStartupHook = do
 
     -- Utilities
     spawnOnce "dunst"
-    spawnOnce "eww daemon"
+    spawnOnce "playerctld"
 
 -- ---------------------------------------------------------------------
 -- Entrypoint

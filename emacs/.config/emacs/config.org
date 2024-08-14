@@ -1754,6 +1754,13 @@ Rust is a modern system programming language that ensures memory safety by langu
     :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
 #+end_src
 
+** Swift
+Swift is to Objective-C as Kotlin is to Java, on Apple devices.
+
+#+begin_src emacs-lisp
+  (use-package swift-mode)
+#+end_src
+
 ** Terraform
 Terraform is a cloud provisioning software from Hashicorp.
 
@@ -1942,7 +1949,7 @@ X11 uses similar syntax for most of its configurations.
 #+begin_src emacs-lisp
   (use-package xrdb-mode
     :ensure nil
-    :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'")
+    :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'"))
 #+end_src
 
 ** YAML

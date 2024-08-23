@@ -195,7 +195,8 @@ Elpaca will wait after this section to ensure that this package is properly inst
     :config
     (no-littering-theme-backups)
     (rangho/no-littering-theme-custom)
-    (rangho/no-littering-theme-eln-cache))
+    (rangho/no-littering-theme-eln-cache)
+    (rangho/no-littering-theme-treesit))
 #+end_src
 
 ** Local Emacs Lisp Path
@@ -1419,7 +1420,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
     :custom
     (corfu-auto t)
     (corfu-cycle t)
-    (corfu-popupinfo-delay '(1 . 0.2))
+    (corfu-popupinfo-delay '(1 . 1))
     :config
     (global-corfu-mode +1)
     (corfu-popupinfo-mode +1))
@@ -1532,18 +1533,8 @@ It is usually much faster than Emacs's built-in parsing facility.
 
 #+begin_src emacs-lisp
   (use-package treesit
-    :if (< emacs-major-version 29)
+    :unless (version< emacs-version "29.1")
     :ensure nil)
-#+end_src
-
-Generally, for each supported major mode ~XXX-mode~, there exists a mode named ~XXX-ts-mode~.
-There is no official mapping, but there is a community-maintained auto-mapper library.
-
-#+begin_src emacs-lisp
-  (use-package treesit-auto
-    :if (featurep 'treesit)
-    :config
-    (global-treesit-auto-mode +1))
 #+end_src
 
 * Per-language Settings
@@ -1551,6 +1542,7 @@ These settings are for individual languages.
 Some are programming languages, some are markups, and some are configuration languages.
 
 Languages are organized in alphabetical orders, unless the package load order is significant.
+(They should not be, though.)
 
 ** BASIC
 While BASIC is not used a lot, some exotic environments like Microsoft Excel still requires a variant of it.
@@ -1575,7 +1567,7 @@ Also, while we're at it, let's enable Language Server support.
   (use-package cc-mode
     :ensure nil
     :mode (("\\.c\\'" . c-mode)
-           ("\\.h\\'" . c-mode)
+           ("\\.h\\'" . c-or-c++-mode)
            ("\\.HC\\'" . c-mode)
            ("\\.ZC\\'" . c-mode)
            ("\\.cpp\\'" . c++-mode)
@@ -1592,13 +1584,39 @@ Also, while we're at it, let's enable Language Server support.
            ("\\.txx\\'" . c++-mode)
            ("\\.cxx\\'" . c++-mode)
            ("\\.inl\\'" . c++-mode)
-           ("\\.ixx\\'" . c++-mode)))
+           ("\\.ixx\\'" . c++-mode))
+    :custom
+    (c-default-style "k&r"))
+
+  (use-package c-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(c "https://github.com/tree-sitter/tree-sitter-c"))
+    (add-to-list 'treesit-language-source-alist
+                 '(cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(c-mode . c-ts-mode))
+    (add-to-list 'major-mode-remap-alist
+                 '(c++-mode . c++-ts-mode))
+    (add-to-list 'major-mode-remap-alist
+                 '(c-or-c++-mode . c-or-c++-ts-mode)))
 #+end_src
 
 Emacs doesn't come with support for build systems, except for Makefile.
 
 #+begin_src emacs-lisp
-  (use-package cmake-mode)
+  (use-package cmake-mode
+    :unless (featurep 'treesit))
+
+  (use-package cmake-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(cmake "https://github.com/uyha/tree-sitter-cmake")))
 
   (use-package meson-mode)
 #+end_src
@@ -1619,7 +1637,15 @@ Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
   (use-package csharp-mode
-    :ensure nil)
+    :ensure nil
+    :init
+    (when (featurep 'treesit)
+      (add-to-list 'treesit-language-source-alist
+                   '(csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")))
+    :config
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(csharp-mode . csharp-ts-mode))))
 #+end_src
 
 ** Caddyfile
@@ -1656,7 +1682,15 @@ Crystal is a native programming language that looks exactly like Ruby.
 Docker is /de facto/ standard container technology these days.
 
 #+begin_src emacs-lisp
-  (use-package dockerfile-mode)
+  (use-package dockerfile-mode
+    :unless (featurep 'treesit))
+
+  (use-package dockerfile-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")))
 #+end_src
 
 ** Elixir
@@ -1726,64 +1760,6 @@ Lua is a small, yet full-featured embedded language that works with C really wel
   (use-package lua-mode)
 #+end_src
 
-** PowerShell
-PowerShell is the new shell script language for Windows and .NET platform.
-
-#+begin_src emacs-lisp
-  (use-package powershell)
-#+end_src
-
-** Python
-Python is overrated.
-Still I need to use it, so...
-
-#+begin_src emacs-lisp
-  (use-package python
-    :ensure nil)
-#+end_src
-
-** Rust
-Rust is a modern system programming language that ensures memory safety by language design.
-
-#+begin_src emacs-lisp
-  (defun rangho/add-rust-mode-before-save-hook ()
-    "Add a hook to format Rust code before saving."
-    (add-hook 'before-save-hook #'eglot-format-buffer nil t))
-
-  (use-package rust-mode
-    :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
-#+end_src
-
-** Swift
-Swift is to Objective-C as Kotlin is to Java, on Apple devices.
-
-#+begin_src emacs-lisp
-  (use-package swift-mode)
-#+end_src
-
-** Terraform
-Terraform is a cloud provisioning software from Hashicorp.
-
-#+begin_src emacs-lisp
-  (use-package terraform-mode)
-#+end_src
-
-** TeX
-TeX is a great typesetting engine.
-It is also complicated as fuck.
-We need to properly build ~auctex~ before actually loading it.
-
-#+begin_src emacs-lisp
-  (use-package auctex
-    :ensure (auctex :pre-build (("./autogen.sh")
-                                ("./configure" "--without-texmf-dir" "--with-lispdir=.")
-                                ("make")
-                                ("install-info" "doc/auctex.info" "doc/dir")
-                                ("install-info" "doc/preview-latex.info" "doc/dir")))
-    :hook ((ConTeXt-mode . prettify-symbols-mode)
-           (LaTeX-mode . prettify-symbols-mode)))
-#+end_src
-
 ** Markdown
 Markdown is a /de facto/ standard for writing README files on modern software projects.
 The syntax is... questionable, at best, though.
@@ -1796,6 +1772,13 @@ The syntax is... questionable, at best, though.
            ("README\\.md\\'" . gfm-mode))
     :custom
     (markdown-fontify-code-block-natively t))
+#+end_src
+
+** Nu
+Nu is a brand-new, data-oriented shell script.
+
+#+begin_src emacs-lisp
+  (use-package nushell-mode)
 #+end_src
 
 ** OpenSCAD
@@ -1872,6 +1855,117 @@ OpenSCAD allows me to make 3D models in code.
     :if (executable-find "mmdc"))
 #+end_src
 
+** PowerShell
+PowerShell is the new shell script language for Windows and .NET platform.
+
+#+begin_src emacs-lisp
+  (use-package powershell)
+#+end_src
+
+** Python
+Python is overrated.
+Still I need to use it, so...
+
+#+begin_src emacs-lisp
+  (use-package python
+    :ensure nil
+    :init
+    (when (featurep 'treesit)
+      (add-to-list 'treesit-language-source-alist
+                   '(python "https://github.com/tree-sitter/tree-sitter-python")))
+    :config
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(python-mode . python-ts-mode))))
+#+end_src
+
+** Ruby
+Ruby is the father of system scripting language.
+Better than Python.
+
+#+begin_src emacs-lisp
+  (use-package ruby-mode
+    :unless (featurep 'treesit)
+    :ensure nil)
+
+  (use-package ruby-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(ruby "https://github.com/tree-sitter/tree-sitter-ruby")))
+#+end_src
+
+** Rust
+Rust is a modern system programming language that ensures memory safety by language design.
+
+#+begin_src emacs-lisp
+  (defun rangho/add-rust-mode-before-save-hook ()
+    "Add a hook to format Rust code before saving."
+    (add-hook 'before-save-hook #'eglot-format-buffer nil t))
+
+  (use-package rust-mode
+    :unless (featurep 'treesit)
+    :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
+
+  (use-package rust-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :hook (rust-ts-mode . rangho/add-rust-mode-before-save-hook)
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(rust "https://github.com/tree-sitter/tree-sitter-rust"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(rust-mode . rust-ts-mode)))
+#+end_src
+
+** Swift
+Swift is to Objective-C as Kotlin is to Java, on Apple devices.
+
+#+begin_src emacs-lisp
+  (use-package swift-mode)
+#+end_src
+
+** Terraform
+Terraform is a cloud provisioning software from Hashicorp.
+
+#+begin_src emacs-lisp
+  (use-package terraform-mode)
+#+end_src
+
+** TeX
+TeX is a great typesetting engine.
+It is also complicated as fuck.
+We need to properly build ~auctex~ before actually loading it.
+
+#+begin_src emacs-lisp
+  (use-package auctex
+    :ensure (auctex :pre-build (("./autogen.sh")
+                                ("./configure" "--without-texmf-dir" "--with-lispdir=.")
+                                ("make")
+                                ("install-info" "doc/auctex.info" "doc/dir")
+                                ("install-info" "doc/preview-latex.info" "doc/dir")))
+    :hook ((ConTeXt-mode . prettify-symbols-mode)
+           (LaTeX-mode . prettify-symbols-mode)))
+#+end_src
+
+** TOML
+TOML, short for Tom's Obvious Minimal Language, is a minimal configuration file that extends simple INI files.
+Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in.
+
+#+begin_src emacs-lisp
+  (use-package toml-ts-mode
+    :requires treesit
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(toml "https://github.com/tree-sitter/tree-sitter-toml"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(conf-toml-mode . toml-ts-mode)))
+#+end_src
+
 ** Web Development
 Web development, especially frontend development, is a pile of mess.
 Emacs can help me with that.
@@ -1883,32 +1977,80 @@ There are a few /modern/ extensions to support, namely, PostCSS.
 #+begin_src emacs-lisp
   (use-package css-mode
     :ensure nil
-    :mode ("\\.pcss\\'" "\\.postcss\\'"))
+    :mode ("\\.pcss\\'" "\\.postcss\\'")
+    :init
+    (when (featurep 'treesit)
+      (add-to-list 'treesit-language-source-alist
+                   '(css "https://github.com/tree-sitter/tree-sitter-css")))
+    :config
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(css-mode . css-ts-mode))))
 #+end_src
 
-*** JavaScript
+*** JavaScript and JSX
 JavaScript is such a pain in the ass to set up, as there are so many different "supersets".
 
 There are three different ways to edit JavaScript in Emacs:
 
 1. via ~js-mode~, a built-in JavaScript mode;
-2. via ~js2-mode~, a major mode deriving from ~js-mode~ and provides AST parsing and linting;
-3. via ~web-mode~, which does happen to support JavaScript to some degree.
+2. via ~js2-mode~, a major mode deriving from ~js-mode~ and provides AST parsing and linting.
+
+TypeScript is ever-so-slightly better, but not by much.
+Note that ~typescript.el~ is no longer supported as ~typescript-ts-mode~ is now built-in since Emacs 29.
+To edit TypeScript files, just install Emacs 29.
 
 #+begin_src emacs-lisp
-  (use-package js2-mode
-    :mode ("\\.js\\'" "\\.cjs\\'" "\\.mjs\\'")
+  (use-package js
+    :ensure nil
     :init
-    (add-to-list 'eglot-server-programs
-                 '(js2-mode . ("typescript-language-server" "--stdio"))))
+    (when (featurep 'treesit)
+      (add-to-list 'treesit-language-source-alist
+                   '(javascript "https://github.com/tree-sitter/tree-sitter-javascript")))
+    :config
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(js-mode . js-ts-mode))))
+
+
 #+end_src
 
-*** TypeScript
-TypeScript is ever-so-slightly better, but not by much.
+*** TypeScript and TSX
+React uses JavaScript with inline HTML-like markup syntax embedded within to declare components.
+There is also a TypeScript variant of it, of course.
+
+Until Emacs 28, the ~js~ package declared above handled JSX syntax, but starting from Emacs 29, there is a new major mode using Tree-Sitter.
+While it says TSX, it supports both JSX and TSX no problem.
 
 #+begin_src emacs-lisp
-  (use-package typescript-mode
-    :mode ("\\.ts\\'" "\\.cts\\'" "\\.mts\\'"))
+  (use-package typescript-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
+    (add-to-list 'treesit-language-source-alist
+                 '(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(js-jsx-mode . tsx-ts-mode)))
+#+end_src
+
+*** JSON
+JSON, short for JavaScript Object Notation, is a /de facto/ standard serialization method for multi-platform communiations.
+
+Starting from Emacs 29, there is a new JSON major mode powered by Tree-Sitter.
+
+#+begin_src emacs-lisp
+  (use-package json-ts-mode
+    :requires treesit
+    :ensure nil
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(json "https://github.com/tree-sitter/tree-sitter-json"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(js-json-mode . json-ts-mode)))
 #+end_src
 
 *** Web-mode
@@ -1932,7 +2074,6 @@ It primarily targets HTML, but it also supports other HTMLx templates.
            "\\.rhtml\\'" "\\.html\\.erb\\'" ; Ruby on Rails
            "\\.html\\.heex\\'"              ; Phoenix
            "\\.ejs\\'"                      ; EJS
-           "\\.jsx\\'" "\\.tsx\\'"          ; React
            "\\.svelte\\'"                   ; Svelte
            "\\.vue\\'"                      ; Vue.js
            "\\.html\\'")                    ; plain HTML (ofc)
@@ -1984,9 +2125,7 @@ Emacs has an unofficial plugin for that, to show off what I'm doing.
        (lambda () (elcord-mode -1)))))
 
   (use-package elcord
-    :ensure (:host github :repo "RangHo/emacs-elcord" :branch "customize-pipe")
     :custom
-    (elcord-discord-ipc-path "/run/user/1000/app/com.discordapp.Discord/discord-ipc-0")
     (elcord-use-major-mode-as-main-icon t)
     :init
     (add-function :after after-focus-change-function

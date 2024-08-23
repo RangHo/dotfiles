@@ -27,21 +27,8 @@ export XMODIFIERS=@im=fcitx
 export GTK2_RC_FILES=~/.gtkrc-2.0
 export QT_QPA_PLATFORMTHEME=gtk2
 
-if [ -d "/etc/profile.d" ]; then
-    for f in /etc/profile.d/*.sh; do
-        . "$f"
-    done
-fi
-
-if [ -d "$HOME/.config/profile.d" ]; then
-    for f in $HOME/.config/profile.d/*.sh; do
-        . "$f"
-    done
-fi
-
-[ -f "$HOME/.profile" ] && . "$HOME/.profile"
-
-[ -f "$HOME/.local/bin/mise" ] && eval "$($HOME/.local/bin/mise env -s bash)"
+[ -r "/etc/profile" ] && . "/etc/profile"
+[ -r "$HOME/.profile" ] && . "$HOME/.profile"
 
 
 # X server configuration ###############################################
@@ -50,8 +37,10 @@ xrdb -merge ~/.Xresources
 xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Tapping Enabled" 1
 xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Natural Scrolling Enabled" 1
 
+setxkbmap -option ctrl:swapcaps
+
 xsetroot -cursor_name left_ptr
 
 
 # X session ############################################################
-exec $HOME/.cache/xmonad/xmonad-x86_64-linux
+exec "$HOME/.cache/xmonad/xmonad-x86_64-linux"

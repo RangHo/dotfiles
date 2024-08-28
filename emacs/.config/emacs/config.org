@@ -129,7 +129,7 @@ If a binary called =mise= is available, load the 3rd-party Emacs integration pac
 
 #+begin_src emacs-lisp
   (use-package mise
-    :if (executable-find "mise")
+    :when (executable-find "mise")
     :ensure (:host github :repo "liuyinz/mise.el")
     :init
     (let ((mise-shims (expand-file-name "mise/shims" user-data-directory)))
@@ -1347,7 +1347,7 @@ Emacs has built-in integration with =ispell=-like spell checkers.
 
 #+begin_src emacs-lisp
   (use-package ispell
-    :if (executable-find "hunspell")
+    :when (executable-find "hunspell")
     :ensure nil
     :custom
     (ispell-program-name (executable-find "hunspell")))
@@ -1361,7 +1361,7 @@ There are two sub-modes available for this package:
 
 #+begin_src emacs-lisp
   (use-package flyspell
-    :if (executable-find "hunspell")
+    :when (executable-find "hunspell")
     :ensure nil
     :hook ((text-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode)))
@@ -1499,7 +1499,7 @@ Elpaca seems to have some [[https://github.com/progfolio/elpaca/issues/236][trou
     (global-eldoc-mode +1))
 
   (use-package eldoc-box
-    :if (or (daemonp) (display-graphic-p))
+    :when (or (daemonp) (display-graphic-p))
     :hook (prog-mode . eldoc-box-hover-at-point-mode)
     :custom
     (eldoc-echo-area-prefer-doc-buffer t))
@@ -1718,7 +1718,7 @@ If =fourmolu= binary is available, integrate it.
 
 #+begin_src emacs-lisp
   (use-package ormolu
-    :if (executable-find "fourmolu")
+    :when (executable-find "fourmolu")
     :hook (haskell-mode . ormolu-format-on-save-mode)
     :custom
     (ormolu-process-path "fourmolu"))
@@ -1859,7 +1859,7 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-mermaid
-    :if (executable-find "mmdc"))
+    :when (executable-find "mmdc"))
 #+end_src
 
 ** PowerShell

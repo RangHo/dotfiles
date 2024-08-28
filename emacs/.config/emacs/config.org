@@ -1778,7 +1778,14 @@ The syntax is... questionable, at best, though.
 Nu is a brand-new, data-oriented shell script.
 
 #+begin_src emacs-lisp
-  (use-package nushell-mode)
+  (use-package nushell-mode
+    :unless (featurep 'treesit))
+
+  (use-package nushell-ts-mode
+    :when (featurep 'treesit)
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(nu "https://github.com/nushell/tree-sitter-nu")))
 #+end_src
 
 ** OpenSCAD

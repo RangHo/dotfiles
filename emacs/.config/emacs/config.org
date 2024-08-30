@@ -1454,8 +1454,7 @@ While it /can/ utilize the built-in completion functions, ~cape~ can provide far
            ("C-c p r" . cape-rfc1345))
     :init
     (add-hook 'completion-at-point-functions #'cape-dabbrev)
-    (add-hook 'completion-at-point-functions #'cape-file)
-    (add-hook 'completion-at-point-functions #'cape-dict))
+    (add-hook 'completion-at-point-functions #'cape-file))
 #+end_src
 
 From the same developer, ~vertico~ is also a nice solution for minibuffer completions.

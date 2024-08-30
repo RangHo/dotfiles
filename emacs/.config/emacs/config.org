@@ -1362,9 +1362,7 @@ There are two sub-modes available for this package:
 #+begin_src emacs-lisp
   (use-package flyspell
     :when (executable-find "hunspell")
-    :ensure nil
-    :hook ((text-mode . flyspell-mode)
-           (prog-mode . flyspell-prog-mode)))
+    :ensure nil)
 #+end_src
 
 ** Syntax Checking

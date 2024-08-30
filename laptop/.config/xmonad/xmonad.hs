@@ -16,6 +16,7 @@ import XMonad.Actions.TiledWindowDragging
 import XMonad.Config.Desktop
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 import XMonad.Layout.BinarySpacePartition
@@ -38,16 +39,19 @@ superMask = mod4Mask
 -- ---------------------------------------------------------------------
 -- Variables
 myBorderWidth = 0
+myDefaultFloatRect = W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3)
 myFocusFollowsMouse = True
 myFocusedBorderColor = "#eeeeee"
 myGapSize = 10
 myModMask = superMask
 myNormalBorderColor = "#222222"
+myPIPRect = W.RationalRect (2 / 3) (2 / 3) (3 / 10) (3 / 10)
+myScratchRect = W.RationalRect (1 / 8) (1 / 8) (3 / 4) (3 / 4)
 myScratchpads =
     [ NS "terminal" "alacritty --class scratchpad" (className =? "scratchpad") focusedFloating
     ]
   where
-    focusedFloating = customFloating $ W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3)
+    focusedFloating = customFloating myScratchRect
 myTerminal = "alacritty"
 myWorkspaces =
     [ "default"
@@ -79,8 +83,7 @@ toggleFloat w = windows $ go w
     go w ws =
         if isFloating w ws
             then W.sink w ws
-            else W.float w floatRect ws
-    floatRect = W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3)
+            else W.float w myDefaultFloatRect ws
 
 -- | Toggle fullscreen mode.
 toggleFullscreen :: Window -> X ()
@@ -113,6 +116,9 @@ myResizeWindow w = do
 -- | Find the index of a workspace by its name.
 findWorkspaceIndex :: WorkspaceId -> Int
 findWorkspaceIndex ws = fromMaybe 0 $ elemIndex ws myWorkspaces
+
+doCopyToAll :: ManageHook
+doCopyToAll = doF copyToAll
 
 -- ---------------------------------------------------------------------
 -- Key bindings
@@ -286,6 +292,7 @@ myLayoutHook =
 myManageHook =
     composeAll
         [ namedScratchpadManageHook myScratchpads
+        , stringProperty "WM_WINDOW_ROLE" =? "PictureInPicture" --> (doRectFloat myPIPRect <+> doCopyToAll)
         ]
 
 -- ---------------------------------------------------------------------

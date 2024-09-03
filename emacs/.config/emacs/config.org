@@ -152,7 +152,9 @@ Elpaca will wait after this section to ensure that this package is properly inst
 #+begin_src emacs-lisp
   (defun rangho/no-littering-theme-custom ()
     "Theme the Emacs customization feature."
-    (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
+    (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+    (when (file-exists-p custom-file)
+      (load custom-file)))
 
   (defun rangho/no-littering-theme-eln-cache ()
     "Theme the Emacs native compilation cache.
@@ -1463,6 +1465,14 @@ From the same developer, ~vertico~ is also a nice solution for minibuffer comple
     (vertico-mode +1))
 #+end_src
 
+~marginalia~ displays annotations about each interactive commands in =M-x= windows.
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :config
+    (marginalia-mode +1))
+#+end_src
+
 ~orderless~ provides a powerful completion style where I can match with space-separated keywords without order.
 
 #+begin_src emacs-lisp
@@ -2131,6 +2141,7 @@ Emacs has an unofficial plugin for that, to show off what I'm doing.
   (use-package elcord
     :custom
     (elcord-use-major-mode-as-main-icon t)
+    (elcord-quiet t)
     :init
     (add-function :after after-focus-change-function
                   #'rangho/toggle-elcord-mode-on-focus-change))

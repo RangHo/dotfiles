@@ -80,6 +80,7 @@ Let's bootstrap the thing.
                                 :ref nil :depth 1
                                 :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                                 :build (:not elpaca--activate-package)))
+  (defvar elpaca-queue-limit 64)
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
          (build (expand-file-name "elpaca/" elpaca-builds-directory))
          (order (cdr elpaca-order))
@@ -1518,20 +1519,12 @@ Meanwhile, the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adap
 Both protocols use JSON-RPC to communicate with their respective servers, and we need to update the built-in one.
 
 #+begin_src emacs-lisp
-  (use-package jsonrpc)
-
-  (defun rangho/enable-eglot-if-possible (&optional mode)
-    "Enable eglot for MODE if it is supported."
-    (setq mode (or mode major-mode))
-    (when (eglot--lookup-mode mode)
-      (eglot-ensure)))
-
   (use-package eglot
-    :hook (prog-mode . rangho/enable-eglot-if-possible))
-
-  (use-package dape
-    :config
-    (dape-breakpoint-global-mode +1))
+    :unless (version< emacs-version "29.1")
+    :ensure nil
+    :init
+    (defvar eglot-server-programs nil
+      "Forward-declaration of `eglot-server-programs'."))
 #+end_src
 
 ** Tree-sitter Integration

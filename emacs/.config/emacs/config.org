@@ -1518,8 +1518,6 @@ The [[https://microsoft.github.io/language-server-protocol/][Language Server Pro
 Meanwhile, the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]] is similar to the [[https://sourceware.org/gdb/current/onlinedocs/gdb.html/GDB_002fMI.html#GDB_002fMI][GDB/MI]] interface as it provides a server-client relationship between the debugger and the UI.
 Both protocols use JSON-RPC to communicate with their respective servers, and we need to update the built-in one.
 
-DAP package is not installed for now until Emacs 30 is out.
-
 #+begin_src emacs-lisp
   (use-package eglot
     :ensure nil
@@ -1528,6 +1526,8 @@ DAP package is not installed for now until Emacs 30 is out.
                          (setq mode (or mode major-mode))
                          (when (eglot--lookup-mode mode)
                            (eglot-ensure)))))
+  (use-package dape
+    :unless (version< emacs-version "30.0"))
 #+end_src
 
 ** Tree-sitter Integration

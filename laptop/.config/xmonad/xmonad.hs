@@ -298,11 +298,6 @@ myManageHook =
 -- ---------------------------------------------------------------------
 -- Autostart programs
 myStartupHook = do
-    -- Audio daemon
-    spawnOnce "pipewire"
-    spawnOnce "wireplumber"
-    spawnOnce "pipewire -c pipewire-pulse.conf"
-
     -- Eye candies
     spawnOnce "picom"
     spawnOnce "wal -R"

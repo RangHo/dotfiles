@@ -9,9 +9,16 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
 fi
 
 
+# System profile #######################################################
+[ -r "/etc/profile" ] && . "/etc/profile"
+[ -r "$HOME/.profile" ] && . "$HOME/.profile"
+
+
 # System daemons #######################################################
 eval "$(dbus-launch --sh-syntax --exit-with-session)"
 eval "$(ssh-agent -s)"
+
+pipewire &
 
 
 # Input methods ########################################################
@@ -27,17 +34,12 @@ export XMODIFIERS=@im=fcitx
 export GTK2_RC_FILES=~/.gtkrc-2.0
 export QT_QPA_PLATFORMTHEME=gtk2
 
-[ -r "/etc/profile" ] && . "/etc/profile"
-[ -r "$HOME/.profile" ] && . "$HOME/.profile"
-
 
 # X server configuration ###############################################
 xrdb -merge ~/.Xresources
 
 xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Tapping Enabled" 1
 xinput set-prop "PIXA3854:00 093A:0274 Touchpad" "libinput Natural Scrolling Enabled" 1
-
-setxkbmap -option ctrl:swapcaps
 
 xsetroot -cursor_name left_ptr
 

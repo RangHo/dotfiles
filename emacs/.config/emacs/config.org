@@ -1772,6 +1772,13 @@ Both of them suck, and Julia performs pretty well.
                  '(julia-mode . rangho/julia-mode-contact)))
 #+end_src
 
+** Lex and Yacc
+Lex and Yacc (or more recently, Flex and Bison) are one of the most popular parser generator.
+
+#+begin_src emacs-lisp
+  (use-package bison-mode)
+#+end_src
+
 ** Lua
 Lua is a small, yet full-featured embedded language that works with C really well.
 
@@ -2135,28 +2142,10 @@ Discord has a feature called *Rich Presence* where a process can send an update 
 Emacs has an unofficial plugin for that, to show off what I'm doing.
 
 #+begin_src emacs-lisp
-  (defconst rangho/elcord-grace-period
-    60
-    "Time in seconds to wait before disconnecting from Discord.")
-
-  (defun rangho/toggle-elcord-mode-on-focus-change ()
-    "Toggle `elcord-mode' based on the current focus state.
-
-  If the frame is focused (gains focus), enable `elcord-mode'.  If the frame is
-  not focused (loses focus), disable `elcord-mode' with the grade period."
-    (if (frame-focus-state)
-        (elcord-mode +1)
-      (run-with-idle-timer
-       rangho/elcord-grace-period nil
-       (lambda () (elcord-mode -1)))))
-
   (use-package elcord
     :custom
     (elcord-use-major-mode-as-main-icon t)
-    (elcord-quiet t)
-    :init
-    (add-function :after after-focus-change-function
-                  #'rangho/toggle-elcord-mode-on-focus-change))
+    (elcord-quiet t))
 #+end_src
 
 ** GitHub Copilot

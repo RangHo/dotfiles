@@ -63,7 +63,7 @@ myWorkspaces =
 
 -- ---------------------------------------------------------------------
 -- Applications
-myBrowser = "firefox"
+myBrowser = "floorp"
 myEditor = "emacs"
 myEmailClient = "thunderbird"
 myFileExplorer = "Thunar"

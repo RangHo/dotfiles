@@ -10,6 +10,7 @@ import Xmobar
 
 -- ---------------------------------------------------------------------
 -- Xmobar format string helpers
+
 wrap :: String -> String -> String -> String
 wrap l r m = l ++ m ++ r
 
@@ -36,6 +37,7 @@ icon = wrap "<icon=" "/>"
 
 -- ---------------------------------------------------------------------
 -- User-defined plugins
+
 instance Show (String -> String) where
     showsPrec _ f = showString "<function>"
 
@@ -61,6 +63,9 @@ instance Exec PostprocessingCommandReader where
             case e of
                 Nothing -> go p m -- not finished, keep going
                 Just _ -> cb "EXITED" -- finished, notify the callback
+
+-- ---------------------------------------------------------------------
+-- Main configuration
 
 config :: Config
 config =

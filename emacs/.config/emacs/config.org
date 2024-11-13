@@ -944,7 +944,7 @@ Let's customize that.
         "in "
         (nerd-icons-octicon "nf-oct-repo" :height 0.90 :v-adjust 0.0)
         " "
-        (file-name-nondirectory (directory-file-name (caddr rangho/current-buffer-project)))
+        (file-name-nondirectory (directory-file-name (project-root rangho/current-buffer-project)))
         " "))
      ;; Show the branch name, if available
      (when nil

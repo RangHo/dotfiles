@@ -91,9 +91,20 @@ config =
         , alpha = 128
         , position = TopHM 40 20 20 20 0
         , commands =
-            [ Run UnsafeXMonadLog
-            , Run $
-                Date (icon "clock.xpm" ++ " %H:%M") "clock" 10
+            [ Run $
+                Alsa
+                    "default"
+                    "Master"
+                    [ "-t"
+                    , "<status> <volume>%"
+                    , "--"
+                    , "-O"
+                    , "<volumeipat>"
+                    , "-o"
+                    , icon "volume-x.xpm"
+                    , "--volume-icon-pattern"
+                    , icon "volume-%%.xpm"
+                    ]
             , Run $
                 Battery
                     [ "-t"
@@ -108,6 +119,8 @@ config =
                     ]
                     100
             , Run $
+                Date (icon "clock.xpm" ++ " %H:%M") "clock" 10
+            , Run $
                 PostprocessingCommandReader
                     "echo && playerctl metadata --follow --format '{{default(artist, \"???\")}} - {{default(title, \"???\")}}'"
                     ( (icon "music.xpm" ++)
@@ -116,20 +129,7 @@ config =
                         . (\s -> if null s then "*cricket noises*" else s)
                     )
                     "music"
-            , Run $
-                Alsa
-                    "default"
-                    "Master"
-                    [ "-t"
-                    , "<status> <volume>%"
-                    , "--"
-                    , "-O"
-                    , "<volumeipat>"
-                    , "-o"
-                    , icon "volume-x.xpm"
-                    , "--volume-icon-pattern"
-                    , icon "volume-%%.xpm"
-                    ]
+            , Run UnsafeXMonadLog
             , Run $
                 Wireless
                     ""

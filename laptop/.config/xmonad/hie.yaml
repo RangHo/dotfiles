@@ -4,3 +4,5 @@ cradle:
       component: "xmonad-rangho:exe:xmonad"
     - path: "./xmobar.hs"
       component: "xmonad-rangho:exe:xmobar"
+    - path: "./utils"
+      component: "xmonad-rangho:lib:utils"

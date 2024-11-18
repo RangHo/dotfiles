@@ -1,13 +1,11 @@
-import System.Exit
-
 import Control.Monad
 import Data.List
 import qualified Data.Map as M
 import Data.Maybe
 import Graphics.X11.ExtraTypes.XF86
+import System.Exit
 
 import XMonad hiding (mouseResizeWindow)
-
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.FlexibleResize
@@ -30,6 +28,8 @@ import qualified XMonad.StackSet as W
 import XMonad.Util.Hacks
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.SpawnOnce
+
+import Backlight
 
 -- ---------------------------------------------------------------------
 -- Constants
@@ -117,6 +117,7 @@ myResizeWindow w = do
 findWorkspaceIndex :: WorkspaceId -> Int
 findWorkspaceIndex ws = fromMaybe 0 $ elemIndex ws myWorkspaces
 
+-- | Copy the managed window to all workspaces.
 doCopyToAll :: ManageHook
 doCopyToAll = doF copyToAll
 
@@ -188,8 +189,8 @@ myKeys conf =
             , ((noModMask, xF86XK_AudioPrev), spawn "playerctl previous")
             , ((noModMask, xF86XK_AudioPlay), spawn "playerctl play-pause")
             , ((noModMask, xF86XK_AudioNext), spawn "playerctl next")
-            , ((noModMask, xF86XK_MonBrightnessDown), spawn "light -U 5")
-            , ((noModMask, xF86XK_MonBrightnessUp), spawn "light -A 5")
+            , ((noModMask, xF86XK_MonBrightnessDown), liftIO $ primaryDriver >>= decBrightness >> primaryDriver >>= getBrightness >>= putStrLn . ("Brightness: " ++) . show)
+            , ((noModMask, xF86XK_MonBrightnessUp), liftIO $ primaryDriver >>= incBrightness >> primaryDriver >>= getBrightness >>= putStrLn . ("Brightness: " ++) . show)
             , ((superMask, xK_grave), namedScratchpadAction myScratchpads "terminal")
             , ((superMask, xK_Tab), windows W.focusDown) -- focus the next window (windows compatible)
             , ((superMask, xK_Return), spawn myTerminal) -- run terminal

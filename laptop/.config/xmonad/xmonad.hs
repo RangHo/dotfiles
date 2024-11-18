@@ -293,6 +293,7 @@ myLayoutHook =
 myManageHook =
     composeAll
         [ namedScratchpadManageHook myScratchpads
+        , isDialog --> doCenterFloat
         , stringProperty "WM_WINDOW_ROLE" =? "PictureInPicture" --> (doRectFloat myPIPRect <+> doCopyToAll)
         ]
 

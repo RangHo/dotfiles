@@ -30,22 +30,17 @@ if not set --query __dotfiles_fish_update
     or fisher update
 end
 
+# If login shell, source POSIX profiles
+if status --is-login
+    test -r /etc/profile
+    and fenv ". /etc/profile"
+
+    test -r ~/.profile
+    and fenv ". ~/.profile"
+end
+
 # Fix curses-based GPG pinentry screen
 set -gx GPG_TTY (tty)
-
-# If there is /etc/profile, then source the file
-test -e /etc/profile
-and fenv "source /etc/profile"
-
-# If there is ~/.profile, then source the file
-test -e ~/.profile
-and fenv "source ~/.profile"
-
-# If there is ~/.config/profile.d, then source the files under that
-test -d ~/.config/profile.d
-and for f in ~/.config/profile.d/*
-    fenv "source $f"
-end
 
 # If mise version manager is installed, use that
 type -q mise

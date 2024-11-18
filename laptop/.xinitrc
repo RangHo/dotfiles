@@ -15,9 +15,20 @@ fi
 
 
 # System daemons #######################################################
+
+# D-Bus session bus
 eval "$(dbus-launch --sh-syntax --exit-with-session)"
+
+# SSH agent
 eval "$(ssh-agent -s)"
+
+# Xfce polkit agent (requires D-Bus)
 /usr/libexec/xfce-polkit &
+
+# Xfce settings daemon (requires D-Bus)
+xfsettingsd --replace &
+
+# PipeWire multimedia service (requires D-Bus)
 pipewire &
 
 
@@ -31,8 +42,7 @@ export XMODIFIERS=@im=fcitx
 
 
 # Environment variables ################################################
-export GTK2_RC_FILES=~/.gtkrc-2.0
-export QT_QPA_PLATFORMTHEME=gtk2
+export QT_STYLE_OVERRIDE=kvantum
 
 
 # X server configuration ###############################################

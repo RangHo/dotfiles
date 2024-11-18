@@ -17,7 +17,7 @@ fi
 # System daemons #######################################################
 eval "$(dbus-launch --sh-syntax --exit-with-session)"
 eval "$(ssh-agent -s)"
-
+/usr/libexec/xfce-polkit &
 pipewire &
 
 

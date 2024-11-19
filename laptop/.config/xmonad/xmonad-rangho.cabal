@@ -9,7 +9,6 @@ executable xmonad
     build-depends:              base
                               , containers
                               , stm
-                              , utils
                               , X11
                               , xmonad >= 0.18.0
                               , xmonad-contrib >= 0.18.0
@@ -21,14 +20,13 @@ executable xmobar
     main-is:                    xmobar.hs
     build-depends:              base
                               , process
-                              , utils
                               , xmobar >= 0.48.0
     default-language:           Haskell2010
 
 
-library utils
+executable backlight
     hs-source-dirs:             utils
-    exposed-modules:            Backlight
+    main-is:                    backlight.hs
     build-depends:              base
                               , directory
                               , filepath

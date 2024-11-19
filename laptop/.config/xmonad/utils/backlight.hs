@@ -1,18 +1,23 @@
-module Backlight (
-    getBrightness,
-    setBrightness,
-    incBrightness,
-    decBrightness,
-    primaryDriver,
-) where
-
 import Data.List
 import Data.Maybe
 import Data.Tuple
+import System.Console.GetOpt
 import System.Directory
+import System.Environment
 import System.FilePath
 import System.IO
 import System.IO.Strict as SIO
+
+data Option
+    = Driver String
+    | Help
+    deriving (Show, Eq)
+
+options :: [OptDescr Option]
+options =
+    [ Option [] ["driver"] (ReqArg Driver "DRIVER") "The backlight driver to use"
+    , Option ['h'] ["help"] (NoArg Help) "Display this help"
+    ]
 
 -- | The path to the backlight sysfs directory.
 sysfsBacklightPath :: FilePath
@@ -115,3 +120,38 @@ decBrightness driver = do
     case rest of
         (x : _) -> setRawBrightness driver x
         [] -> return ()
+
+-- | Parse the command line arguments.
+parseOpts :: [String] -> IO ([Option], [String])
+parseOpts argv = do
+    (o, n) <- case getOpt Permute options argv of
+        (o, n, []) -> return (o, n)
+        (_, _, errs) -> error $ concat errs
+    return (o, n)
+
+runAction ::
+    -- | The rest of the argument vector.
+    [String] ->
+    -- | The driver to use.
+    String ->
+    -- | The result of the action.
+    IO ()
+runAction ["get"] driver =
+    getBrightness driver >>= print
+runAction ["set", argument] driver =
+    setBrightness driver $ read argument
+runAction ["inc"] driver =
+    incBrightness driver
+runAction ["dec"] driver =
+    decBrightness driver
+runAction _ _ =
+    error $ usageInfo "No such subcommand is available." options
+
+main :: IO ()
+main = do
+    args <- getArgs
+    (opts, rest) <- parseOpts args
+    case opts of
+        [Help] -> putStrLn $ usageInfo "Usage: backlight [OPTIONS] <subcommand>" options
+        [Driver driver] -> runAction rest driver
+        _ -> primaryDriver >>= runAction rest

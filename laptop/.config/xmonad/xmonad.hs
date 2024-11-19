@@ -29,8 +29,6 @@ import XMonad.Util.Hacks
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.SpawnOnce
 
-import Backlight
-
 -- ---------------------------------------------------------------------
 -- Constants
 altMask = mod1Mask
@@ -63,6 +61,8 @@ myWorkspaces =
 
 -- ---------------------------------------------------------------------
 -- Applications
+myBacklight = "~/.cache/xmonad/backlight"
+myBar = "~/.cache/xmonad/xmobar"
 myBrowser = "floorp"
 myEditor = "emacs"
 myEmailClient = "thunderbird"
@@ -189,8 +189,8 @@ myKeys conf =
             , ((noModMask, xF86XK_AudioPrev), spawn "playerctl previous")
             , ((noModMask, xF86XK_AudioPlay), spawn "playerctl play-pause")
             , ((noModMask, xF86XK_AudioNext), spawn "playerctl next")
-            , ((noModMask, xF86XK_MonBrightnessDown), liftIO $ primaryDriver >>= decBrightness >> primaryDriver >>= getBrightness >>= putStrLn . ("Brightness: " ++) . show)
-            , ((noModMask, xF86XK_MonBrightnessUp), liftIO $ primaryDriver >>= incBrightness >> primaryDriver >>= getBrightness >>= putStrLn . ("Brightness: " ++) . show)
+            , ((noModMask, xF86XK_MonBrightnessDown), spawn $ myBacklight ++ " dec")
+            , ((noModMask, xF86XK_MonBrightnessUp), spawn $ myBacklight ++ " inc")
             , ((superMask, xK_grave), namedScratchpadAction myScratchpads "terminal")
             , ((superMask, xK_Tab), windows W.focusDown) -- focus the next window (windows compatible)
             , ((superMask, xK_Return), spawn myTerminal) -- run terminal
@@ -261,7 +261,7 @@ myPP =
             "1"
             (style wid)
 
-mySB = statusBarProp "~/.cache/xmonad/xmobar" (pure myPP)
+mySB = statusBarProp myBar (pure myPP)
 
 -- ---------------------------------------------------------------------
 -- Layout hook

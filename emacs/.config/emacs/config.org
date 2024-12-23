@@ -72,7 +72,7 @@ It supports parallel installation, and installing from Git repositories directly
 Let's bootstrap the thing.
 
 #+begin_src emacs-lisp
-  (defvar elpaca-installer-version 0.7)
+  (defvar elpaca-installer-version 0.8)
   (defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -1241,7 +1241,7 @@ We can prettify it with Nerd Fonts.
 
 #+begin_src emacs-lisp
   (use-package nerd-icons-dired
-    :hook dired-mode)
+    :hook (dired-mode))
 #+end_src
 
 ~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
@@ -1335,12 +1335,12 @@ These look nice when everything is made of monospace texts, but as soon as we pu
 
 ** Line Numbers
 Display line numbers for computer codes.
-For rergular texts, usually they are more of an annoyance.
+For regular texts, usually they are more of an annoyance.
 
 #+begin_src emacs-lisp
   (use-package evil-line-numbers
     :ensure nil
-    :hook prog-mode
+    :hook (prog-mode)
     :custom
     (display-line-numbers-width 3))
 #+end_src
@@ -1375,7 +1375,7 @@ They collect diagnostic information from multiple sources and display them in a 
 #+begin_src emacs-lisp
   (use-package flymake
     :ensure nil
-    :hook prog-mode)
+    :hook (prog-mode))
 #+end_src
 
 ** Electric Modes
@@ -1398,7 +1398,7 @@ Basically, a must-have for Lisp.
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :hook prog-mode)
+    :hook (prog-mode))
 #+end_src
 
 ** Completions
@@ -1684,7 +1684,10 @@ Perfect solution for small web servers like in a homelab.
 Crystal is a native programming language that looks exactly like Ruby.
 
 #+begin_src emacs-lisp
-  (use-package crystal-mode)
+  (use-package crystal-mode
+    :init
+    (add-to-list 'eglot-server-programs
+                 '(crystal-mode . ("crystalline"))))
 #+end_src
 
 ** Dockerfile
@@ -2155,6 +2158,7 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
   (use-package copilot
     :ensure (:host github :repo "copilot-emacs/copilot.el")
     :hook (prog-mode)
+
     :config
     (evil-define-key 'insert copilot-mode-map (kbd "TAB")
       (lambda ()

@@ -2156,7 +2156,6 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
 
 #+begin_src emacs-lisp
   (use-package copilot
-    :ensure (:host github :repo "copilot-emacs/copilot.el")
     :bind (("C-c M-f" . copilot-complete)
            :map copilot-completion-map
            ("C-g" . 'copilot-clear-overlay)
@@ -2165,9 +2164,7 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
            ("<tab>" . 'copilot-accept-completion)
            ("M-f" . 'copilot-accept-completion-by-word)
            ("M-<return>" . 'copilot-accept-completion-by-line))
-    :hook (prog-mode)
-    :init
-    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent)))
+    :hook (prog-mode))
 #+end_src
 
 ** Preview Color Codes

@@ -1752,7 +1752,7 @@ Both of them suck, and Julia performs pretty well.
 
 #+begin_src emacs-lisp
   (defconst rangho/julia-language-server-project
-    (no-littering-expand-var-file-name "julia-language-server/"))
+    (no-littering-expand-var-file-name "eglot/servers/julia/"))
 
   (defconst rangho/julia-language-server-script
     (expand-file-name "usr/bin/eglot-julia" user-emacs-directory))

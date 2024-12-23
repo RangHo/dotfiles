@@ -2167,6 +2167,12 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
     :hook (prog-mode))
 #+end_src
 
+I can even chat with my outsourced thoughts!
+
+#+begin_src emacs-lisp
+  (use-package copilot-chat)
+#+end_src
+
 ** Preview Color Codes
 ~rainbow-mode~ changes the background of color representations in a source code.
 This is especially useful for stylesheets, etc.

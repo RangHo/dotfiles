@@ -316,12 +316,14 @@ Some UI elements are controlled with per-frame alists.
 
 #+begin_src emacs-lisp
   (setq default-frame-alist
-        (list '(width . 115) ; 80 col of editor + 35 col of treemacs
-              '(height . 25)
-              '(left-fringe . 0)
-              '(right-fringe . 0)
-              '(vertical-scroll-bars . nil)
-              '(horizontal-scroll-bars . nil)))
+        `((width . 115) ; 80 col of editor + 35 col of treemacs
+          (height . 25)
+          (left-fringe . 0)
+          (right-fringe . 0)
+          (vertical-scroll-bars . nil)
+          (horizontal-scroll-bars . nil)
+          (right-divider-width . 10)
+          (internal-border-width . 20)))
 #+end_src
 
 *** UI Element Minor Modes
@@ -348,6 +350,9 @@ There is a fancier version of dashboard.
     :custom
     (initial-buffer-choice (lambda ()
                              (get-buffer-create dashboard-buffer-name)))
+    (dashboard-display-icons-p t)
+    (dashboard-set-file-icons t)
+    (dashboard-set-heading-icons t)
     (dashboard-startup-banner (expand-file-name "usr/share/gnu-emacs.png" user-emacs-directory))
     (dashboard-image-banner-max-height 400)
     (dashboard-icon-type 'nerd-icons)
@@ -713,41 +718,40 @@ This can be done by defining a theme.
   (let-alist rangho/color-matrix-alist
     (custom-set-faces
      ;; Basic UI elements
-     `(border              ((t (:foreground ,.color/foreground+10))))
-     `(button              ((t (:underline t))))
-     `(cursor              ((t (:foreground ,.color/background :background ,.color/foreground))))
-     `(default             ((t (:foreground ,.color/foreground :background ,.color/background))))
-     `(default-italic      ((t (:slant italic))))
-     `(error               ((t (:foreground ,.color/red :weight bold))))
-     `(ffap                ((t (:foreground ,.color/foreground+20))))
-     `(fringe              ((t (:background ,.color/background+10))))
-     `(header-line         ((t (:inherit mode-line))))
-     `(highlight           ((t (:foreground ,.color/intense-white :background ,.color/intense-black))))
-     `(hl-line             ((t (:background ,.color/background+5 :extend t))))
-     `(info-quoted-name    ((t (:foreground ,.color/intense-red))))
-     `(info-string         ((t (:foreground ,.color/intense-yellow))))
-     `(line-number         ((t (:foreground ,.color/intense-black :slant italic))))
-     `(link                ((t (:foreground ,.color/cyan :underline t :weight bold))))
-     `(link-visited        ((t (:foreground ,.color/blue :underline t :weight normal))))
-     `(match               ((t (:foreground ,.color/background :background ,.color/yellow))))
-     `(menu                ((t (:inverse-video nil))))
-     `(minibuffer-prompt   ((t (:foreground ,.color/intense-magenta :weight bold))))
-     `(mode-line           ((t (:foreground ,.color/background-10
-                                :background ,.color/foreground+10
-                                :box (:line-width 3 :color ,.color/foreground+10 :style nil)))))
-     `(mode-line-inactive  ((t (:foreground ,.color/foreground-10
-                                :background ,.color/background+10
-                                :box (:line-width 3 :color ,.color/background+10 :style nil)))))
-     `(mode-line-highlight ((t (:inherit highlight))))
-     `(mode-line-emphasis  ((t (:weight regular))))
-     `(mode-line-buffer-id ((t (:weight regular))))
-     `(region              ((t (:inherit highlight))))
-     `(shadow              ((t (:foreground ,.color/intense-black))))
-     `(success             ((t (:foreground ,.color/green :weight bold))))
-     `(tooltip             ((t (:foregroud ,.color/foreground :background ,.color/cursor))))
-     `(trailing-whitespace ((t (:background ,.color/intense-yellow))))
-     `(vertical-border     ((t (:foreground ,.color/foreground-10))))
-     `(warning             ((t (:foreground ,.color/yellow :weight bold))))
+     `(border                     ((t (:foreground ,.color/foreground+10))))
+     `(button                     ((t (:underline t))))
+     `(cursor                     ((t (:foreground ,.color/background :background ,.color/foreground))))
+     `(default                    ((t (:foreground ,.color/foreground :background ,.color/background))))
+     `(default-italic             ((t (:slant italic))))
+     `(error                      ((t (:foreground ,.color/red :weight bold))))
+     `(ffap                       ((t (:foreground ,.color/foreground+20))))
+     `(fringe                     ((t (:background ,.color/background))))
+     `(header-line                ((t (:inherit mode-line))))
+     `(highlight                  ((t (:foreground ,.color/intense-white :background ,.color/intense-black))))
+     `(hl-line                    ((t (:background ,.color/background+5 :extend t))))
+     `(info-quoted-name           ((t (:foreground ,.color/intense-red))))
+     `(info-string                ((t (:foreground ,.color/intense-yellow))))
+     `(line-number                ((t (:foreground ,.color/intense-black :slant italic))))
+     `(link                       ((t (:foreground ,.color/cyan :underline t :weight bold))))
+     `(link-visited               ((t (:foreground ,.color/blue :underline t :weight normal))))
+     `(match                      ((t (:foreground ,.color/background :background ,.color/yellow))))
+     `(menu                       ((t (:inverse-video nil))))
+     `(minibuffer-prompt          ((t (:foreground ,.color/intense-magenta :weight bold))))
+     `(mode-line                  ((t (:foreground ,.color/background-10 :background ,.color/foreground+10 :box (:line-width 3 :color ,.color/foreground+10 :style nil)))))
+     `(mode-line-inactive         ((t (:foreground ,.color/foreground-10 :background ,.color/background+10 :box (:line-width 3 :color ,.color/background+10 :style nil)))))
+     `(mode-line-highlight        ((t (:inherit highlight))))
+     `(mode-line-emphasis         ((t (:weight regular))))
+     `(mode-line-buffer-id        ((t (:weight regular))))
+     `(region                     ((t (:inherit highlight))))
+     `(shadow                     ((t (:foreground ,.color/intense-black))))
+     `(success                    ((t (:foreground ,.color/green :weight bold))))
+     `(tooltip                    ((t (:foregroud ,.color/foreground :background ,.color/cursor))))
+     `(trailing-whitespace        ((t (:background ,.color/intense-yellow))))
+     `(vertical-border            ((t (:foreground ,.color/foreground-10))))
+     `(warning                    ((t (:foreground ,.color/yellow :weight bold))))
+     `(window-divider             ((t (:foreground ,.color/background))))
+     `(window-divider-first-pixel ((t (:foreground ,.color/background+5))))
+     `(window-divider-last-pixel  ((t (:foreground ,.color/background))))
 
      ;; font-lock!
      `(font-lock-builtin-face           ((t (:foreground ,.color/cyan :slant italic))))
@@ -819,8 +823,7 @@ This can be done by defining a theme.
      `(outline-5 ((t (:foreground ,.color/foreground+4 :weight bold :height 1.0))))
      `(outline-6 ((t (:foreground ,.color/foreground+3 :height 1.0))))
      `(outline-7 ((t (:foreground ,.color/foreground+2 :height 1.0))))
-     `(outline-8 ((t (:foreground ,.color/foreground+1 :height 1.0))))
-     ))
+     `(outline-8 ((t (:foreground ,.color/foreground+1 :height 1.0))))))
 #+end_src
 
 *** Mode Line
@@ -886,8 +889,8 @@ Let's customize that.
       (add-face-text-property 0
                               (length status-str)
                               `(:foreground ,status-fore
-                                :background ,status-back
-                                :box (:color ,status-back))
+                                            :background ,status-back
+                                            :box (:color ,status-back))
                               nil
                               status-str)
       status-str))

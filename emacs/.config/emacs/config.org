@@ -295,6 +295,17 @@ They are still available in =*Warnings*= buffer, however.
   (setq warning-minimum-level :error)
 #+end_src
 
+** Override default packages
+Some packages require newer versions of built-in packages.
+Using ~elpaca~ will pull the entire Emacs codebase which will cost around 2 GiB per package.
+For these, we're better off manually downloading tarballs from ELPA.
+
+*** JSON-RPC
+#+begin_src emacs-lisp
+  (use-package jsonrpc
+    :ensure nil)
+#+end_src
+
 * Appearances
 Eye-candies are imporant.
 Trust me, *they are*.

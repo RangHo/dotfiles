@@ -537,14 +537,9 @@ Ligatures provide alternative combined glyphs for commonly used character combin
       "<:<" ";;;")
     "List of ligatures to enable in `prog-mode' buffers.")
 
-  (defconst rangho/text-mode-ligatures
-    '("ff" "fi" "ffi" "ffl" "fl" "st" "ct" "sp" "Th" "Qu" "qu" "rt")
-    "List of ligatures to enable in `text-mode' buffers.")
-
   (use-package ligature
     :config
     (ligature-set-ligatures 'prog-mode rangho/prog-mode-ligatures)
-    (ligature-set-ligatures 'text-mode rangho/text-mode-ligatures)
     (global-ligature-mode +1))
 #+end_src
 

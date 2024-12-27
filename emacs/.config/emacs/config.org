@@ -215,7 +215,7 @@ Since ~no-littering~ creates a directory structure that looks like the [[https:/
 Emacs has a tiny GC threshold.
 It may have been useful some 15 years ago, but it is fair to increase the size for modern computers.
 
-Before running this script, the [[file:early-init.el][=early-init.el=]] file should have the threshold increased to its maximum.
+Before running this script, the ~early-init.el~ file should have the threshold increased to its maximum.
 Since initialization process requires a lot of computation, we will keep that threshold, and change it once initialization is over.
 
 Also, using the minibuffer will cause the GC threshold to increase, and Emacs will try to collect garbages when focus is lost.
@@ -318,11 +318,9 @@ Some UI elements are controlled with per-frame alists.
   (setq default-frame-alist
         `((width . 115) ; 80 col of editor + 35 col of treemacs
           (height . 25)
-          (left-fringe . 0)
-          (right-fringe . 0)
           (vertical-scroll-bars . nil)
           (horizontal-scroll-bars . nil)
-          (right-divider-width . 10)
+          (right-divider-width . 3)
           (internal-border-width . 20)))
 #+end_src
 
@@ -330,6 +328,7 @@ Some UI elements are controlled with per-frame alists.
 Some UI elements are exposed as minor modes, and they are ugly.
 
 #+begin_src emacs-lisp
+  (fringe-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
@@ -345,19 +344,20 @@ There is a fancier version of dashboard.
 
 #+begin_src emacs-lisp
   (use-package dashboard
-    :hook ((elpaca-after-init . dashboard-insert-startupify-lists)
-           (elpaca-after-init . dashboard-initialize))
     :custom
-    (initial-buffer-choice (lambda ()
-                             (get-buffer-create dashboard-buffer-name)))
     (dashboard-display-icons-p t)
     (dashboard-set-file-icons t)
     (dashboard-set-heading-icons t)
     (dashboard-startup-banner (expand-file-name "usr/share/gnu-emacs.png" user-emacs-directory))
     (dashboard-image-banner-max-height 400)
     (dashboard-icon-type 'nerd-icons)
+    :init
+    (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
+    (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
+    (add-hook 'window-setup-hook #'dashboard-resize-on-hook)
+    (add-to-list 'window-size-change-functions #'dashboard-resize-on-hook)
     :config
-    (dashboard-setup-startup-hook))
+    (setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))))
 #+end_src
 
 ** Fonts
@@ -745,7 +745,7 @@ This can be done by defining a theme.
      `(vertical-border            ((t (:foreground ,.color/foreground-10))))
      `(warning                    ((t (:foreground ,.color/yellow :weight bold))))
      `(window-divider             ((t (:foreground ,.color/background))))
-     `(window-divider-first-pixel ((t (:foreground ,.color/background+5))))
+     `(window-divider-first-pixel ((t (:foreground ,.color/background))))
      `(window-divider-last-pixel  ((t (:foreground ,.color/background))))
 
      ;; font-lock!
@@ -975,26 +975,6 @@ Therefore, the length of the position will be based on the raw string, not the a
 ~rangho/mode-line-evil-state~ shows the current state that Evil is in.
 
 #+begin_src emacs-lisp
-  (defconst rangho/evil-status-alist
-    '((emacs "EMACS" :background "#d3d0c8" :foreground "#737373")
-      (normal "NORMAL" :background "#99cc99" :foreground "#394d39")
-      (insert "INSERT" :background "#6699cc" :foreground "#26394d")
-      (replace "REPLACE" :background "#f2777a" :foreground "#733939")
-      (visual "VISUAL" :background "#ffcc66" :foreground "#806330")
-      (hades "HADES" :background "#cc99cc" :foreground "#4d394d"))
-    "List of texts and colors that represent the current evil status.")
-
-  (defun rangho/mode-line-evil-status ()
-    "Modeline component that displays the current status of Evil mode."
-    (when (rangho/selected-window-active-p (selected-window))
-      (let* ((current-status (assq evil-state
-                                   rangho/evil-status-alist))
-             (status-text (cadr current-status))
-             (status-prop (cddr current-status)))
-        (funcall 'propertize
-                 (concat " " status-text " ")
-                 'face (append status-prop
-                               `(:weight bold :box (:color ,(plist-get status-prop :background))))))))
   (defconst rangho/evil-state-alist
     '((emacs "EMACS" :background "#d3d0c8" :foreground "#737373")
       (normal "NORMAL" :background "#99cc99" :foreground "#394d39")
@@ -1855,8 +1835,16 @@ OpenSCAD allows me to make 3D models in code.
     (org-use-sub-superscripts '{}))
 
   (use-package org-modern
+    :after nerd-icons
     :hook ((org-mode . org-modern-mode)
-           (org-agenda-finalize . org-modern-agenda)))
+           (org-agenda-finalize . org-modern-agenda))
+    :custom
+    (org-modern-star 'fold)
+    (org-modern-fold-stars `((,(nerd-icons-mdicon "nf-md-chevron_right") . ,(nerd-icons-mdicon "nf-md-chevron_down"))
+                             (,(nerd-icons-mdicon "nf-md-chevron_double_right") . ,(nerd-icons-mdicon "nf-md-chevron_double_down"))
+                             (,(nerd-icons-mdicon "nf-md-chevron_triple_right") . ,(nerd-icons-mdicon "nf-md-chevron_triple_down"))
+                             (,(nerd-icons-mdicon "nf-md-chevron_right_circle") . ,(nerd-icons-mdicon "nf-md-chevron_down_circle"))
+                             (,(nerd-icons-mdicon "nf-md-chevron_right_circle_outline") . ,(nerd-icons-mdicon "nf-md-chevron_down_circle_outline")))))
 #+end_src
 
 ~org-roam~ brings the Zettelkasten method of notetaking into Emacs.

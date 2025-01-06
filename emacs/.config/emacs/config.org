@@ -339,7 +339,6 @@ Some UI elements are controlled with per-frame alists.
 Some UI elements are exposed as minor modes, and they are ugly.
 
 #+begin_src emacs-lisp
-  (fringe-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
@@ -368,7 +367,9 @@ There is a fancier version of dashboard.
     (add-hook 'window-setup-hook #'dashboard-resize-on-hook)
     (add-to-list 'window-size-change-functions #'dashboard-resize-on-hook)
     :config
-    (setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))))
+    (setq initial-buffer-choice (lambda ()
+                                  (dashboard-insert-startupify-lists t)
+                                  (get-buffer-create dashboard-buffer-name))))
 #+end_src
 
 ** Fonts
@@ -755,9 +756,9 @@ This can be done by defining a theme.
      `(trailing-whitespace        ((t (:background ,.color/intense-yellow))))
      `(vertical-border            ((t (:foreground ,.color/foreground-10))))
      `(warning                    ((t (:foreground ,.color/yellow :weight bold))))
-     `(window-divider             ((t (:foreground ,.color/background))))
-     `(window-divider-first-pixel ((t (:foreground ,.color/background))))
-     `(window-divider-last-pixel  ((t (:foreground ,.color/background))))
+     `(window-divider             ((t (:foreground ,.color/background+10))))
+     `(window-divider-first-pixel ((t (:foreground ,.color/background+10))))
+     `(window-divider-last-pixel  ((t (:foreground ,.color/background+10))))
 
      ;; font-lock!
      `(font-lock-builtin-face           ((t (:foreground ,.color/cyan :slant italic))))

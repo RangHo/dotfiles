@@ -3,31 +3,31 @@
 @import "~/.cache/wal/colors-rofi-dark"
 
 configuration {
-    modes: "window,drun,run,ssh";
+    modes:               "window,drun,run,ssh";
     drun-display-format: "{name}";
 }
 
 * {
     --translucent: #28282895;
-    --active: #a9b665;
-    --urgent: #fb4934;
+    --active:      #a9b665;
+    --urgent:      #fb4934;
 
     background-color:  transparent;
 }
 
 window {
-    fullscreen: true;
-    padding: 30% 20%;
-    transparency: "real";
+    fullscreen:       true;
+    padding:          30% 20%;
+    transparency:     "real";
     background-color: @--translucent;
-    border-color: transparent;
+    border-color:     transparent;
 }
 
 listview {
     background-color: transparent;
-    border: 0 0 0 0;
-    padding: 23 0 0;
-    scrollbar: true;
+    border:           0 0 0 0;
+    padding:          23 0 0;
+    scrollbar:        true;
 }
 
 scrollbar {
@@ -43,7 +43,7 @@ entry {
 }
 
 textbox {
-    text-color: @foreground;
+    text-color:       @foreground;
     background-color: @--translucent;
 }
 
@@ -102,11 +102,11 @@ sidebar {
 }
 
 inputbar {
-    spacing:    0;
-    padding:    2px;
-    text-color: @foreground;
+    spacing:          0;
+    padding:          10px;
+    text-color:       @foreground;
     background-color: transparent;
-    children:   [ prompt, textbox-prompt-sep, entry, case-indicator ];
+    children:        [ prompt, textbox-prompt-sep, entry, case-indicator ];
 }
 
 case-indicator,

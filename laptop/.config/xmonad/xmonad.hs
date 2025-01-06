@@ -61,13 +61,15 @@ myWorkspaces =
 
 -- ---------------------------------------------------------------------
 -- Applications
-myBacklight = "~/.cache/xmonad/backlight"
+myBacklight = "sudo ~/.cache/xmonad/backlight"
 myBar = "~/.cache/xmonad/xmobar"
 myBrowser = "floorp"
-myEditor = "emacs"
+myDisplaySettings = "xfce4-display-settings"
+myEditor = "emacsclient -c"
 myEmailClient = "thunderbird"
 myFileExplorer = "Thunar"
 myLauncher = "rofi -show drun"
+myScreenshot = "xfce4-screenshooter"
 
 -- ---------------------------------------------------------------------
 -- Helper functions
@@ -141,7 +143,7 @@ myKeys conf =
             , ((superMask, xK_u), return ())
             , ((superMask, xK_i), return ())
             , ((superMask, xK_o), return ())
-            , ((superMask, xK_p), return ())
+            , ((superMask, xK_p), spawn myDisplaySettings) -- run display settings (windows compatible)
             , ((superMask, xK_a), return ())
             , ((superMask, xK_s), return ())
             , ((superMask, xK_d), return ())
@@ -306,6 +308,7 @@ myStartupHook = do
 
     -- Utilities
     spawnOnce "dunst"
+    spawnOnce "emacs --fg-daemon"
     spawnOnce "playerctld"
 
 -- ---------------------------------------------------------------------

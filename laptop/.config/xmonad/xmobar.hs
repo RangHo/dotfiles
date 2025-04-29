@@ -145,12 +145,12 @@ config =
             unwords
                 [ hspace 20
                 , command "UnsafeXMonadLog"
-                , "}"
+                , left
                 , command "music"
                 , sep
                 , command "alsa:default:Master"
                 , hspace 20
-                , "{"
+                , right
                 , command "wi"
                 , sep
                 , command "battery"
@@ -162,6 +162,8 @@ config =
                 ]
         }
   where
+    left = "}"
+    right = "{"
     sep = hspace 10 ++ fontColor "gray" "|" ++ hspace 10
 
 main :: IO ()

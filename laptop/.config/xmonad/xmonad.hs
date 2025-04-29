@@ -63,7 +63,7 @@ myWorkspaces =
 -- Applications
 myBacklight = "sudo ~/.cache/xmonad/backlight"
 myBar = "~/.cache/xmonad/xmobar"
-myBrowser = "floorp"
+myBrowser = "firefox"
 myDisplaySettings = "xfce4-display-settings"
 myEditor = "emacsclient -c"
 myEmailClient = "thunderbird"

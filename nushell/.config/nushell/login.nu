@@ -11,5 +11,5 @@ def --env source-posix [filename] {
 }
 
 for profile in ["/etc/profile" "~/.profile"] {
-    try { source-posix $profile }
+  try { source-posix $profile }
 }

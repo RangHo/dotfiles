@@ -1686,6 +1686,13 @@ Crystal is a native programming language that looks exactly like Ruby.
                  '(crystal-mode . ("crystalline"))))
 #+end_src
 
+** D2
+D2 is a diagram scripting language, producing an image.
+
+#+begin_src emacs-lisp
+  (use-package d2-mode)
+#+end_src
+
 ** Dockerfile
 Docker is /de facto/ standard container technology these days.
 
@@ -1807,6 +1814,13 @@ The syntax is... questionable, at best, though.
     (markdown-fontify-code-block-natively t))
 #+end_src
 
+** Mermaid
+Mermaid is a diagram and graph scripting language, producing an image.
+
+#+begin_src emacs-lisp
+  (use-package mermaid-mode)
+#+end_src
+
 ** Nu
 Nu is a brand-new, data-oriented shell script.
 
@@ -1820,6 +1834,9 @@ Nu is a brand-new, data-oriented shell script.
     (add-to-list 'treesit-language-source-alist
                  '(nu "https://github.com/nushell/tree-sitter-nu")))
 #+end_src
+
+** OCaml
+OCaml is a functional language.
 
 ** OpenSCAD
 OpenSCAD allows me to make 3D models in code.
@@ -1902,11 +1919,23 @@ OpenSCAD allows me to make 3D models in code.
     (add-to-list 'org-export-filter-paragraph-functions #'org-re-reveal-citeproc-filter-cite))
 #+end_src
 
+~ob-d2~ uses Mermaid to display graphs in Org documents.
+
+#+begin_src emacs-lisp
+  (use-package ob-d2
+    :when (executable-find "d2")
+    :init
+    (add-to-list 'org-babel-load-languages '(d2 . t)))
+#+end_src
+
 ~ob-mermaid~ uses Mermaid to display graphs in Org documents.
 
 #+begin_src emacs-lisp
   (use-package ob-mermaid
-    :when (executable-find "mmdc"))
+    :when (executable-find "mmdc")
+    :custom (ob-mermaid-cli-path (executable-find "mmdc"))
+    :init
+    (add-to-list 'org-babel-load-languages '(mermaid . t)))
 #+end_src
 
 ** PowerShell
@@ -2154,7 +2183,10 @@ X11 uses similar syntax for most of its configurations.
 While there are a lot of criticisms, it is still widely used to represent data in a human-readable format.
 
 #+begin_src emacs-lisp
-  (use-package yaml-mode)
+  (use-package yaml-mode
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))
 #+end_src
 
 * Utilities
@@ -2169,6 +2201,21 @@ Emacs has an unofficial plugin for that, to show off what I'm doing.
     :custom
     (elcord-use-major-mode-as-main-icon t)
     (elcord-quiet t))
+#+end_src
+
+** Easy Draw
+~el-easydraw~ is a drawing tool that runs inside Emacs.
+
+#+begin_src emacs-lisp
+  (use-package edraw
+    :ensure (:host github :repo "misohena/el-easydraw")
+    :config
+    (with-eval-after-load 'org
+      (require 'edraw-org)
+      (edraw-org-setup-default))
+    (with-eval-after-load 'ox
+      (require 'edraw-org)
+      (edraw-org-setup-exporter)))
 #+end_src
 
 ** GitHub Copilot

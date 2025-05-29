@@ -1821,6 +1821,13 @@ Mermaid is a diagram and graph scripting language, producing an image.
   (use-package mermaid-mode)
 #+end_src
 
+** Nix
+Nix is a functional and declarative expression format used to configure NixOS.
+
+#+begin_src emacs-lisp
+  (use-package nix-mode)
+#+end_src
+
 ** Nu
 Nu is a brand-new, data-oriented shell script.
 

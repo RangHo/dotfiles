@@ -1,8 +1,8 @@
 # Ignore everything...
 .config/emacs/*
 
-# ...except custom configuration files
+# ...except custom configuration files.
 !.config/emacs/early-init.el
 !.config/emacs/init.el
-!.config/emacs/config.org
+!.config/emacs/README.org
 !.config/emacs/usr

@@ -1952,6 +1952,15 @@ PowerShell is the new shell script language for Windows and .NET platform.
   (use-package powershell)
 #+end_src
 
+** Praat Script
+Praat is a phonetics analysis software used by linguists.
+It allows automation by writing object-manipulating commands into a script.
+
+#+begin_src emacs-lisp
+  (use-package praat-mode
+    :ensure nil)
+#+end_src
+
 ** Python
 Python is overrated.
 Still I need to use it, so...

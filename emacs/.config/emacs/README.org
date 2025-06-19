@@ -2198,6 +2198,14 @@ It primarily targets HTML, but it also supports other HTMLx templates.
                  '(web-mode . rangho/web-mode-contact)))
 #+end_src
 
+** Why3
+Why3 is a deductive software verification platform.
+
+#+begin_src emacs-lisp
+  (use-package why3
+    :ensure nil)
+#+end_src
+
 ** X Resource Database
 X11 uses similar syntax for most of its configurations.
 

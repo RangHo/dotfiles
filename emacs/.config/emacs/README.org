@@ -1843,7 +1843,21 @@ Nu is a brand-new, data-oriented shell script.
 #+end_src
 
 ** OCaml
-OCaml is a functional language.
+OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in static analysis and formal verification softwares.
+
+#+begin_src emacs-lisp
+  (use-package tuareg)
+#+end_src
+
+OCaml has its own package manager called OPAM.
+It allows installing multiple versions of compilers, à la Python's ~venv~.
+There is a minor mode for Emacs to use those switches.
+
+#+begin_src emacs-lisp
+  (use-package opam-switch-mode
+    :hook ((coq-mode . opam-switch-mode)
+           (tuareg-mode . opam-switch-mode)))
+#+end_src
 
 ** OpenSCAD
 OpenSCAD allows me to make 3D models in code.

@@ -2274,7 +2274,6 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
 
 #+begin_src emacs-lisp
   (use-package copilot
-    :ensure (:host github :repo "aasseman/copilot.el" :branch "fix-352")
     :bind (("C-c M-f" . copilot-complete)
            :map copilot-completion-map
            ("C-g" . 'copilot-clear-overlay)

@@ -66,6 +66,15 @@ These constants resolve to user directories akin to the XDG Base Directory speci
     "Per-user cache directory.")
 #+end_src
 
+* Default Shell
+I use different shells on different systems, and Emacs seems to work the best when combined with POSIX-compliant shells.
+Let's fix the shell to ~/bin/sh~ if on a supported platform.
+
+#+begin_src emacs-lisp
+  (unless (eq system-type 'windows-nt)
+    (setq shell-file-name "/bin/sh"))
+#+end_src
+
 * Package Manager
 [[https://github.com/progfolio/elpaca][Elpaca]] is great.
 It supports parallel installation, and installing from Git repositories directly.
@@ -131,13 +140,7 @@ If a binary called =mise= is available, load the 3rd-party Emacs integration pac
 #+begin_src emacs-lisp
   (use-package mise
     :when (executable-find "mise")
-    :ensure (:host github :repo "liuyinz/mise.el")
-    :init
-    (let ((mise-shims (expand-file-name "mise/shims" user-data-directory)))
-      (setenv "PATH" (concat (getenv "PATH") ":" mise-shims))
-      (add-to-list 'exec-path mise-shims))
-    :config
-    (global-mise-mode +1))
+    :hook (after-init . global-mise-mode))
 #+end_src
 
 * Emacs Behavior Modification

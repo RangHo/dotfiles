@@ -1,21 +1,10 @@
-# Set up mise
-use /tmp/mise.nu
+# Nu Package Manager.
+overlay use nupm/nupm --prefix
 
-# Set up starship prompt
-use /tmp/starship.nu
+# OCaml package manager integration.
+overlay use opam
 
-
-# If carapace is available, use it for completions
-let carapace_available = (which carapace | length) > 0
-let carapace_completer = { |spans|
-    carapace $spans.0 nushell ...$spans | from json
-}
-
-$env.config = {
-    completions: {
-        external: {
-            enable: $carapace_available
-            completer: $carapace_completer
-        }
-    }
-}
+# Generated integrations.
+source "/tmp/carapace.nu"
+overlay use "/tmp/mise.nu"
+overlay use "/tmp/starship.nu"

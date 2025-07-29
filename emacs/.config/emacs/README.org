@@ -1894,6 +1894,19 @@ OpenSCAD allows me to make 3D models in code.
     (org-tags-column 0)
     (org-use-sub-superscripts '{}))
 
+  (use-package org-appear
+    :hook (org-mode . (lambda ()
+                        (org-appear-mode +1)
+                        (add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start nil t)
+                        (add-hook 'evil-insert-state-exit-hook #'org-appear-manual-stop nil t)))
+    :custom
+    (org-appear-autoemphasis t)
+    (org-appear-autoentities t)
+    (org-appear-autolinks t)
+    (org-appear-autosubmarkers t)
+    (org-appear-inside-latex t)
+    (org-appear-trigger 'manual))
+
   (use-package org-modern
     :after nerd-icons
     :hook ((org-mode . org-modern-mode)

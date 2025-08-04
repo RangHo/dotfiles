@@ -1941,27 +1941,24 @@ OpenSCAD allows me to make 3D models in code.
                              (,(nerd-icons-mdicon "nf-md-chevron_right_circle_outline") . ,(nerd-icons-mdicon "nf-md-chevron_down_circle_outline")))))
 #+end_src
 
-~org-roam~ brings the Zettelkasten method of notetaking into Emacs.
+~org-node~ brings the Zettelkasten method of notetaking into Emacs.
 
 #+begin_src emacs-lisp
-  (use-package org-roam
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture))
+  (use-package org-mem
     :custom
-    (org-roam-directory org-directory)
-    (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-mem-watch-dirs (list org-directory))
     :config
-    (org-roam-db-autosync-mode +1))
+    (org-mem-updater-mode))
 
-  (use-package org-roam-ui
-    :custom
-    (org-roam-ui-sync-theme t)
-    (org-roam-ui-follow t)
-    (org-roam-ui-update-on-save t)
-    (org-roam-ui-open-on-start t))
+  (use-package org-node
+    :bind-keymap ("C-c n" . org-node-global-prefix-map)
+    :init
+    ;; The :bind-keymap keyword cannot bind a keymap to another map yet.
+    ;; (https://github.com/jwiegley/use-package/issues/736)
+    (with-eval-after-load 'org
+      (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
+    :config
+    (org-node-cache-mode))
 #+end_src
 
 ~org-re-reveal~ allows me to export an Org document into a Reveal.js presentation file.

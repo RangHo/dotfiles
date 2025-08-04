@@ -1537,6 +1537,26 @@ It is usually much faster than Emacs's built-in parsing facility.
   (use-package treesit
     :unless (version< emacs-version "29.1")
     :ensure nil)
+
+  (defun treesit-install-all-language-grammars (&optional out-dir)
+    "Build and install all tree-sitter language grammar libraries.
+
+  It builds all available grammars specified in `treesit-language-source-alist'.
+  Interactively, it prompts for the directory in which to install the compiled
+  grammar files.  Non-interactively, use OUT-DIR; if it is nil, the grammars are
+  installed to the standard location, the \"tree-sitter\" directory under
+  `user-emacs-directory'."
+    (interactive (list (read-directory-name
+                        "Install to: "
+                        (or (car treesit--install-language-grammar-out-dir-history)
+                            (locate-user-emacs-file "tree-sitter")))))
+    (mapcar (lambda (grammar)
+              (treesit-install-language-grammar
+               (car grammar)
+               (or out-dir
+                   (car treesit--install-language-grammar-out-dir-history
+                        (locate-user-emacs-file "tree-sitter")))))
+            treesit-language-source-alist))
 #+end_src
 
 * Per-language Settings

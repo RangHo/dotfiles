@@ -1,10 +1,10 @@
 # Nu Package Manager.
 overlay use nupm/nupm --prefix
 
-# OCaml package manager integration.
-overlay use opam
+# Completion and prompting.
+use carapace
+use starship
 
-# Generated integrations.
-source "/tmp/carapace.nu"
-overlay use "/tmp/mise.nu"
-overlay use "/tmp/starship.nu"
+# Package and version management.
+overlay use mise
+overlay use opam

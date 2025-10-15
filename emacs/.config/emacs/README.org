@@ -1754,6 +1754,31 @@ F# is a functional programming language in OCaml family that runs on .NET Common
     :when (featurep 'eglot))
 #+end_src
 
+** Gnuplot
+Gnuplot is a command-line plotting program.
+
+#+begin_src emacs-lisp
+  (use-package gnuplot)
+#+end_src
+
+** Go
+Do I /really/ have to use Go?
+Ugh...
+At least it's built-in...
+
+#+begin_src emacs-lisp
+  (use-package go-ts-mode
+    :when (featurep 'treesit)
+    :ensure nil
+    :mode (("\\.go\\'" . go-ts-mode)
+           ("/go\\.mod\\'" . go-mod-ts-mode))
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(go "https://github.com/tree-sitter/tree-sitter-go"))
+    (add-to-list 'treesit-language-source-alist
+                 '(gomod "https://github.com/camdencheek/tree-sitter-go-mod")))
+#+end_src
+
 ** Haskell
 Haskell, being a purely functional language, has an exceptional support for Emacs.
 So much so that it doesn't even require LSP!
@@ -1958,7 +1983,7 @@ OpenSCAD allows me to make 3D models in code.
 #+begin_src emacs-lisp
   (use-package org-mem
     :custom
-    (org-mem-watch-dirs (list org-directory))
+    (org-mem-do-sync-with-org-id t)
     :config
     (org-mem-updater-mode))
 
@@ -2003,6 +2028,15 @@ OpenSCAD allows me to make 3D models in code.
     :custom (ob-mermaid-cli-path (executable-find "mmdc"))
     :init
     (add-to-list 'org-babel-load-languages '(mermaid . t)))
+#+end_src
+
+~ox-latex~ is a built-in package, but I need to use LuaLaTex if I want to do anything remotely related to CJK characters.
+
+#+begin_src emacs-lisp
+  (use-package ox-latex
+    :ensure nil
+    :custom
+    (org-latex-compiler "lualatex"))
 #+end_src
 
 ** PowerShell

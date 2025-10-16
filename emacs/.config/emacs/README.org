@@ -1810,6 +1810,17 @@ Both of them suck, and Julia performs pretty well.
                  '(julia-mode . rangho/julia-mode-contact)))
 #+end_src
 
+** KDL
+KDL is a small, pleasant document language with XML-like node semantics that resembles CLI commands.
+
+#+begin_src emacs-lisp
+  (use-package kdl-mode
+    :when (featurep 'treesit)
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")))
+#+end_src
+
 ** Lex and Yacc
 Lex and Yacc (or more recently, Flex and Bison) are one of the most popular parser generator.
 

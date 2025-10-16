@@ -1,0 +1,276 @@
+// =====================================================================
+// Input devices.
+// =====================================================================
+
+input {
+    keyboard {
+        // Treat Alt_R and Ctrl_R as Hangul and Hangul_Hanja, respectively.
+        xkb {
+            layout "us"
+            options "korean:ralt_hangul,korean:rctrl_hanja"
+        }
+        // Enable numlock on startup.
+        numlock
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+        scroll-method "two-finger"
+    }
+
+    // Focus follows mouse, only if it would scroll less than 80% of the screen. 
+    focus-follows-mouse max-scroll-amount="80%"
+}
+
+// =====================================================================
+// Monitors.
+// =====================================================================
+
+// Vertical monitor on the right for coffeelab.
+output "Samsung Electric Company U32J59x HNMX102362" {
+    scale 1.25
+    transform "270"
+    position x=0 y=0
+}
+
+// Horizontal monitor on the left for coffelab.
+output "Samsung Electric Company LS32D70xE HNBY100538" {
+    scale 1.25
+    transform "normal" 
+    position x=-3072 y=590
+}
+
+// =====================================================================
+// Appearances.
+// =====================================================================
+
+layout {
+    gaps 16
+
+    // Center the focused column if the previously focused column will overflow.
+    center-focused-column "on-overflow"
+
+    preset-column-widths {
+        proportion 0.25
+        proportion 0.5
+        proportion 0.75
+    }
+    preset-window-heights {
+        proportion 0.25
+        proportion 0.5
+        proportion 0.75
+    }
+
+    default-column-width { proportion 0.9; }
+
+    focus-ring {
+        off
+    }
+
+    border {
+        width 4
+        active-gradient from="#e5989b" to="#ffb4a2" angle=45 relative-to="workspace-view" in="oklch longer hue"
+        inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+        urgent-gradient from="#9b0000" to="#d90429" angle=45 relative-to="workspace-view"
+    }
+
+    shadow {
+        on
+        draw-behind-window true
+        softness 30
+        spread 5
+        offset x=5 y=5
+        color "#0007"
+    }
+}
+
+// No client-side decorations, please.
+prefer-no-csd
+
+// =====================================================================
+// Window rules.
+// =====================================================================
+
+// Global window rules.
+window-rule {
+    // Rounded corners for all windows.
+    geometry-corner-radius 8
+    clip-to-geometry true
+
+    draw-border-with-background true
+}
+
+// Open the Firefox picture-in-picture player as floating by default.
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+    baba-is-float true
+}
+
+// Open Firefox extension windows in floating mode by default.
+window-rule {
+    match app-id=r#"firefox$"# title="^Extension: "
+    open-floating true
+}
+
+
+// =====================================================================
+// Keybindings.
+// =====================================================================
+
+binds {
+    Ctrl+Alt+Delete { quit; }
+    
+    // Letter shortcuts.
+    Mod+Q repeat=false { close-window; }
+    Mod+W              { spawn "firefox"; }
+    Mod+E              { spawn "nautilus"; }
+    Mod+R              { spawn "fuzzel"; }
+    Mod+T              { spawn "emacsclient" "-c"; }
+    // Mod+Y
+    // Mod+U
+    // Mod+I
+    // Mod+O
+    Mod+P              { power-off-monitors; }
+    // Mod+A
+    // Mod+S
+    Mod+Shift+S        { screenshot; }
+    // Mod+D
+    Mod+F              { maximize-column; }
+    Mod+Shift+F        { fullscreen-window; }
+    // Mod+G
+    // Mod+H is reserved as an alternative to arrow keys.
+    // Mod+J is reserved as an alternative to arrow keys.
+    // Mod+K is reserved as an alternative to arrow keys.
+    // Mod+L is reserved as an alternative to arrow keys.
+    // Mod+Z
+    // Mod+X
+    // Mod+C
+    // Mod+V
+    // Mod+B
+    // Mod+N
+    Mod+M { spawn "thunderbird"; }
+
+    // Number shortcuts.
+    Mod+1      { focus-workspace 1; }
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+2      { focus-workspace 2; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+3      { focus-workspace 3; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+4      { focus-workspace 4; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+5      { focus-workspace 5; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+6      { focus-workspace 6; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+7      { focus-workspace 7; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+8      { focus-workspace 8; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+9      { focus-workspace 9; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+
+    // Function keys and symbols.
+    Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    Mod+Minus                         { set-column-width "-10%"; }
+    Mod+Shift+Minus                   { set-window-height "-10%"; }
+    Mod+Equal                         { set-column-width "+10%"; }
+    Mod+Shift+Equal                   { set-window-height "+10%"; }
+    Mod+Grave                         { switch-preset-column-width; }
+    Mod+Shift+Grave                   { switch-preset-window-height; }
+    Mod+Tab repeat=false              { toggle-overview; }
+    Mod+Return                        { spawn "alacritty"; }
+    Mod+Space                         { toggle-window-floating; }
+    Mod+Shift+Space                   { switch-focus-between-floating-and-tiling; }
+    Mod+Comma                         { consume-window-into-column; }
+    Mod+Period                        { expel-window-from-column; }
+    Mod+Slash                         { show-hotkey-overlay; }
+    Print                             { screenshot; }
+    Ctrl+Print                        { screenshot-screen; }
+    Alt+Print                         { screenshot-window; }
+
+    // Multimedia keys.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+
+    // Arrow keys.
+    Mod+Left             { focus-column-left; }
+    Mod+Down             { focus-window-down; }
+    Mod+Up               { focus-window-up; }
+    Mod+Right            { focus-column-right; }
+    Mod+H                { focus-column-left; }
+    Mod+J                { focus-window-down; }
+    Mod+K                { focus-window-up; }
+    Mod+L                { focus-column-right; }
+    Mod+Shift+Left       { move-column-left; }
+    Mod+Shift+Down       { move-window-down; }
+    Mod+Shift+Up         { move-window-up; }
+    Mod+Shift+Right      { move-column-right; }
+    Mod+Shift+H          { move-column-left; }
+    Mod+Shift+J          { move-window-down; }
+    Mod+Shift+K          { move-window-up; }
+    Mod+Shift+L          { move-column-right; }
+    Mod+Ctrl+Left        { focus-monitor-left; }
+    Mod+Ctrl+Down        { focus-workspace-down; }
+    Mod+Ctrl+Up          { focus-workspace-up; }
+    Mod+Ctrl+Right       { focus-monitor-right; }
+    Mod+Ctrl+H           { focus-monitor-left; }
+    Mod+Ctrl+J           { focus-workspace-down; }
+    Mod+Ctrl+K           { focus-workspace-up; }
+    Mod+Ctrl+L           { focus-monitor-right; }
+    Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
+    Mod+Shift+Ctrl+Down  { move-column-to-workspace-down; }
+    Mod+Shift+Ctrl+Up    { move-column-to-workspace-up; }
+    Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+    Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
+    Mod+Shift+Ctrl+J     { move-column-to-workspace-down; }
+    Mod+Shift+Ctrl+K     { move-column-to-workspace-up; }
+    Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
+
+    // Mouse shortcuts.
+    Mod+WheelScrollDown            cooldown-ms=50  { focus-column-right; }
+    Mod+WheelScrollUp              cooldown-ms=50  { focus-column-left; }
+    Mod+Shift+WheelScrollDown      cooldown-ms=150 { focus-column-right; }
+    Mod+Shift+WheelScrollUp        cooldown-ms=150 { focus-column-left; }
+    Mod+Ctrl+WheelScrollDown       cooldown-ms=50  { focus-workspace-down; }
+    Mod+Ctrl+WheelScrollUp         cooldown-ms=50  { focus-workspace-up; }
+    Mod+Ctrl+Shift+WheelScrollDown cooldown-ms=150 { move-column-right; }
+    Mod+Ctrl+Shift+WheelScrollUp   cooldown-ms=150 { move-column-left; }
+}
+
+// =====================================================================
+// Miscellaneous settings.
+// =====================================================================
+
+screenshot-path "~/Pictures/Screenshots/%Y%m%d-%H%M%S.png"
+
+// Don't show hotkey help box on startup.
+hotkey-overlay {
+    skip-at-startup
+}
+
+// =====================================================================
+// Autostarts.
+// =====================================================================
+
+spawn-at-startup "ibus-daemon" "-rxRd"
+spawn-at-startup "waybar"
+spawn-at-startup "wal" "-R"
+
+// =====================================================================
+// Environment variables.
+// =====================================================================
+
+environment {
+    // Input method settings.
+    GTK_IM_MODULE "ibus"
+    QT_IM_MODULE "ibus"
+    XMODIFIERS "@im=ibus"
+
+    // Enable Wayland support in GTK and Qt applications.
+    QT_QPA_PLATFORM "wayland"
+}

@@ -331,7 +331,8 @@ Some UI elements are controlled with per-frame alists.
 
 #+begin_src emacs-lisp
   (setq default-frame-alist
-        `((width . 115) ; 80 col of editor + 35 col of treemacs
+        `((undecorated . t)
+          (width . 115) ; 80 col of editor + 35 col of treemacs
           (height . 25)
           (vertical-scroll-bars . nil)
           (horizontal-scroll-bars . nil)

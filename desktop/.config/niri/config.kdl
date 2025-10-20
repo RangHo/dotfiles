@@ -105,7 +105,6 @@ window-rule {
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
-    baba-is-float true
 }
 
 // Open Firefox extension windows in floating mode by default.

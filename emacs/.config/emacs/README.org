@@ -272,7 +272,8 @@ Let's just use built-in input method here.
 
 #+begin_src emacs-lisp
   (setq default-input-method "korean-hangul390")
-  (global-set-key (kbd "<Hangul>") 'toggle-input-method)
+  (when (string= (getenv "XDG_SESSION_TYPE") "wayland")
+    (global-set-key (kbd "<Hangul>") 'toggle-input-method))
 #+end_src
 
 ** Mouse Support

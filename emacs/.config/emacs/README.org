@@ -265,6 +265,16 @@ Make sure Emacs keeps the history of visited files and executed commands.
   (recentf-mode +1)
 #+end_src
 
+** Input Method
+Emacs comes with various input methods.
+It seems Wayland + Niri + IBus combo doesn't work well with GTK Emacs.
+Let's just use built-in input method here.
+
+#+begin_src emacs-lisp
+  (setq default-input-method "korean-hangul390")
+  (global-set-key (kbd "<Hangul>") 'toggle-input-method)
+#+end_src
+
 ** Mouse Support
 There are a bit of things to tweak when using mouse.
 

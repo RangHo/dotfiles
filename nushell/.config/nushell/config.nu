@@ -2,8 +2,8 @@
 overlay use nupm/nupm --prefix
 
 # Completion and prompting.
-use carapace
-use starship
+source carapace
+source starship
 
 # Package and version management.
 overlay use mise

@@ -256,7 +256,8 @@ hotkey-overlay {
 // Autostarts.
 // =====================================================================
 
-spawn-at-startup "ibus-daemon" "-rxRd"
+spawn-at-startup "/usr/lib/soteria-polkit/soteria"
+spawn-at-startup "ibus" "start" "--type" "wayland"
 spawn-at-startup "waybar"
 spawn-at-startup "wal" "-R"
 

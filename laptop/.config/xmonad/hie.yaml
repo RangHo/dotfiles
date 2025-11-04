@@ -1,10 +1,6 @@
 cradle:
   cabal:
+    - path: "./taffybar.hs"
+      component: "xmonad-rangho:exe:taffybar"
     - path: "./xmonad.hs"
       component: "xmonad-rangho:exe:xmonad"
-    - path: "./xmobar.hs"
-      component: "xmonad-rangho:exe:xmobar"
-    - path: "./utils/backlight.hs"
-      component: "xmonad-rangho:exe:backlight"
-    - path: "./utils/wireless.hs"
-      component: "xmonad-rangho:exe:wireless"

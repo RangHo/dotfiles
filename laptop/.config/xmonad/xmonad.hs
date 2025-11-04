@@ -1,22 +1,25 @@
 import Control.Monad
+import qualified Data.ByteString.Char8 as B
+import Data.Default
 import Data.List
 import qualified Data.Map as M
 import Data.Maybe
 import Graphics.X11.ExtraTypes.XF86
+import System.Directory
 import System.Exit
+import System.FilePath
+import System.IO
+import System.Posix.Process
 
-import XMonad hiding (mouseResizeWindow)
+import XMonad
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
-import XMonad.Actions.FlexibleResize
+import qualified XMonad.Actions.FlexibleResize as FR
 import XMonad.Actions.Navigation2D
 import XMonad.Actions.TiledWindowDragging
-import XMonad.Config.Desktop
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
-import XMonad.Hooks.StatusBar
-import XMonad.Hooks.StatusBar.PP
 import XMonad.Layout.BinarySpacePartition
 import XMonad.Layout.BorderResize
 import XMonad.Layout.DraggingVisualizer
@@ -25,17 +28,20 @@ import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Spacing
 import XMonad.Layout.ToggleLayouts
 import qualified XMonad.StackSet as W
+import qualified XMonad.Util.ExtensibleState as XS
 import XMonad.Util.Hacks
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.SpawnOnce
 
 -- ---------------------------------------------------------------------
 -- Constants
+
 altMask = mod1Mask
 superMask = mod4Mask
 
 -- ---------------------------------------------------------------------
 -- Variables
+
 myBorderWidth = 0
 myDefaultFloatRect = W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3)
 myFocusFollowsMouse = True
@@ -60,9 +66,9 @@ myWorkspaces =
     ]
 
 -- ---------------------------------------------------------------------
--- Applications
-myBacklight = "sudo ~/.cache/xmonad/backlight"
-myBar = "~/.cache/xmonad/xmobar"
+-- Applications and commands
+
+myBar = "~/.cache/xmonad/taffybar"
 myBrowser = "firefox"
 myDisplaySettings = "xfce4-display-settings"
 myEditor = "emacsclient -c"
@@ -74,62 +80,134 @@ myScreenshot = "xfce4-screenshooter"
 -- ---------------------------------------------------------------------
 -- Helper functions
 
--- | Check if a window is in floating state.
-isFloating :: Window -> WindowSet -> Bool
-isFloating w ws = M.member w (W.floating ws)
-
--- | Toggle the floating state of a window.
-toggleFloat :: Window -> X ()
-toggleFloat w = windows $ go w
-  where
-    go w ws =
-        if isFloating w ws
-            then W.sink w ws
-            else W.float w myDefaultFloatRect ws
-
--- | Toggle fullscreen mode.
-toggleFullscreen :: Window -> X ()
-toggleFullscreen _ = do
-    sendMessage $ Toggle "Full"
-    sendMessage $ ToggleStruts
-
--- | Drag the window with the mouse, depending on the floating state.
-myDragWindow :: Window -> X ()
-myDragWindow w = do
-    ws <- gets windowset
-    if isFloating w ws
-        then dragFloating w
-        else dragWindow w
-  where
-    dragFloating w = do
-        focus w
-        mouseMoveWindow w
-        windows W.shiftMaster
-
--- | Resize the window with the mouse, depending on the floating state.
-myResizeWindow :: Window -> X ()
-myResizeWindow w = do
-    ws <- gets windowset
-    when (isFloating w ws) $ do
-        focus w
-        mouseResizeWindow w
-        windows W.shiftMaster
-
 -- | Find the index of a workspace by its name.
 findWorkspaceIndex :: WorkspaceId -> Int
 findWorkspaceIndex ws = fromMaybe 0 $ elemIndex ws myWorkspaces
 
--- | Copy the managed window to all workspaces.
-doCopyToAll :: ManageHook
-doCopyToAll = doF copyToAll
+-- | Check if a window is in floating state.
+isFloating :: Window -> WindowSet -> Bool
+isFloating w ws = M.member w (W.floating ws)
+
+-- ---------------------------------------------------------------------
+-- Screen brightness utility
+
+type BrightnessDriver = FilePath
+
+sysfsBacklightPath :: FilePath
+sysfsBacklightPath = "/sys/class/backlight"
+
+mkBrightnessDriver :: String -> BrightnessDriver
+mkBrightnessDriver = (</>) sysfsBacklightPath
+
+lsBrightnessDrivers :: IO [BrightnessDriver]
+lsBrightnessDrivers = listDirectory sysfsBacklightPath >>= mapM (return . mkBrightnessDriver)
+
+mainBrightnessDriver :: IO BrightnessDriver
+mainBrightnessDriver = head <$> lsBrightnessDrivers
+
+readBrightnessFile :: BrightnessDriver -> IO (Maybe Int)
+readBrightnessFile f = do
+    content <- B.readFile f
+    case B.readInt content of
+        Just (v, _) -> return $ Just v
+        _ -> return Nothing
+
+getRawBrightness :: BrightnessDriver -> IO (Maybe Int)
+getRawBrightness = readBrightnessFile . (</> "brightness")
+
+setRawBrightness :: BrightnessDriver -> Int -> IO ()
+setRawBrightness drv value = B.writeFile (drv </> "brightness") (B.pack $ show value)
+
+getRawMaxBrightness :: BrightnessDriver -> IO (Maybe Int)
+getRawMaxBrightness drv = readBrightnessFile (drv </> "max_brightness")
+
+getBrightness :: BrightnessDriver -> IO Double
+getBrightness drv = do
+    val <- fromIntegral . fromMaybe 0 <$> getRawBrightness drv
+    max <- fromIntegral . fromMaybe 0 <$> getRawMaxBrightness drv
+    let gamma = (val / max) ** (1 / 2)
+    return gamma
+
+setBrightness :: BrightnessDriver -> Double -> IO ()
+setBrightness drv val = do
+    max <- fromIntegral . fromMaybe 0 <$> getRawMaxBrightness drv
+    let raw = round $ max * val ** 2
+    setRawBrightness drv raw
+
+getMainBrightness :: IO Double
+getMainBrightness = do
+    drv <- mainBrightnessDriver
+    getBrightness drv
+
+setMainBrightness :: Double -> IO ()
+setMainBrightness val = do
+    drv <- mainBrightnessDriver
+    setBrightness drv val
+
+incBrightness :: Double -> IO ()
+incBrightness delta = do
+    oldVal <- getMainBrightness
+    let newVal = min 1.0 (oldVal + delta)
+    setMainBrightness newVal
+
+decBrightness :: Double -> IO ()
+decBrightness delta = do
+    oldVal <- getMainBrightness
+    let newVal = max 0.0 (oldVal - delta)
+    setMainBrightness newVal
 
 -- ---------------------------------------------------------------------
 -- Key bindings
+
+-- | Drag the window with the mouse, depending on the floating state.
+dragWindowOrFloating :: Window -> X ()
+dragWindowOrFloating w =
+    let dragFloating w = focus w >> mouseMoveWindow w >> windows W.shiftMaster
+     in do
+            ws <- gets windowset
+            if isFloating w ws
+                then dragFloating w
+                else dragWindow w
+
+-- | Resize the window with the mouse, depending on the floating state.
+resizeWindowWhenFloating :: Window -> X ()
+resizeWindowWhenFloating w =
+    let resizeFloating = focus w >> FR.mouseResizeWindow w >> windows W.shiftMaster
+     in do
+            ws <- gets windowset
+            when (isFloating w ws) resizeFloating
+
+-- | Toggle the floating state of a window.
+toggleFloat :: Window -> X ()
+toggleFloat w =
+    let toggle w ws =
+            if isFloating w ws
+                then W.sink w ws
+                else W.float w myDefaultFloatRect ws
+     in windows $ toggle w
+
+-- | Toggle fullscreen mode.
+toggleFullscreen :: Window -> X ()
+toggleFullscreen _ = do
+    sendMessage (Toggle "Full")
+    sendMessage ToggleStruts
+
+-- | Power off the system.
+powerOff :: X ()
+powerOff = do
+    -- Kill all windows first.
+    ws <- gets windowset
+    mapM_ killWindow (W.allWindows ws)
+    -- Run other custom shutdown commands.
+    spawn "emacsclient -e '(kill-emacs)'"
+    -- Call poweroff command as root.
+    spawn "sleep 1; sudo poweroff"
+
 myKeys :: XConfig l -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf =
     M.fromList $
         -- XMonad management
-        [ ((controlMask .|. altMask, xK_Delete), return ()) -- Ctrl + Alt + Delete to show power menu
+        [ ((controlMask .|. altMask, xK_Delete), powerOff) -- Ctrl + Alt + Delete to show power menu
         , ((controlMask .|. altMask, xK_BackSpace), io exitSuccess) -- Ctrl + Alt + Backspace to kill XMonad
         ]
             ++
@@ -191,8 +269,8 @@ myKeys conf =
             , ((noModMask, xF86XK_AudioPrev), spawn "playerctl previous")
             , ((noModMask, xF86XK_AudioPlay), spawn "playerctl play-pause")
             , ((noModMask, xF86XK_AudioNext), spawn "playerctl next")
-            , ((noModMask, xF86XK_MonBrightnessDown), spawn $ myBacklight ++ " dec")
-            , ((noModMask, xF86XK_MonBrightnessUp), spawn $ myBacklight ++ " inc")
+            , ((noModMask, xF86XK_MonBrightnessDown), io $ decBrightness 0.05)
+            , ((noModMask, xF86XK_MonBrightnessUp), io $ incBrightness 0.05)
             , ((superMask, xK_grave), namedScratchpadAction myScratchpads "terminal")
             , ((superMask, xK_Tab), windows W.focusDown) -- focus the next window (windows compatible)
             , ((superMask, xK_Return), spawn myTerminal) -- run terminal
@@ -229,9 +307,9 @@ myKeys conf =
 myMouseBindings :: XConfig l -> M.Map (KeyMask, Button) (Window -> X ())
 myMouseBindings _ =
     M.fromList
-        [ ((superMask, leftClick), myDragWindow) -- move window
+        [ ((superMask, leftClick), dragWindowOrFloating) -- move window
         , ((superMask, middleClick), doNothing)
-        , ((superMask, rightClick), myResizeWindow) -- resize window
+        , ((superMask, rightClick), resizeWindowWhenFloating) -- resize window
         , ((superMask, scrollUp), doNothing)
         , ((superMask, scrollDown), doNothing)
         ]
@@ -244,29 +322,8 @@ myMouseBindings _ =
     doNothing _ = return ()
 
 -- ---------------------------------------------------------------------
--- Status bar
-myPP =
-    filterOutWsPP [scratchpadWorkspaceTag] $
-        def
-            { ppCurrent = gotoWorkspace $ xmobarColor "yellow" ""
-            , ppVisible = gotoWorkspace $ xmobarColor "white" ""
-            , ppHidden = gotoWorkspace $ xmobarColor "white" ""
-            , ppHiddenNoWindows = gotoWorkspace $ xmobarColor "gray" ""
-            , ppSep = " "
-            , ppWsSep = xmobarColor "gray" "" " | "
-            , ppOrder = \(ws : l : t : _) -> [ws]
-            }
-  where
-    gotoWorkspace style wid =
-        xmobarAction
-            ("xdotool set_desktop " ++ show (findWorkspaceIndex wid))
-            "1"
-            (style wid)
-
-mySB = statusBarProp myBar (pure myPP)
-
--- ---------------------------------------------------------------------
 -- Layout hook
+
 myLayoutHook =
     avoidStruts
         $ draggingVisualizer
@@ -276,22 +333,27 @@ myLayoutHook =
             . onWorkspace "media" fullscreen
         $ bsp
   where
-    equalGaps s =
+    beardGaps s =
         gaps
-            [ (U, s)
+            [ (U, 0)
             , (D, s)
             , (L, s)
             , (R, s)
             ]
     bsp =
-        equalGaps myGapSize $ spacing myGapSize $ borderResize emptyBSP
+        beardGaps myGapSize $ spacing myGapSize $ borderResize emptyBSP
     tiled frac =
-        equalGaps myGapSize $ spacing myGapSize $ Mirror $ Tall 1 (2 / 100) frac
+        beardGaps myGapSize $ spacing myGapSize $ Mirror $ Tall 1 (2 / 100) frac
     fullscreen =
-        equalGaps (myGapSize * 2) Full
+        beardGaps (myGapSize * 2) Full
 
 -- ---------------------------------------------------------------------
 -- Manage hook
+
+-- | Copy the managed window to all workspaces.
+doCopyToAll :: ManageHook
+doCopyToAll = doF copyToAll
+
 myManageHook =
     composeAll
         [ namedScratchpadManageHook myScratchpads
@@ -301,26 +363,30 @@ myManageHook =
 
 -- ---------------------------------------------------------------------
 -- Autostart programs
+
 myStartupHook = do
+    -- Daemons
+    spawnOnce "status-notifier-watcher"
+    spawnOnce "emacs --fg-daemon"
+
     -- Eye candies
     spawnOnce "picom"
     spawnOnce "wal -R"
 
     -- Utilities
+    spawnOnce "~/.cache/xmonad/taffybar"
     spawnOnce "dunst"
-    spawnOnce "emacs --fg-daemon"
-    spawnOnce "playerctld"
 
 -- ---------------------------------------------------------------------
 -- Entrypoint
+
 main :: IO ()
-main =
+main = do
     xmonad
         . ewmh
         . ewmhFullscreen
         . docks
         . javaHack
-        . withSB mySB
         . withNavigation2DConfig def
         $ def
             { borderWidth = myBorderWidth

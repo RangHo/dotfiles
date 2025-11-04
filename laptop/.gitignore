@@ -1,0 +1,3 @@
+# Haskell build artifacts
+.config/taffybar/dist-newstyle/
+.config/xmonad/dist-newstyle/

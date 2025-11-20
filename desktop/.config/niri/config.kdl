@@ -38,7 +38,7 @@ output "Samsung Electric Company U32J59x HNMX102362" {
 output "Samsung Electric Company LS32D70xE HNBY100538" {
     scale 1.25
     transform "normal" 
-    position x=-3072 y=590
+    position x=-3072 y=790
 }
 
 // =====================================================================

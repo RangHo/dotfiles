@@ -1406,6 +1406,18 @@ Basically, a must-have for Lisp.
     :hook (prog-mode))
 #+end_src
 
+** Preview Color Codes
+~rainbow-mode~ changes the background of color representations in a source code.
+This is especially useful for stylesheets, etc.
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :hook (prog-mode)
+    :custom
+    (rainbow-r-colors nil)
+    (rainbow-x-colors nil))
+#+end_src
+
 ** Completions
 There are two kinds of completions in Emacs.
 One is *in-buffer completions*, and the other is *minibuffer completions*.
@@ -1533,13 +1545,6 @@ Both protocols use JSON-RPC to communicate with their respective servers, and we
                            (eglot-ensure)))))
   (use-package dape
     :unless (version< emacs-version "30.0"))
-#+end_src
-
-** Proof Assistant Interface
-[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
-
-#+begin_src emacs-lisp
-  (use-package proof-general)
 #+end_src
 
 ** Tree-sitter Integration
@@ -2047,7 +2052,12 @@ OpenSCAD allows me to make 3D models in code.
   (use-package ox-latex
     :ensure nil
     :custom
-    (org-latex-compiler "lualatex"))
+    (org-latex-compiler "lualatex")
+    (org-latex-src-block-backend 'engraved)
+    :init
+    (add-to-list 'org-latex-packages-alist '("" "fvextra")))
+
+  (use-package engrave-faces)
 #+end_src
 
 ** PowerShell
@@ -2064,6 +2074,13 @@ It allows automation by writing object-manipulating commands into a script.
 #+begin_src emacs-lisp
   (use-package praat-mode
     :ensure nil)
+#+end_src
+
+** Proof Assistant
+[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
+
+#+begin_src emacs-lisp
+  (use-package proof-general)
 #+end_src
 
 ** Python
@@ -2380,18 +2397,6 @@ I can even chat with my outsourced thoughts!
 
 #+begin_src emacs-lisp
   (use-package copilot-chat)
-#+end_src
-
-** Preview Color Codes
-~rainbow-mode~ changes the background of color representations in a source code.
-This is especially useful for stylesheets, etc.
-
-#+begin_src emacs-lisp
-  (use-package rainbow-mode
-    :hook (prog-mode)
-    :custom
-    (rainbow-r-colors nil)
-    (rainbow-x-colors nil))
 #+end_src
 
 ** Terminal Emulator

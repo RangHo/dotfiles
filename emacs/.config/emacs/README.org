@@ -2115,6 +2115,8 @@ Better than Python.
     :init
     (add-to-list 'treesit-language-source-alist
                  '(ruby "https://github.com/tree-sitter/tree-sitter-ruby")))
+
+  (use-package rbs-mode)
 #+end_src
 
 ** Rust

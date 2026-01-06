@@ -113,6 +113,13 @@ window-rule {
     open-floating true
 }
 
+// Waydroid windows have fixed size; maximize them to fill the screen.
+window-rule {
+    match app-id=r#"^Waydroid$"#
+    border { off; }
+    open-maximized-to-edges true
+}
+
 
 // =====================================================================
 // Keybindings.
@@ -137,6 +144,7 @@ binds {
     Mod+Shift+S        { screenshot; }
     // Mod+D
     Mod+F              { maximize-column; }
+    Mod+Alt+F          { maximize-window-to-edges; }
     Mod+Shift+F        { fullscreen-window; }
     // Mod+G
     // Mod+H is reserved as an alternative to arrow keys.

@@ -1547,6 +1547,16 @@ Both protocols use JSON-RPC to communicate with their respective servers, and we
     :unless (version< emacs-version "30.0"))
 #+end_src
 
+** Proof Assistant Interface
+[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
+
+#+begin_src emacs-lisp
+  (use-package proof-general
+    :custom
+    (proof-splash-enable nil)
+    (proof-layout-windows 'hybrid))
+#+end_src
+
 ** Tree-sitter Integration
 Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
 It is usually much faster than Emacs's built-in parsing facility.
@@ -1933,7 +1943,8 @@ There is a minor mode for Emacs to use those switches.
 #+begin_src emacs-lisp
   (use-package opam-switch-mode
     :hook ((coq-mode . opam-switch-mode)
-           (tuareg-mode . opam-switch-mode)))
+           (tuareg-mode . opam-switch-mode)
+           (proof-shell-mode . opam-switch-mode)))
 #+end_src
 
 ** OpenSCAD

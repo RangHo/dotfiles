@@ -27,6 +27,22 @@ input {
 // Monitors.
 // =====================================================================
 
+// Ultrawide monitor at the top for espresso-bar.
+output "LG Electronics LG ULTRAWIDE 0x00041309" {
+    position x=0 y=0
+}
+
+// 2K monitor at the bottom for espresso-bar.
+output "Dell Inc. DELL S2721DS 44S0R43" {
+    position x=0 y=1080
+}
+
+// Wacom One graphics tablet for espresso-bar
+output "Wacom Tech Wacom One 13 0KQ0171007544" {
+    scale 1.0
+    position x=320 y=2520
+}
+
 // Vertical monitor on the right for coffeelab.
 output "Samsung Electric Company U32J59x HNMX102362" {
     scale 1.25

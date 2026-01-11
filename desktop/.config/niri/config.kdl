@@ -133,7 +133,7 @@ window-rule {
 window-rule {
     match app-id=r#"^Waydroid$"#
     border { off; }
-    open-maximized-to-edges true
+    open-fullscreen true
 }
 
 

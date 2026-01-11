@@ -29,6 +29,7 @@ input {
 
 // Ultrawide monitor at the top for espresso-bar.
 output "LG Electronics LG ULTRAWIDE 0x00041309" {
+    transform "180"
     position x=0 y=0
 }
 

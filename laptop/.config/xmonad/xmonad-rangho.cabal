@@ -33,4 +33,6 @@ executable taffybar
                               , gtk-strut
                               , hslogger
                               , taffybar >= 4.0.0
+                              , text
+                              , xdg-basedir
     default-language:           Haskell2010

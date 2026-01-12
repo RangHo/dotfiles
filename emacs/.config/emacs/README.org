@@ -1600,6 +1600,21 @@ Before loading individual configurations, ensure that all packages defined above
 Languages are organized in alphabetical orders, unless the package load order is significant.
 (They should not be, though.)
 
+** Agda
+[[https://wiki.portal.chalmers.se/agda/pmwiki.php][Agda]] is a totally functional proof assistant and programming language.
+Its documentation was pretty horrible back in the day, but it has got /a lot/ better recently.
+
+#+begin_src emacs-lisp
+  (use-package agda2
+    :ensure nil
+    :when (executable-find "agda")
+    :load-path (lambda ()
+                 (let ((coding-system-for-read 'utf-8))
+                   (directory-file-name
+                    (file-name-directory
+                     (shell-command-to-string "agda --emacs-mode locate"))))))
+#+end_src
+
 ** BASIC
 While BASIC is not used a lot, some exotic environments like Microsoft Excel still requires a variant of it.
 
@@ -2202,7 +2217,7 @@ Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in
                  '(conf-toml-mode . toml-ts-mode)))
 #+end_src
 
-** Typst
+** Typs
 Typst is a next-generation typesetting system with a markup language significantly easier than TeX.
 
 Note that the major mode for Typst is provided only as a Tree-Sitter grammar.

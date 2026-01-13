@@ -1,14 +1,5 @@
-# Nu package manager.
-$env.NUPM_HOME = $env.XDG_DATA_HOME | path join "nupm"
-$env.NU_LIB_DIRS = [
-    ($env.NUPM_HOME | path join "modules")
-]
-$env.PATH = (
-    $env.PATH
-        | split row (char esep)
-        | prepend ($env.NUPM_HOME | path join "scripts")
-        | uniq
-)
+# Nu modules.
+$env.NU_LIB_DIRS = ls ($nu.default-config-dir | path join "modules") | each { $in.name }
 
 # External initialization scripts.
 let generated_lib_dir = if "XDG_CACHE_HOME" in $env {

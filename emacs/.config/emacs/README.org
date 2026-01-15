@@ -310,15 +310,14 @@ They are still available in =*Warnings*= buffer, however.
   (setq warning-minimum-level :error)
 #+end_src
 
-** Override default packages
+** Override Default Packages
 Some packages require newer versions of built-in packages.
 Using ~elpaca~ will pull the entire Emacs codebase which will cost around 2 GiB per package.
 For these, we're better off manually downloading tarballs from ELPA.
 
-*** JSON-RPC
+*** track-changes
 #+begin_src emacs-lisp
-  (use-package jsonrpc
-    :ensure nil)
+  (use-package track-changes)
 #+end_src
 
 * Appearances
@@ -2100,13 +2099,6 @@ It allows automation by writing object-manipulating commands into a script.
 #+begin_src emacs-lisp
   (use-package praat-mode
     :ensure nil)
-#+end_src
-
-** Proof Assistant
-[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
-
-#+begin_src emacs-lisp
-  (use-package proof-general)
 #+end_src
 
 ** Python

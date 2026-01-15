@@ -276,6 +276,22 @@ Let's just use built-in input method here.
     (global-set-key (kbd "<Hangul>") 'toggle-input-method))
 #+end_src
 
+Editing Unicode-heavy codes kinda sucks if I need to type LaTeX sources every time.
+Before defining any input methods, any math-related input method can benefit from the data package ~math-symbol-lists~.
+Input method definitions require the data package to be installed at compile time, so we need to have Elpaca wait for its installation.
+
+#+begin_src emacs-lisp
+  (use-package math-symbol-lists
+    :ensure (:wait t))
+#+end_src
+
+At least for Iris-related sources, I nicked the [[https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md][recommended editor setup guide]] from Iris repository.
+
+#+begin_src emacs-lisp
+  (use-package uni-iris
+    :ensure nil)
+#+end_src
+
 ** Mouse Support
 There are a bit of things to tweak when using mouse.
 

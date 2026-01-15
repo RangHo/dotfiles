@@ -2225,7 +2225,7 @@ Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in
                  '(conf-toml-mode . toml-ts-mode)))
 #+end_src
 
-** Typs
+** Typst
 Typst is a next-generation typesetting system with a markup language significantly easier than TeX.
 
 Note that the major mode for Typst is provided only as a Tree-Sitter grammar.

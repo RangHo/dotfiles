@@ -3,8 +3,8 @@ $env.NU_LIB_DIRS = ls ($nu.default-config-dir | path join "modules") | each { $i
 
 # Generated init scripts.
 def generate-init [tool: string, command: closure] {
-  let local_vendor_autoload_dir = $nu.vendor-autoload-dirs | where { str starts-with $env.HOME } | first
-  if ($local_vendor_autoload_dir | path exists) {
+  let local_vendor_autoload_dir = $nu.vendor-autoload-dirs | where { str starts-with $env.HOME } | last
+  if not ($local_vendor_autoload_dir | path exists) {
     mkdir $local_vendor_autoload_dir
   }
   if (which $tool | is-not-empty) {

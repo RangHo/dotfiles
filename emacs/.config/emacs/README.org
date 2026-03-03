@@ -1966,17 +1966,6 @@ OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in 
   (use-package tuareg)
 #+end_src
 
-OCaml has its own package manager called OPAM.
-It allows installing multiple versions of compilers, à la Python's ~venv~.
-There is a minor mode for Emacs to use those switches.
-
-#+begin_src emacs-lisp
-  (use-package opam-switch-mode
-    :hook ((coq-mode . opam-switch-mode)
-           (tuareg-mode . opam-switch-mode)
-           (proof-shell-mode . opam-switch-mode)))
-#+end_src
-
 ** OpenSCAD
 OpenSCAD allows me to make 3D models in code.
 

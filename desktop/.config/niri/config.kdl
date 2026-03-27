@@ -291,8 +291,6 @@ spawn-at-startup "wal" "-R"
 
 environment {
     // Input method settings.
-    GTK_IM_MODULE "ibus"
-    QT_IM_MODULE "ibus"
     XMODIFIERS "@im=ibus"
 
     // Enable Wayland support in GTK and Qt applications.

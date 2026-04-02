@@ -265,6 +265,14 @@ Make sure Emacs keeps the history of visited files and executed commands.
   (recentf-mode +1)
 #+end_src
 
+** Revert Files Automatically
+If files are changed in the background, reflect the latest changes.
+
+#+begin_src emacs-lisp
+  (global-auto-revert-mode +1)
+  (setq auto-revert-interval 1)
+#+end_src
+
 ** Input Method
 Emacs comes with various input methods.
 It seems Wayland + Niri + IBus combo doesn't work well with GTK Emacs.
@@ -2418,10 +2426,19 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
     :hook (prog-mode))
 #+end_src
 
-I can even chat with my outsourced thoughts!
+** AI Assistance
+I can even outsource typing to AI agents too.
 
 #+begin_src emacs-lisp
-  (use-package copilot-chat)
+  (use-package ai-code
+    :after (evil magit)
+    :bind (("C-c a" . ai-code-menu))
+    :custom
+    (ai-code-backends-infra-terminal-backend 'eat)
+    :config
+    (ai-code-set-backend 'claude-code)
+    (ai-code-backends-infra-evil-setup)
+    (ai-code-magit-setup-transients))
 #+end_src
 
 ** Terminal Emulator

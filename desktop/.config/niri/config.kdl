@@ -282,7 +282,6 @@ hotkey-overlay {
 // =====================================================================
 
 spawn-at-startup "ibus" "start" "--type" "wayland"
-spawn-at-startup "waybar"
 spawn-at-startup "wal" "-R"
 
 // =====================================================================

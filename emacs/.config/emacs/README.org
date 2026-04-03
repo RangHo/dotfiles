@@ -1,6 +1,4 @@
 #+title: Emacs configuration
-#+author: RangHo Lee
-#+email: hello@rangho.me
 
 This document describes and configures my Emacs instance.
 

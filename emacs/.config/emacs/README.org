@@ -2074,6 +2074,16 @@ OpenSCAD allows me to make 3D models in code.
     (add-to-list 'org-babel-load-languages '(d2 . t)))
 #+end_src
 
+~ob-gnuplot~ is built-in with Org mode distribution, and creates graphs in Org documents.
+
+#+begin_src emacs-lisp
+  (use-package ob-gnuplot
+    :when (executable-find "gnuplot")
+    :ensure nil
+    :init
+    (add-to-list 'org-babel-load-languages '(gnuplot . t)))
+#+end_src
+
 ~ob-mermaid~ uses Mermaid to display graphs in Org documents.
 
 #+begin_src emacs-lisp

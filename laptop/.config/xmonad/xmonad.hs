@@ -56,7 +56,7 @@ myScratchpads =
     ]
   where
     focusedFloating = customFloating myScratchRect
-myTerminal = "alacritty"
+myTerminal = "ghostty"
 myWorkspaces =
     [ "default"
     , "code"

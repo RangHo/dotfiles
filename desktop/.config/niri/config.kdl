@@ -23,63 +23,126 @@ input {
     focus-follows-mouse max-scroll-amount="80%"
 }
 
+
 // =====================================================================
 // Monitors.
 // =====================================================================
+
+// espresso-bar layout:
+//
+// +-------------------------+
+// |                         |
+// | LG ULTRAWIDE 0x00041309 |
+// |                         |
+// +-------------------------+
+// |                         |
+// | Dell Inc.               |
+// | DELL S2721DS 44S0R43    |
+// |                         |
+// +-------------------------+
+//      | Wacom Tech    |
+//      | Wacom One 13  |
+//      | U32J59X       |
+//      +---------------+
 
 // Ultrawide monitor at the top for espresso-bar.
 output "LG Electronics LG ULTRAWIDE 0x00041309" {
     transform "180"
     position x=0 y=0
+
+    hot-corners {
+        top-left
+        top-right
+    }
+
+    layout {
+        default-column-display "tabbed"
+    }
 }
 
 // 2K monitor at the bottom for espresso-bar.
 output "Dell Inc. DELL S2721DS 44S0R43" {
+    focus-at-startup
     position x=0 y=1080
+
+    hot-corners {
+        off
+    }
 }
 
 // Wacom One graphics tablet for espresso-bar
 output "Wacom Tech Wacom One 13 0KQ0171007544" {
     scale 1.0
     position x=320 y=2520
+
+    hot-corners {
+        off
+    }
 }
+
+// coffeelab layout:
+//
+//                            +--------------+
+//                            |              |
+// +--------------------------+              |
+// |                          | Samsung      |
+// | Samsung Electric Company | Electric Co. |
+// | LS32D70xE HNBY100538     | U32J59x      |
+// |                          | HMMX102362   |
+// +--------------------------+              |
+//                            |              |
+//                            +--------------+
 
 // Vertical monitor on the right for coffeelab.
 output "Samsung Electric Company U32J59x HNMX102362" {
     scale 1.25
     transform "270"
     position x=0 y=0
+
+    hot-corners {
+        top-right
+    }
+
+    layout {
+        gaps 10
+        default-column-width { proportion 1.0; }
+    }
 }
 
 // Horizontal monitor on the left for coffelab.
 output "Samsung Electric Company LS32D70xE HNBY100538" {
+    focus-at-startup
     scale 1.25
     transform "normal" 
     position x=-3072 y=790
 }
+
 
 // =====================================================================
 // Appearances.
 // =====================================================================
 
 layout {
-    gaps 16
+    gaps 25
 
     // Center the focused column if the previously focused column will overflow.
     center-focused-column "on-overflow"
 
     preset-column-widths {
-        proportion 0.25
+        proportion 0.33333
         proportion 0.5
-        proportion 0.75
+        proportion 0.66667
+        fixed 1920
     }
     preset-window-heights {
-        proportion 0.25
+        proportion 0.33333
         proportion 0.5
-        proportion 0.75
+        proportion 0.66667
     }
 
-    default-column-width { proportion 0.9; }
+    default-column-width {
+        proportion 0.8
+    }
 
     focus-ring {
         off
@@ -100,10 +163,15 @@ layout {
         offset x=5 y=5
         color "#0007"
     }
+
+    tab-indicator {
+        on
+    }
 }
 
 // No client-side decorations, please.
 prefer-no-csd
+
 
 // =====================================================================
 // Window rules.
@@ -205,7 +273,7 @@ binds {
     Mod+Grave                         { switch-preset-column-width; }
     Mod+Shift+Grave                   { switch-preset-window-height; }
     Mod+Tab repeat=false              { toggle-overview; }
-    Mod+Return                        { spawn "footclient"; }
+    Mod+Return                        { spawn-sh "ghostty +new-window"; }
     Mod+Space                         { toggle-window-floating; }
     Mod+Shift+Space                   { switch-focus-between-floating-and-tiling; }
     Mod+Comma                         { consume-window-into-column; }
@@ -266,6 +334,7 @@ binds {
     Mod+Ctrl+Shift+WheelScrollUp   cooldown-ms=150 { move-column-left; }
 }
 
+
 // =====================================================================
 // Miscellaneous settings.
 // =====================================================================
@@ -277,12 +346,14 @@ hotkey-overlay {
     skip-at-startup
 }
 
+
 // =====================================================================
 // Autostarts.
 // =====================================================================
 
 spawn-at-startup "ibus" "start" "--type" "wayland"
 spawn-at-startup "wal" "-R"
+
 
 // =====================================================================
 // Environment variables.

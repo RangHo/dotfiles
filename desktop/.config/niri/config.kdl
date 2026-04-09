@@ -19,8 +19,8 @@ input {
         scroll-method "two-finger"
     }
 
-    // Focus follows mouse, only if it would scroll less than 80% of the screen. 
-    focus-follows-mouse max-scroll-amount="80%"
+    // Focus follows mouse, only if it would scroll less than 50% of the screen. 
+    focus-follows-mouse max-scroll-amount="50%"
 }
 
 
@@ -105,6 +105,7 @@ output "Samsung Electric Company U32J59x HNMX102362" {
 
     layout {
         gaps 10
+
         default-column-width { proportion 1.0; }
     }
 }
@@ -112,6 +113,7 @@ output "Samsung Electric Company U32J59x HNMX102362" {
 // Horizontal monitor on the left for coffelab.
 output "Samsung Electric Company LS32D70xE HNBY100538" {
     focus-at-startup
+
     scale 1.25
     transform "normal" 
     position x=-3072 y=790
@@ -125,8 +127,9 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
 layout {
     gaps 25
 
-    // Center the focused column if the previously focused column will overflow.
-    center-focused-column "on-overflow"
+    center-focused-column "on-overflow" // center the focused column if the previously focused column will overflow...
+    always-center-single-column // ...but always center if there's only one column
+    empty-workspace-above-first
 
     preset-column-widths {
         proportion 0.33333

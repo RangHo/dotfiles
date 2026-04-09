@@ -12,8 +12,8 @@ font-size = 12
 window-padding-x = 15
 window-padding-y = 15
 
-# If window is not focused when command finishes, notify.
-notify-on-command-finish = unfocused
+# Leave window decoration to window manager/compositor.
+window-decoration = none
 
 # Import wal theme if available.
 config-file = ?"~/.cache/wal/ghostty.conf"

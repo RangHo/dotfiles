@@ -19,8 +19,8 @@ input {
         scroll-method "two-finger"
     }
 
-    // Focus follows mouse, only if it would scroll less than 50% of the screen. 
-    focus-follows-mouse max-scroll-amount="50%"
+    // Focus follows mouse, only if it would scroll less than 75% of the screen.
+    focus-follows-mouse max-scroll-amount="75%"
 }
 
 
@@ -127,20 +127,18 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
 layout {
     gaps 25
 
-    center-focused-column "on-overflow" // center the focused column if the previously focused column will overflow...
-    always-center-single-column // ...but always center if there's only one column
+    center-focused-column "on-overflow" // center the focused column if the previously focused column will overflow
     empty-workspace-above-first
 
     preset-column-widths {
         proportion 0.33333
-        proportion 0.5
-        proportion 0.66667
+        proportion 0.66666
         fixed 1920
     }
     preset-window-heights {
         proportion 0.33333
         proportion 0.5
-        proportion 0.66667
+        proportion 0.66666
     }
 
     default-column-width {
@@ -182,32 +180,48 @@ prefer-no-csd
 
 // Global window rules.
 window-rule {
-    // Rounded corners for all windows.
     geometry-corner-radius 8
     clip-to-geometry true
-
     draw-border-with-background true
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id="firefox$" title="^Picture-in-Picture$"
+
     open-floating true
 }
 
 // Open Firefox extension windows in floating mode by default.
 window-rule {
-    match app-id=r#"firefox$"# title="^Extension: "
+    match app-id="firefox$" title="^Extension: "
+
     open-floating true
 }
 
 // Waydroid windows have fixed size; maximize them to fill the screen.
 window-rule {
-    match app-id=r#"^Waydroid$"#
-    border { off; }
+    match app-id="^Waydroid$"
+
     open-fullscreen true
+    border { off; }
 }
 
+// Get the annoying KakaoTalk "shadow window" out of the way.
+window-rule {
+    match app-id="^kakaotalk.exe$" title="^KakaoTalkShadowWnd$"
+
+    open-focused false
+
+    open-floating true
+    default-floating-position x=-1024 y=-1024 relative-to="top-left"
+
+    border { off; }
+    shadow { off; }
+    geometry-corner-radius 0;
+
+    opacity 0.0;
+}
 
 // =====================================================================
 // Keybindings.

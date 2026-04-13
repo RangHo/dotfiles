@@ -1880,7 +1880,7 @@ Both of them suck, and Julia performs pretty well.
       (make-directory rangho/julia-language-server-project t))
     (when interactive
       (unless (executable-find "julia")
-        (user-error "Julia is not installed."))
+        (user-error "Julia is not installed"))
       (process-file "julia" nil t nil
                     "--startup-file=no"
                     (concat "--project=" rangho/julia-language-server-project)
@@ -2193,7 +2193,20 @@ Swift is to Objective-C as Kotlin is to Java, on Apple devices.
 Terraform is a cloud provisioning software from Hashicorp.
 
 #+begin_src emacs-lisp
-  (use-package terraform-mode)
+  (defun rangho/terraform-mode-contact (interactive)
+    "Produce the Eglot contact information for Terraform language server.
+  Ensure that Terraform language server is installed when called with INTERACTIVE."
+    (let ((lsp-server (or (executable-find "terraform-ls")
+                          (executable-find "tofu-ls"))))
+      (when interactive
+        (unless lsp-server
+          (user-error "Neither terraform-ls nor tofu-ls is installed")))
+      (list lsp-server "serve")))
+
+  (use-package terraform-mode
+    :init
+    (add-to-list 'eglot-server-programs
+                 '(terraform-mode . rangho/terraform-mode-contact)))
 #+end_src
 
 ** TeX

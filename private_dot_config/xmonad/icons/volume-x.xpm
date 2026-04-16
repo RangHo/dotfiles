@@ -1,0 +1,34 @@
+/* XPM */
+static char *pixelarticons__volume_x[] = {
+/* columns rows colors chars-per-pixel */
+"24 24 4 1 ",
+"  c None",
+". c #393939",
+"X c gray78",
+"o c white",
+/* pixels */
+"                        ",
+"                        ",
+"           oo           ",
+"           oo           ",
+"         oooo           ",
+"         oooo           ",
+"       oo  oo           ",
+"       oo  oo           ",
+"   oooo    oo           ",
+"   oooo    oo  XX  XX   ",
+"   oo      oo  oo  oo   ",
+"   oo      oo  ..XX..   ",
+"   oo      oo    oo     ",
+"   oo      oo  XX..XX   ",
+"   oooo    oo  oo  oo   ",
+"   oooo    oo  ..  ..   ",
+"       oo  oo           ",
+"       oo  oo           ",
+"         oooo           ",
+"         oooo           ",
+"           oo           ",
+"           oo           ",
+"                        ",
+"                        "
+};

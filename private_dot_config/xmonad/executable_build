@@ -1,0 +1,14 @@
+#!/bin/sh -eu
+
+output="$1"
+
+output_dir="$(dirname "$output")"
+output_file="$(basename "$output")"
+
+cabal install \
+      --enable-executable-stripping \
+	  --enable-optimization=2 \
+	  --installdir="$output_dir" \
+	  --overwrite-policy=always
+
+ln -sf xmonad "$output"

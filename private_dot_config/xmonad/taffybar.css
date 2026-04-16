@@ -1,0 +1,18 @@
+@import url("../../.cache/wal/colors-waybar.css");
+
+.taffy-window * {
+    font-family: "NeoDunggeunmo", monospace;
+    font-size: 12pt;
+    color: @foreground;
+}
+
+.taffy-box {
+    padding: 15px;
+    background: alpha(@background, 0.75);
+}
+
+.contents {
+	padding: 2px;
+	transition: background-color .5s;
+	opacity: 1;
+}

@@ -1,3 +1,6 @@
 [submodule "nushell/.config/nushell/modules/opam.nu"]
 	path = nushell/.config/nushell/modules/opam.nu
 	url = https://github.com/RangHo/opam.nu
+[submodule "nushell/modules/opam.nu"]
+	path = dot_config/nushell/modules/opam.nu
+	url = https://github.com/RangHo/opam.nu

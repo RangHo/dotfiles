@@ -1,6 +1,0 @@
-cradle:
-  cabal:
-    - path: "./taffybar.hs"
-      component: "xmonad-rangho:exe:taffybar"
-    - path: "./xmonad.hs"
-      component: "xmonad-rangho:exe:xmonad"

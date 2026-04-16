@@ -1,3 +1,0 @@
-timeout 1800 '[ -e $XDG_CACHE_HOME/wal/wal ] && swaylock -f -i $(cat $XDG_CACHE_HOME/wal/wal) || swaylock -f'
-timeout 3600 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors'
-before-sleep 'playerctl pause; [ -e $XDG_CACHE_HOME/wal/wal ] && swaylock -f -i $(cat $XDG_CACHE_HOME/wal/wal) || swaylock -f'

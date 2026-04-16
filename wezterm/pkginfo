@@ -1,5 +1,0 @@
-#!/bin/sh
-
-depends native wezterm
-
-depends dotfile fontconfig

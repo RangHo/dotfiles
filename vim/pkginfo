@@ -1,8 +1,0 @@
-#!/bin/sh
-
-depends native vim
-
-post_install() {
-    # Install plugins
-    vim +PlugInstall
-}

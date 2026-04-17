@@ -8,9 +8,9 @@ if has('nvim')
     let s:data_directory     = stdpath('data') . '/'
     let s:autoload_directory = stdpath('data') . '/site/autoload/'
 else
-    let s:config_directory   = '~/.vim/'
-    let s:data_directory     = '~/.vim/'
-    let s:autoload_directory = '~/.vim/autoload/'
+    let s:config_directory   = fnamemodify(expand('$MYVIMRC'), ':p:h')
+    let s:data_directory     = fnamemodify(expand('$MYVIMRC'), ':p:h')
+    let s:autoload_directory = fnamemodify(expand('$MYVIMRC'), ':p:h') . '/autoload/'
 endif
 
 " POSIX the hell out of fish

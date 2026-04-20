@@ -12,4 +12,7 @@ LICENSE
 # Xmonad is on Void Linux (laptop) hosts.
 .config/xmonad
 .config/picom
+.Xresources
+.xinitrc
+.xsession
 {{- end }}

@@ -1,0 +1,15 @@
+README.md
+LICENSE
+
+{{- if ne .chezmoi.osRelease.id "arch" }}
+# Niri is on Arch Linux (desktop) hosts.
+.config/niri
+.config/swayidle
+.config/swaylock
+{{- end }}
+
+{{- if ne .chezmoi.osRelease.id "void" }}
+# Xmonad is on Void Linux (laptop) hosts.
+.config/xmonad
+.config/picom
+{{- end }}

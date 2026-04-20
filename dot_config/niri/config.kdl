@@ -241,7 +241,7 @@ binds {
     Mod+Q repeat=false { close-window; }
     Mod+W              { spawn "firefox"; }
     Mod+E              { spawn "nautilus"; }
-    Mod+R              { spawn "fuzzel"; }
+    Mod+R              { spawn "rofi" "-show" "drun"; }
     Mod+T              { spawn "emacsclient" "-c"; }
     // Mod+Y
     // Mod+U

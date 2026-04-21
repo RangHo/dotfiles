@@ -258,7 +258,7 @@ binds {
     // Mod+U
     // Mod+I
     // Mod+O
-    Mod+P              { spawn "swaylock" "-f"; }
+    Mod+P              { spawn-sh "$XDG_CONFIG_HOME/swaylock/run -f"; }
     // Mod+A
     // Mod+S
     Mod+Shift+S        { screenshot; }

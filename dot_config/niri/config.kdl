@@ -181,6 +181,9 @@ layout {
     }
 }
 
+// Include Noctalia themes.
+include "./noctalia.kdl"
+
 // No client-side decorations, please.
 prefer-no-csd
 
@@ -387,7 +390,7 @@ hotkey-overlay {
 // =====================================================================
 
 spawn-at-startup "ibus" "start" "--type" "wayland"
-spawn-at-startup "wal" "-R"
+spawn-at-startup "quickshell" "--config" "noctalia-shell"
 spawn-at-startup "swayidle"
 
 

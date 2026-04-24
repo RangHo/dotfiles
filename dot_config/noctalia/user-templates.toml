@@ -1,0 +1,5 @@
+[config]
+
+[templates.emacs-no-littering]
+input_path = "~/.config/noctalia/templates/emacs.el"
+output_path = "~/.config/emacs/var/themes"

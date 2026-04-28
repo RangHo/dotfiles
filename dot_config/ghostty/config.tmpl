@@ -15,5 +15,12 @@ window-padding-y = 15
 # Leave window decoration to window manager/compositor.
 window-decoration = none
 
-# Import wal theme if available.
+{{- if eq .chezmoi.osRelease.id "arch" }}
+# On Arch Linux (Wayland), use Noctalia's theme.
+theme = noctalia
+{{- else if eq .chezmoi.osRelease.id "void" }}
+# On Void Linux (X11), use Pywal-provided theme.
 config-file = ?~/.cache/wal/ghostty.conf
+{{- else }}
+# Do nothing on other systems.
+{{- end }}

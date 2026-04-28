@@ -337,7 +337,7 @@ There is a fancier version of dashboard.
     (dashboard-display-icons-p t)
     (dashboard-set-file-icons t)
     (dashboard-set-heading-icons t)
-    (dashboard-startup-banner (expand-file-name "images/gnu-emacs.png" user-emacs-directory))
+    (dashboard-startup-banner (expand-file-name "image/gnu-emacs.png" user-emacs-directory))
     (dashboard-image-banner-max-height 400)
     (dashboard-icon-type 'nerd-icons)
     :init
@@ -1468,6 +1468,9 @@ Snippets make life so much easier by creating repetitive boilerplate codes for m
 
 #+begin_src emacs-lisp
   (use-package yasnippet
+    :custom
+    (yas-snippet-dirs (list (expand-file-name
+                             (locate-user-emacs-file "snippet"))))
     :config
     (yas-global-mode +1))
 
@@ -1810,11 +1813,11 @@ Both of them suck, and Julia performs pretty well.
 #+begin_src emacs-lisp
   (defconst rangho/julia-language-server-project
     (expand-file-name
-     (locate-user-emacs-file (file-name-concat "language-servers" "julia"))))
+     (locate-user-emacs-file (file-name-concat "language-server" "julia"))))
 
   (defconst rangho/julia-language-server-script
     (expand-file-name
-     (locate-user-emacs-file (file-name-concat "scripts" "eglot-julia"))))
+     (locate-user-emacs-file (file-name-concat "script" "eglot-julia"))))
 
   (defun rangho/julia-mode-contact (interactive)
     "Produce the Eglot contact information for Julia language server.
@@ -2392,7 +2395,7 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
     :custom
     (copilot-install-dir (expand-file-name
                           (locate-user-emacs-file
-                           (file-name-concat "language-servers" "copilot")))))
+                           (file-name-concat "language-server" "copilot")))))
 #+end_src
 
 ** AI Assistance

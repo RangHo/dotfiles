@@ -1,95 +1,89 @@
-;;; noctalia-theme.el --- Theme using Template SCSS variables -*- lexical-binding: t -*-
+;;; noctalia-theme.el --- Custom theme for Noctalia-generated color scheme. -*- lexical-binding: t -*-
 
-;; Copyright (C) 2025
-
-;; Author: Generated (Improved)
-;; Version: 1.2
-;; Package-Requires: ((emacs "24.1"))
-;; Keywords: faces
+;; Copyright (C) 2026 RangHo Lee
 
 ;;; Commentary:
 
 ;; A theme using Template SCSS variables with quality of life improvements:
 ;; - Better source block distinction
 ;; - Improved text visibility when selected
-;; - Refined org-mode styling with hidden asterisks
 ;; - Enhanced contrast and readability
 ;; - Seamless integration of source blocks with consistent styling
 
 ;;; Code:
 
-(deftheme noctalia "Theme using Template variables with quality of life improvements.")
+(deftheme noctalia "Theme using Noctalia-generated color scheme.")
 
 ;; Define all the color variables (replaced by template processor)
 (let* ((bg "{{colors.background.default.hex}}")
-      (err "{{colors.error.default.hex}}")
-      (err-container "{{colors.error_container.default.hex}}")
-      (on-background "{{colors.on_background.default.hex}}")
-      (on-err "{{colors.on_error.default.hex}}")
-      (on-err-container "{{colors.on_error_container.default.hex}}")
-      (on-primary "{{colors.on_primary.default.hex}}")
-      (on-primary-container "{{colors.on_primary_container.default.hex}}")
-      (on-secondary "{{colors.on_secondary.default.hex}}")
-      (on-secondary-container "{{colors.on_secondary_container.default.hex}}")
-      (on-surface "{{colors.on_surface.default.hex}}")
-      (on-surface-variant "{{colors.on_surface_variant.default.hex}}")
-      (on-tertiary "{{colors.on_tertiary.default.hex}}")
-      (on-tertiary-container "{{colors.on_tertiary_container.default.hex}}")
-      (outline-color "{{colors.outline.default.hex}}")
-      (outline-variant "{{colors.outline_variant.default.hex}}")
-      (primary "{{colors.primary.default.hex}}")
-      (primary-container "{{colors.primary_container.default.hex}}")
-      (secondary "{{colors.secondary.default.hex}}")
-      (secondary-container "{{colors.secondary_container.default.hex}}")
-      (shadow "{{colors.shadow.default.hex}}")
-      (surface "{{colors.surface.default.hex}}")
-      (surface-container "{{colors.surface_container.default.hex}}")
-      (surface-container-high "{{colors.surface_container_high.default.hex}}")
-      (surface-container-highest "{{colors.surface_container_highest.default.hex}}")
-      (surface-container-low "{{colors.surface_container_low.default.hex}}")
-      (surface-container-lowest "{{colors.surface_container_lowest.default.hex}}")
-      (surface-variant "{{colors.surface_variant.default.hex}}")
-      (tertiary "{{colors.tertiary.default.hex}}")
-      (tertiary-container "{{colors.tertiary_container.default.hex}}")
-      ;; Map success colors to tertiary (as used in other templates)
-      (success "{{colors.tertiary.default.hex}}")
-      (on-success "{{colors.on_tertiary.default.hex}}")
-      (success-container "{{colors.tertiary_container.default.hex}}")
-      (on-success-container "{{colors.on_tertiary_container.default.hex}}")
-      ;; Map fixed colors to regular colors
-      (primary-fixed "{{colors.primary.default.hex}}")
-      (primary-fixed-dim "{{colors.primary_container.default.hex}}")
-      (secondary-fixed "{{colors.secondary.default.hex}}")
-      (secondary-fixed-dim "{{colors.secondary_container.default.hex}}")
-      (tertiary-fixed "{{colors.tertiary.default.hex}}")
-      (tertiary-fixed-dim "{{colors.tertiary_container.default.hex}}")
-      (on-primary-fixed "{{colors.on_primary.default.hex}}")
-      (on-primary-fixed-variant "{{colors.on_primary_container.default.hex}}")
-      (on-secondary-fixed "{{colors.on_secondary.default.hex}}")
-      (on-secondary-fixed-variant "{{colors.on_secondary_container.default.hex}}")
-      (on-tertiary-fixed "{{colors.on_tertiary.default.hex}}")
-      (on-tertiary-fixed-variant "{{colors.on_tertiary_container.default.hex}}")
-      ;; Map inverse colors to surface variants
-      (inverse-on-surface "{{colors.on_surface.default.hex}}")
-      (inverse-primary "{{colors.primary.default.hex}}")
-      (inverse-surface "{{colors.surface.default.hex}}")
-      ;; Map terminal colors (term0-term15) to available colors
-      (term0 "{{colors.surface.default.hex}}")
-      (term1 "{{colors.error.default.hex}}")
-      (term2 "{{colors.tertiary.default.hex}}")
-      (term3 "{{colors.secondary.default.hex}}")
-      (term4 "{{colors.primary.default.hex}}")
-      (term5 "{{colors.tertiary_container.default.hex}}")
-      (term6 "{{colors.secondary_container.default.hex}}")
-      (term7 "{{colors.on_surface.default.hex}}")
-      (term8 "{{colors.outline.default.hex}}")
-      (term9 "{{colors.error.default.hex}}")
-      (term10 "{{colors.tertiary.default.hex}}")
-      (term11 "{{colors.secondary.default.hex}}")
-      (term12 "{{colors.primary.default.hex}}")
-      (term13 "{{colors.tertiary_container.default.hex}}")
-      (term14 "{{colors.secondary_container.default.hex}}")
-      (term15 "{{colors.on_surface.default.hex}}"))
+       (err "{{colors.error.default.hex}}")
+       (err-container "{{colors.error_container.default.hex}}")
+       (on-background "{{colors.on_background.default.hex}}")
+       (on-err "{{colors.on_error.default.hex}}")
+       (on-err-container "{{colors.on_error_container.default.hex}}")
+       (on-primary "{{colors.on_primary.default.hex}}")
+       (on-primary-container "{{colors.on_primary_container.default.hex}}")
+       (on-secondary "{{colors.on_secondary.default.hex}}")
+       (on-secondary-container "{{colors.on_secondary_container.default.hex}}")
+       (on-surface "{{colors.on_surface.default.hex}}")
+       (on-surface-variant "{{colors.on_surface_variant.default.hex}}")
+       (on-tertiary "{{colors.on_tertiary.default.hex}}")
+       (on-tertiary-container "{{colors.on_tertiary_container.default.hex}}")
+       (outline-color "{{colors.outline.default.hex}}")
+       (outline-variant "{{colors.outline_variant.default.hex}}")
+       (primary "{{colors.primary.default.hex}}")
+       (primary-container "{{colors.primary_container.default.hex}}")
+       (secondary "{{colors.secondary.default.hex}}")
+       (secondary-container "{{colors.secondary_container.default.hex}}")
+       (shadow "{{colors.shadow.default.hex}}")
+       (surface "{{colors.surface.default.hex}}")
+       (surface-container "{{colors.surface_container.default.hex}}")
+       (surface-container-high "{{colors.surface_container_high.default.hex}}")
+       (surface-container-highest "{{colors.surface_container_highest.default.hex}}")
+       (surface-container-low "{{colors.surface_container_low.default.hex}}")
+       (surface-container-lowest "{{colors.surface_container_lowest.default.hex}}")
+       (surface-variant "{{colors.surface_variant.default.hex}}")
+       (tertiary "{{colors.tertiary.default.hex}}")
+       (tertiary-container "{{colors.tertiary_container.default.hex}}")
+       ;; Map success colors to tertiary (as used in other templates)
+       (success "{{colors.tertiary.default.hex}}")
+       (on-success "{{colors.on_tertiary.default.hex}}")
+       (success-container "{{colors.tertiary_container.default.hex}}")
+       (on-success-container "{{colors.on_tertiary_container.default.hex}}")
+       ;; Map fixed colors to regular colors
+       (primary-fixed "{{colors.primary.default.hex}}")
+       (primary-fixed-dim "{{colors.primary_container.default.hex}}")
+       (secondary-fixed "{{colors.secondary.default.hex}}")
+       (secondary-fixed-dim "{{colors.secondary_container.default.hex}}")
+       (tertiary-fixed "{{colors.tertiary.default.hex}}")
+       (tertiary-fixed-dim "{{colors.tertiary_container.default.hex}}")
+       (on-primary-fixed "{{colors.on_primary.default.hex}}")
+       (on-primary-fixed-variant "{{colors.on_primary_container.default.hex}}")
+       (on-secondary-fixed "{{colors.on_secondary.default.hex}}")
+       (on-secondary-fixed-variant "{{colors.on_secondary_container.default.hex}}")
+       (on-tertiary-fixed "{{colors.on_tertiary.default.hex}}")
+       (on-tertiary-fixed-variant "{{colors.on_tertiary_container.default.hex}}")
+       ;; Map inverse colors to surface variants
+       (inverse-on-surface "{{colors.on_surface.default.hex}}")
+       (inverse-primary "{{colors.primary.default.hex}}")
+       (inverse-surface "{{colors.surface.default.hex}}")
+       ;; Map terminal colors (term0-term15) to available colors
+       (term0 "{{colors.surface.default.hex}}")
+       (term1 "{{colors.error.default.hex}}")
+       (term2 "{{colors.tertiary.default.hex}}")
+       (term3 "{{colors.secondary.default.hex}}")
+       (term4 "{{colors.primary.default.hex}}")
+       (term5 "{{colors.tertiary_container.default.hex}}")
+       (term6 "{{colors.secondary_container.default.hex}}")
+       (term7 "{{colors.on_surface.default.hex}}")
+       (term8 "{{colors.outline.default.hex}}")
+       (term9 "{{colors.error.default.hex}}")
+       (term10 "{{colors.tertiary.default.hex}}")
+       (term11 "{{colors.secondary.default.hex}}")
+       (term12 "{{colors.primary.default.hex}}")
+       (term13 "{{colors.tertiary_container.default.hex}}")
+       (term14 "{{colors.secondary_container.default.hex}}")
+       (term15 "{{colors.on_surface.default.hex}}"))
 
   (custom-theme-set-faces
    'noctalia
@@ -337,24 +331,8 @@
    `(centaur-tabs-selected-modified ((t (:background ,surface-container-high :foreground ,tertiary :weight bold))))
    `(centaur-tabs-unselected-modified ((t (:background ,surface :foreground ,tertiary))))
    `(centaur-tabs-active-bar-face ((t (:background ,primary))))
-   
-   ;; Fixed-pitch faces
-   `(fixed-pitch ((t (:family "monospace"))))
-   `(fixed-pitch-serif ((t (:family "monospace serif"))))
-   
-   ;; Variable-pitch face
-   `(variable-pitch ((t (:family "sans serif"))))
    ))
 
-;; Add org-mode hooks for hiding leading stars
-(with-eval-after-load 'org
-  (setq org-hide-leading-stars t)
-  (setq org-startup-indented t))
-
-;;;###autoload
-(when load-file-name
-  (add-to-list 'custom-theme-load-path
-               (file-name-as-directory (file-name-directory load-file-name))))
-
 (provide-theme 'noctalia)
+(provide 'noctalia-theme)
 ;;; noctalia-theme.el ends here

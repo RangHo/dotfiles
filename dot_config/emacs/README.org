@@ -149,7 +149,6 @@ Let's address that first.
 ** Local Emacs Lisp Path
 There are some drop-in packges that are not separately available.
 (Most of them are stolen from [[https://emacswiki.org/][EmacsWiki]] or the mailing list.)
-Since ~no-littering~ creates a directory structure that looks like the [[https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard][Filesystem Hierarchy Standard]], let's add a new directory called =usr= there.
 
 #+begin_src emacs-lisp
   (when (version< emacs-version "31.1")
@@ -1810,7 +1809,7 @@ Both of them suck, and Julia performs pretty well.
 
 #+begin_src emacs-lisp
   (defconst rangho/julia-language-server-project
-    (no-littering-expand-var-file-name "eglot/servers/julia/"))
+    (expand-file-name "eglot-servers/julia/" user-emacs-directory))
 
   (defconst rangho/julia-language-server-script
     (expand-file-name "usr/bin/eglot-julia" user-emacs-directory))

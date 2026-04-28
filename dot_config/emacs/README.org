@@ -1217,6 +1217,11 @@ It's really good.
 
 #+begin_src emacs-lisp
   (use-package treemacs
+    :custom
+    (treemacs-persist-file (expand-file-name
+                            (locate-user-emacs-file (file-name-concat "treemacs" "persist"))))
+    (treemacs-last-error-persist-file (expand-file-name
+                                  (locate-user-emacs-file (file-name-concat "treemacs" "persist-at-last-error"))))
     :config
     (treemacs-follow-mode +1)
     (treemacs-filewatch-mode +1)

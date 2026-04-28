@@ -165,36 +165,36 @@ Since initialization process requires a lot of computation, we will keep that th
 Also, using the minibuffer will cause the GC threshold to increase, and Emacs will try to collect garbages when focus is lost.
 
 #+begin_src emacs-lisp
-  (defconst rangho/gc-cons-threshold
+  (defconst rangho--gc-cons-threshold
     (* 64 1024 1024)
     "The default value of `gc-cons-threshold'.")
 
-  (defconst rangho/gc-cons-percentage
+  (defconst rangho--gc-cons-percentage
     0.4
     "The default value of `gc-cons-percentage'.")
 
-  (defun rangho/set-excessive-gc ()
+  (defun rangho--set-excessive-gc ()
     "Set the garbage collector threshold for high-speed usage."
     (setq gc-cons-threshold most-positive-fixnum
           gc-cons-percentage 0.6))
 
-  (defun rangho/set-reasonable-gc ()
+  (defun rangho--set-reasonable-gc ()
     "Set the garbage collector threshold for normal usage."
-    (setq gc-cons-threshold rangho/gc-cons-threshold
-          gc-cons-percentage rangho/gc-cons-percentage))
+    (setq gc-cons-threshold rangho--gc-cons-threshold
+          gc-cons-percentage rangho--gc-cons-percentage))
 
-  (defun rangho/collect-garbage-on-focus-change ()
+  (defun rangho--collect-garbage-on-focus-change ()
     "Collect garbage when Emacs noticese a focus change event."
     (unless (frame-focus-state)
       (garbage-collect)))
 
-  (add-hook 'after-init-hook #'rangho/set-reasonable-gc)
+  (add-hook 'after-init-hook #'rangho--set-reasonable-gc)
 
-  (add-hook 'minibuffer-setup-hook #'rangho/set-excessive-gc)
-  (add-hook 'minibuffer-exit-hook #'rangho/set-reasonable-gc)
+  (add-hook 'minibuffer-setup-hook #'rangho--set-excessive-gc)
+  (add-hook 'minibuffer-exit-hook #'rangho--set-reasonable-gc)
 
   (add-function :after after-focus-change-function
-                #'rangho/collect-garbage-on-focus-change)
+                #'rangho--collect-garbage-on-focus-change)
 #+end_src
 
 ** History of Buffers and Commands
@@ -362,7 +362,7 @@ Here is a set of fonts I use.
   ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
   ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
 
-  (defconst rangho/fixed-font-alist
+  (defconst rangho--fixed-font-alist
     '((nil "hesalche" "semteulche"
            "Noto Sans Mono"
            "Cascadia Code" "Consolas" "Courier New"
@@ -384,7 +384,7 @@ Here is a set of fonts I use.
              "Segoe UI Emoji"))
     "List of fixed-pitch fonts, in order of preference.")
 
-  (defconst rangho/variable-font-alist
+  (defconst rangho--variable-font-alist
     '((nil "Noto Sans" "Noto Serif"
            "Segoe UI" "Arial"
            "sans-serif")
@@ -405,7 +405,7 @@ Here is a set of fonts I use.
              "Segoe UI Emoji"))
     "List of variable-pitch fonts, in order of preference.")
 
-  (defconst rangho/unicode-private-use-areas
+  (defconst rangho--unicode-private-use-areas
     '((#xe000 . #xf8ff) ; Private Use Area
       (#xf0000 . #xffffd) ; Supplementary Private Use Area-A
       (#x100000 . #x10fffd)) ; Supplementary Private Use Area-B
@@ -427,55 +427,55 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
 #+end_notes
 
 #+begin_src emacs-lisp
-  (defun rangho/font-available-p (font)
+  (defun rangho--font-available-p (font)
     "Check if the FONT is available."
     (if (listp font)
         ;; All fonts in the list must be found
-        (cl-every #'rangho/font-available-p font)
+        (cl-every #'rangho--font-available-p font)
       ;; Check if the font is available
       (find-font (font-spec :name font))))
 
-  (defun rangho/find-font-specs (alist charset)
+  (defun rangho--find-font-specs (alist charset)
     "Find a list of font specs for CHARSET in ALIST."
     (when-let* ((candidates (alist-get charset alist))
                 (found-fonts (cl-loop
                               for font in candidates
-                              when (rangho/font-available-p font)
+                              when (rangho--font-available-p font)
                               return (if (listp font) font (list font)))))
       (mapcar (apply-partially #'font-spec :name) found-fonts)))
 
-  (defun rangho/find-first-available-font (alist charset)
+  (defun rangho--find-first-available-font (alist charset)
     "Find the first available font for CHARSET in ALIST."
     (when-let ((candidates (alist-get charset alist)))
-      (cl-find-if #'rangho/font-available-p candidates)))
+      (cl-find-if #'rangho--font-available-p candidates)))
 
-  (defun rangho/set-fontset-fonts (fontset alist)
+  (defun rangho--set-fontset-fonts (fontset alist)
     "Set fonts in FONTSET using ALIST."
     (dolist (item alist)
-      (dolist (font (rangho/find-font-specs alist (car item)))
+      (dolist (font (rangho--find-font-specs alist (car item)))
         (set-fontset-font fontset (car item) font)))
-    (dolist (area rangho/unicode-private-use-areas)
-      (set-fontset-font fontset area (car (rangho/find-font-specs alist 'symbol)))))
+    (dolist (area rangho--unicode-private-use-areas)
+      (set-fontset-font fontset area (car (rangho--find-font-specs alist 'symbol)))))
 
-  (defun rangho/set-default-font ()
+  (defun rangho--set-default-font ()
     "Set the default font to use throughout Emacs."
     (interactive)
-    (let ((fixed-font (rangho/find-first-available-font rangho/fixed-font-alist nil))
-          (variable-font (rangho/find-first-available-font rangho/variable-font-alist nil)))
+    (let ((fixed-font (rangho--find-first-available-font rangho--fixed-font-alist nil))
+          (variable-font (rangho--find-first-available-font rangho--variable-font-alist nil)))
       ;; Default fontset
-      (rangho/set-fontset-fonts t rangho/fixed-font-alist)
+      (rangho--set-fontset-fonts t rangho--fixed-font-alist)
       ;; Fixed-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name fixed-font
                    :registry "fontset-fixed")))
-      (rangho/set-fontset-fonts "fontset-fixed" rangho/fixed-font-alist)
+      (rangho--set-fontset-fonts "fontset-fixed" rangho--fixed-font-alist)
       ;; Variable-pitch fontset
       (create-fontset-from-fontset-spec
        (font-xlfd-name
         (font-spec :name variable-font
                    :registry "fontset-variable")))
-      (rangho/set-fontset-fonts "fontset-variable" rangho/variable-font-alist)
+      (rangho--set-fontset-fonts "fontset-variable" rangho--variable-font-alist)
       ;; Frame-wide face attributes
       (set-face-attribute 'default nil
                           :family fixed-font
@@ -503,16 +503,16 @@ There are differnt ways to set these settings.
                  (lambda (frame)
                    (select-frame frame)
                    (if (display-graphic-p frame)
-                       (rangho/set-default-font)))))
+                       (rangho--set-default-font)))))
    ((display-graphic-p)
-    (rangho/set-default-font))
+    (rangho--set-default-font))
    (t nil))
 #+end_src
 
 Ligatures provide alternative combined glyphs for commonly used character combinations (such as operators).
 
 #+begin_src emacs-lisp
-  (defconst rangho/prog-mode-ligatures
+  (defconst rangho--prog-mode-ligatures
     '("--" "---" "==" "===" "!=" "!==" "=!="
       "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
       "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
@@ -530,7 +530,7 @@ Ligatures provide alternative combined glyphs for commonly used character combin
 
   (use-package ligature
     :config
-    (ligature-set-ligatures 'prog-mode rangho/prog-mode-ligatures)
+    (ligature-set-ligatures 'prog-mode rangho--prog-mode-ligatures)
     (global-ligature-mode +1))
 #+end_src
 
@@ -581,7 +581,7 @@ Load that if available; if not, pick a sensible colorscheme based on [[https://d
 Since ANSI color codes are bullshit, let's give them friendly names.
 
 #+begin_src emacs-lisp
-  (defvar rangho/color-name-alist
+  (defvar rangho--color-name-alist
     `((color/foreground      . ,wal/foreground)
       (color/background      . ,wal/background)
       (color/cursor          . ,wal/cursor)
@@ -609,7 +609,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
 #+begin_src emacs-lisp
   (require 'color)
 
-  (defvar rangho/color-shade-list
+  (defvar rangho--color-shade-list
     (number-sequence -50 50 1)
     "List of percentage values to lighten/darken the original colors.")
 
@@ -619,7 +619,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
           (/ (string-to-number (substring color 3 5) 16) 255.0)
           (/ (string-to-number (substring color 5) 16) 255.0)))
 
-  (defun rangho/add-color-luminance (color delta)
+  (defun rangho--add-color-luminance (color delta)
     "Return a new color from COLOR with the luminance adjusted by DELTA / 100."
     (let* ((rgb (color-hex-to-rgb color))
            (hsl (apply #'color-rgb-to-hsl rgb))
@@ -628,7 +628,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
            (new-rgb (apply #'color-hsl-to-rgb new-hsl)))
       (apply #'color-rgb-to-hex (nconc new-rgb '(2)))))
 
-  (defun rangho/light-theme-p (color-alist)
+  (defun rangho--light-theme-p (color-alist)
     "Return t if the colors in COLOR-ALIST looks like a light theme."
     (let* ((color-hex-to-luminance
             (lambda (hex)
@@ -641,7 +641,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
                      (cdr (assoc 'color/background color-alist)))))
       (< foreground-luminance background-luminance)))
 
-  (defun rangho/create-color-matrix-alist (color-alist shade-list)
+  (defun rangho--create-color-matrix-alist (color-alist shade-list)
     "Create a matrix of colors based on a COLOR-ALIST and SHADE-LIST.
 
     COLOR-ALIST is a list of cons cells where the car is a symbol, and the cdr is a
@@ -653,7 +653,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
     theme, it will either lighten or darken the colors so that it stands out more."
     (let* ((prefix-value
             (lambda (value)
-              (pcase (cons (rangho/light-theme-p color-alist)
+              (pcase (cons (rangho--light-theme-p color-alist)
                            (>= value 0))
                 (`(t . t)
                  ;; Making it lighter on light theme => diminishing
@@ -676,7 +676,7 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
               (cons (intern (concat
                              (symbol-name (car color))
                              (funcall prefix-value value)))
-                    (rangho/add-color-luminance (cdr color) value))))
+                    (rangho--add-color-luminance (cdr color) value))))
            (lighten-color-for-values
             (lambda (color)
               (mapcar (lambda (value)
@@ -688,9 +688,9 @@ We can automatically generate a new "color matrix" by mapping a list of shades.
       (append color-alist
               (funcall lighten-colors))))
 
-  (defvar rangho/color-matrix-alist
-    (rangho/create-color-matrix-alist rangho/color-name-alist
-                                      rangho/color-shade-list)
+  (defvar rangho--color-matrix-alist
+    (rangho--create-color-matrix-alist rangho--color-name-alist
+                                       rangho--color-shade-list)
     "Alist of colors with varying brightnesses.")
 #+end_src
 
@@ -701,7 +701,7 @@ This can be done by defining a theme.
 #+begin_src emacs-lisp
   (require 'let-alist)
 
-  (let-alist rangho/color-matrix-alist
+  (let-alist rangho--color-matrix-alist
     (custom-set-faces
      ;; Basic UI elements
      `(border                     ((t (:foreground ,.color/foreground+10))))
@@ -818,40 +818,40 @@ However, the default mode line isn't really fun.
 Let's customize that.
 
 #+begin_src emacs-lisp
-  (defvar rangho/selected-window
+  (defvar rangho--selected-window
     (frame-selected-window)
     "Currently selected window.")
 
-  (defun rangho/selected-window-active-p (&optional target)
+  (defun rangho--selected-window-active-p (&optional target)
     "Check if TARGET window is active."
-    (eq rangho/selected-window (or target (selected-window))))
+    (eq rangho--selected-window (or target (selected-window))))
 
-  (defun rangho/selected-window-graphic-p (&optional target)
+  (defun rangho--selected-window-graphic-p (&optional target)
     "Check if TARGET window's frame is graphical."
     (display-graphic-p (window-frame (or target (selected-window)))))
 
-  (defun rangho/set-selected-window (&rest _)
+  (defun rangho--set-selected-window (&rest _)
     "Update the selected window cache to a new one."
     (unless (minibuffer-window-active-p (frame-selected-window))
-      (setq rangho/selected-window (frame-selected-window))))
+      (setq rangho--selected-window (frame-selected-window))))
 
-  (add-to-list 'pre-redisplay-functions #'rangho/set-selected-window)
+  (add-to-list 'pre-redisplay-functions #'rangho--set-selected-window)
 
-  (defvar rangho/current-buffer-project
+  (defvar rangho--current-buffer-project
     (project-current)
     "Name of the current project, updated whenever active buffer changes.")
 
-  (defun rangho/update-buffer-project (_)
+  (defun rangho--update-buffer-project (_)
     "Update the current buffer's project name."
-    (setq rangho/current-buffer-project (project-current)))
+    (setq rangho--current-buffer-project (project-current)))
 
-  (add-to-list 'window-buffer-change-functions #'rangho/update-buffer-project)
+  (add-to-list 'window-buffer-change-functions #'rangho--update-buffer-project)
 #+end_src
 
-~rangho/mode-line-buffer-status~ indicates the current status of buffer.
+~rangho--mode-line-buffer-status~ indicates the current status of buffer.
 
 #+begin_src emacs-lisp
-  (defconst rangho/buffer-status-alist
+  (defconst rangho--buffer-status-alist
     `(("*" ; edited, yet to be saved
        ,(nerd-icons-faicon "nf-fa-plus_circle" :height 0.90 :v-adjust 0.10)
        :foreground "#19150c" :background "#f0c674")
@@ -863,10 +863,10 @@ Let's customize that.
        :foreground "#190c0c" :background "#cc6666"))
     "Alist of icons and faces to indicate the current status of the buffer.")
 
-  (defun rangho/mode-line-buffer-status ()
+  (defun rangho--mode-line-buffer-status ()
     "Modeline component that indicates the current status of buffer."
     (let* ((current-status (assoc (format-mode-line "%*")
-                                  rangho/buffer-status-alist))
+                                  rangho--buffer-status-alist))
            (status-icon (cadr current-status))
            (status-prop (cddr current-status))
            (status-fore (plist-get status-prop :foreground))
@@ -882,7 +882,7 @@ Let's customize that.
       status-str))
 #+end_src
 
-~rangho/mode-line-scroll-bar~ shows where I am in a file, but with [[https://www.nyan.cat/][Nyan Cat]]!
+~rangho--mode-line-scroll-bar~ shows where I am in a file, but with [[https://www.nyan.cat/][Nyan Cat]]!
 
 #+begin_src emacs-lisp
   (use-package nyan-mode
@@ -892,7 +892,7 @@ Let's customize that.
     (nyan-animate-nyancat t)
     (nyan-wavy-trail t))
 
-  (defun rangho/mode-line-scroll-bar ()
+  (defun rangho--mode-line-scroll-bar ()
     "Modeline component that displays the current position in a file, but nyan cat!"
     (let* ((nyan-cat-string (concat " " (nyan-create) " "))
            (nyan-cat-length (length nyan-cat-string))
@@ -907,10 +907,10 @@ Let's customize that.
         nyan-cat-string)))
 #+end_src
 
-~rangho/mode-line-buffer-description~ shows what the current buffer is in plain English.
+~rangho--mode-line-buffer-description~ shows what the current buffer is in plain English.
 
 #+begin_src emacs-lisp
-  (defun rangho/mode-line-buffer-description ()
+  (defun rangho--mode-line-buffer-description ()
     "Modeline component that shows what file is being edited.
 
    Basically, it displays the current information in the following form:
@@ -927,12 +927,12 @@ Let's customize that.
      (buffer-name)
      " "
      ;; If project is available show that as well
-     (when (and (buffer-file-name) rangho/current-buffer-project)
+     (when (and (buffer-file-name) rangho--current-buffer-project)
        (concat
         "in "
         (nerd-icons-octicon "nf-oct-repo" :height 0.90 :v-adjust 0.0)
         " "
-        (file-name-nondirectory (directory-file-name (project-root rangho/current-buffer-project)))
+        (file-name-nondirectory (directory-file-name (project-root rangho--current-buffer-project)))
         " "))
      ;; Show the branch name, if available
      (when nil
@@ -952,21 +952,21 @@ Let's customize that.
      " "))
 #+end_src
 
-~rangho/mode-line-position~ shows the =LN:COL= pair.
+~rangho--mode-line-position~ shows the =LN:COL= pair.
 Here, the [[https://www.emacswiki.org/emacs/PercentConstruct][%-constructs]] are evaluated when actually drawing the mode line.
 Therefore, the length of the position will be based on the raw string, not the actual line numbers.
 
 #+begin_src emacs-lisp
-  (defun rangho/mode-line-position ()
+  (defun rangho--mode-line-position ()
     "Modeline component that displays the current line and column number."
     (propertize " %4l:%2c "
                 'face '(:background "#202124" :foreground "#e8eaed" :box (:color "#202124"))))
 #+end_src
 
-~rangho/mode-line-evil-state~ shows the current state that Evil is in.
+~rangho--mode-line-evil-state~ shows the current state that Evil is in.
 
 #+begin_src emacs-lisp
-  (defconst rangho/evil-state-alist
+  (defconst rangho--evil-state-alist
     '((emacs "EMACS" :background "#d3d0c8" :foreground "#737373")
       (normal "NORMAL" :background "#99cc99" :foreground "#394d39")
       (insert "INSERT" :background "#6699cc" :foreground "#26394d")
@@ -975,11 +975,11 @@ Therefore, the length of the position will be based on the raw string, not the a
       (hades "HADES" :background "#cc99cc" :foreground "#4d394d"))
     "List of texts and colors that represent the current evil status.")
 
-  (defun rangho/mode-line-evil-state ()
+  (defun rangho--mode-line-evil-state ()
     "Modeline component that displays the current state of Evil mode."
-    (when (rangho/selected-window-active-p (selected-window))
+    (when (rangho--selected-window-active-p (selected-window))
       (let* ((current-state (assq evil-state
-                                  rangho/evil-state-alist))
+                                  rangho--evil-state-alist))
              (state-text (cadr current-state))
              (state-prop (cddr current-state)))
         (funcall 'propertize
@@ -992,7 +992,7 @@ Components are complete.
 Let's apply it.
 
 #+begin_src emacs-lisp
-  (defun rangho/render-mode-line (lhs rhs)
+  (defun rangho--render-mode-line (lhs rhs)
     "Render the mode line with LHS and RHS components."
     (let* ((lhs-rendered (seq-reduce (lambda (acc fun)
                                        (concat acc (funcall fun)))
@@ -1019,14 +1019,14 @@ Let's apply it.
               rhs-rendered)))
 
   (setq-default mode-line-format
-                '(:eval (rangho/render-mode-line
+                '(:eval (rangho--render-mode-line
                          (list
-                          #'rangho/mode-line-buffer-status
-                          #'rangho/mode-line-scroll-bar
-                          #'rangho/mode-line-buffer-description)
+                          #'rangho--mode-line-buffer-status
+                          #'rangho--mode-line-scroll-bar
+                          #'rangho--mode-line-buffer-description)
                          (list
-                          #'rangho/mode-line-position
-                          #'rangho/mode-line-evil-state))))
+                          #'rangho--mode-line-position
+                          #'rangho--mode-line-evil-state))))
 #+end_src
 
 * Keybindings
@@ -1221,7 +1221,7 @@ It's really good.
     (treemacs-persist-file (expand-file-name
                             (locate-user-emacs-file (file-name-concat "treemacs" "persist"))))
     (treemacs-last-error-persist-file (expand-file-name
-                                  (locate-user-emacs-file (file-name-concat "treemacs" "persist-at-last-error"))))
+                                       (locate-user-emacs-file (file-name-concat "treemacs" "persist-at-last-error"))))
     :config
     (treemacs-follow-mode +1)
     (treemacs-filewatch-mode +1)
@@ -1393,7 +1393,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
 ~corfu~, short for COmpletion in Region FUnction, aims to provide nice UI using child frames.
 
 #+begin_src emacs-lisp
-  (defun rangho/enable-corfu-in-minibuffer ()
+  (defun rangho--enable-corfu-in-minibuffer ()
     "Enable `corfu-mode' in the minibuffer, if supported."
     (when (local-variable-p 'completion-at-point-functions)
       (setq-local corfu-auto nil
@@ -1402,7 +1402,7 @@ One is *in-buffer completions*, and the other is *minibuffer completions*.
       (corfu-mode +1)))
 
   (use-package corfu
-    :hook (minibuffer-setup . rangho/enable-corfu-in-minibuffer)
+    :hook (minibuffer-setup . rangho--enable-corfu-in-minibuffer)
     :custom
     (corfu-auto t)
     (corfu-cycle t)
@@ -1666,7 +1666,7 @@ Emacs doesn't come with support for build systems, except for Makefile.
 We can add support for =clang-format= formatter with a bit of RegExp magic.
 
 #+begin_src emacs-lisp
-  (defun rangho/get-clang-format-item (config-string key &optional default)
+  (defun rangho--get-clang-format-item (config-string key &optional default)
     "Extract the value of KEY from `.clang-format' file's content provided as CONFIG-STRING."
     (let ((match-result (s-match (concat "^" key ":[ \t]*\\([a-zA-Z0-9]+\\)") config-string)))
       (if match-result
@@ -1816,38 +1816,38 @@ If =fourmolu= binary is available, integrate it.
 Both of them suck, and Julia performs pretty well.
 
 #+begin_src emacs-lisp
-  (defconst rangho/julia-language-server-project
+  (defconst rangho--julia-language-server-project
     (expand-file-name
      (locate-user-emacs-file (file-name-concat "language-server" "julia"))))
 
-  (defconst rangho/julia-language-server-script
+  (defconst rangho--julia-language-server-script
     (expand-file-name
      (locate-user-emacs-file (file-name-concat "script" "eglot-julia"))))
 
-  (defun rangho/julia-mode-contact (interactive)
+  (defun rangho--julia-mode-contact (interactive)
     "Produce the Eglot contact information for Julia language server.
   Ensure that Julia language server is installed when called with INTERACTIVE."
     ;; Make sure that the Julia project directory is available
-    (unless (file-exists-p rangho/julia-language-server-project)
-      (make-directory rangho/julia-language-server-project t))
+    (unless (file-exists-p rangho--julia-language-server-project)
+      (make-directory rangho--julia-language-server-project t))
     (when interactive
       (unless (executable-find "julia")
         (user-error "Julia is not installed"))
       (process-file "julia" nil t nil
                     "--startup-file=no"
-                    (concat "--project=" rangho/julia-language-server-project)
-                    rangho/julia-language-server-script))
+                    (concat "--project=" rangho--julia-language-server-project)
+                    rangho--julia-language-server-script))
     ;; Produce the contact information
     (list (executable-find "julia")
           "--startup-file=no"
-          (concat "--project=" rangho/julia-language-server-project)
-          rangho/julia-language-server-script
+          (concat "--project=" rangho--julia-language-server-project)
+          rangho--julia-language-server-script
           (file-name-directory (buffer-file-name))))
 
   (use-package julia-mode
     :init
     (add-to-list 'eglot-server-programs
-                 '(julia-mode . rangho/julia-mode-contact)))
+                 '(julia-mode . rangho--julia-mode-contact)))
 #+end_src
 
 ** KDL
@@ -2114,18 +2114,18 @@ Better than Python.
 Rust is a modern system programming language that ensures memory safety by language design.
 
 #+begin_src emacs-lisp
-  (defun rangho/add-rust-mode-before-save-hook ()
+  (defun rangho--add-rust-mode-before-save-hook ()
     "Add a hook to format Rust code before saving."
     (add-hook 'before-save-hook #'eglot-format-buffer nil t))
 
   (use-package rust-mode
     :unless (featurep 'treesit)
-    :hook (rust-mode . rangho/add-rust-mode-before-save-hook))
+    :hook (rust-mode . rangho--add-rust-mode-before-save-hook))
 
   (use-package rust-ts-mode
     :when (featurep 'treesit)
     :ensure nil
-    :hook (rust-ts-mode . rangho/add-rust-mode-before-save-hook)
+    :hook (rust-ts-mode . rangho--add-rust-mode-before-save-hook)
     :init
     (add-to-list 'treesit-language-source-alist
                  '(rust "https://github.com/tree-sitter/tree-sitter-rust"))
@@ -2145,7 +2145,7 @@ Swift is to Objective-C as Kotlin is to Java, on Apple devices.
 Terraform is a cloud provisioning software from Hashicorp.
 
 #+begin_src emacs-lisp
-  (defun rangho/terraform-mode-contact (interactive)
+  (defun rangho--terraform-mode-contact (interactive)
     "Produce the Eglot contact information for Terraform language server.
   Ensure that Terraform language server is installed when called with INTERACTIVE."
     (let ((lsp-server (or (executable-find "terraform-ls")
@@ -2158,7 +2158,7 @@ Terraform is a cloud provisioning software from Hashicorp.
   (use-package terraform-mode
     :init
     (add-to-list 'eglot-server-programs
-                 '(terraform-mode . rangho/terraform-mode-contact)))
+                 '(terraform-mode . rangho--terraform-mode-contact)))
 #+end_src
 
 ** TeX
@@ -2300,14 +2300,14 @@ Web-mode integrates all web-related languages into a single package nicely.
 It primarily targets HTML, but it also supports other HTMLx templates.
 
 #+begin_src emacs-lisp
-  (defconst rangho/web-mode-server-programs
+  (defconst rangho--web-mode-server-programs
     '(("php" . ("phpactor" "language-server"))
       ("svelte" . ("svelteserver" "--stdio")))
     "Alist of language servers for `web-mode'.")
 
-  (defun rangho/web-mode-contact (_)
+  (defun rangho--web-mode-contact (_)
     "Return the language server program for the current buffer."
-    (if-let ((contact (assoc web-mode-engine rangho/web-mode-server-programs)))
+    (if-let ((contact (assoc web-mode-engine rangho--web-mode-server-programs)))
         (cdr contact)
       '("echo" "No language server available")))
 
@@ -2323,7 +2323,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
     (web-mode-enable-auto-quoting nil)
     :init
     (add-to-list 'eglot-server-programs
-                 '(web-mode . rangho/web-mode-contact)))
+                 '(web-mode . rangho--web-mode-contact)))
 #+end_src
 
 ** Why3

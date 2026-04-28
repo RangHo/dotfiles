@@ -4,6 +4,7 @@ LICENSE
 {{- if ne .chezmoi.osRelease.id "arch" }}
 # Niri is on Arch Linux (desktop) hosts.
 .config/niri
+.config/noctalia
 .config/swayidle
 .config/swaylock
 {{- end }}
@@ -12,6 +13,9 @@ LICENSE
 # Xmonad is on Void Linux (laptop) hosts.
 .config/xmonad
 .config/picom
+.config/dunst
+.config/rofi
+.config/wal
 .Xresources
 .xinitrc
 .xsession

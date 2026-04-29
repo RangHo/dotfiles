@@ -162,9 +162,6 @@ layout {
 
     border {
         width 2
-        active-gradient from="#e5989b" to="#ffb4a2" angle=45 relative-to="workspace-view" in="oklch longer hue"
-        inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
-        urgent-gradient from="#9b0000" to="#d90429" angle=45 relative-to="workspace-view"
     }
 
     shadow {
@@ -173,7 +170,6 @@ layout {
         softness 30
         spread 5
         offset x=5 y=5
-        color "#0007"
     }
 
     tab-indicator {
@@ -255,7 +251,7 @@ binds {
     Mod+Q repeat=false { close-window; }
     Mod+W              { spawn "firefox"; }
     Mod+E              { spawn "nautilus"; }
-    Mod+R              { spawn "rofi" "-show" "drun"; }
+    Mod+R              { spawn "quickshell" "--config" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
     Mod+T              { spawn "emacsclient" "-c"; }
     // Mod+Y
     // Mod+U
@@ -404,4 +400,11 @@ environment {
 
     // Enable Wayland support in GTK and Qt applications.
     QT_QPA_PLATFORM "wayland"
+}
+
+// =====================================================================
+// Debug options.
+// =====================================================================
+debug {
+    honor-xdg-activation-with-invalid-serial
 }

@@ -2,4 +2,4 @@
 
 [templates.emacs]
 input_path = "~/.config/noctalia/templates/emacs.el"
-output_path = "~/.config/emacs/theme/noctalia-theme.el"
+output_path = "~/.config/emacs/etc/themes/noctalia-theme.el"

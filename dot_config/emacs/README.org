@@ -1275,11 +1275,6 @@ It's really good.
 
 #+begin_src emacs-lisp
   (use-package treemacs
-    :custom
-    (treemacs-persist-file (expand-file-name
-                            (locate-user-emacs-file (file-name-concat "treemacs" "persist"))))
-    (treemacs-last-error-persist-file (expand-file-name
-                                       (locate-user-emacs-file (file-name-concat "treemacs" "persist-at-last-error"))))
     :config
     (treemacs-follow-mode +1)
     (treemacs-filewatch-mode +1)
@@ -1531,9 +1526,6 @@ Snippets make life so much easier by creating repetitive boilerplate codes for m
 
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :custom
-    (yas-snippet-dirs (list (expand-file-name
-                             (locate-user-emacs-file "snippet"))))
     :config
     (yas-global-mode +1))
 
@@ -1879,7 +1871,7 @@ Both of them suck, and Julia performs pretty well.
 
   (defconst rangho--julia-language-server-script
     (expand-file-name
-     (locate-user-emacs-file (file-name-concat "script" "eglot-julia"))))
+     (locate-user-emacs-file (file-name-concat "usr" "bin" "eglot-julia"))))
 
   (defun rangho--julia-mode-contact (interactive)
     "Produce the Eglot contact information for Julia language server.
@@ -2453,11 +2445,7 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
            ("<tab>" . 'copilot-accept-completion)
            ("M-f" . 'copilot-accept-completion-by-word)
            ("M-<return>" . 'copilot-accept-completion-by-line))
-    :hook (prog-mode)
-    :custom
-    (copilot-install-dir (expand-file-name
-                          (locate-user-emacs-file
-                           (file-name-concat "language-server" "copilot")))))
+    :hook (prog-mode))
 #+end_src
 
 ** AI Assistance

@@ -5,8 +5,6 @@ LICENSE
 # Niri is on Arch Linux (desktop) hosts.
 .config/niri
 .config/noctalia
-.config/swayidle
-.config/swaylock
 {{- end }}
 
 {{- if ne .chezmoi.osRelease.id "void" }}

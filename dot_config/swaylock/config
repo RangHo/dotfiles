@@ -1,8 +1,0 @@
-ignore-empty-password
-show-failed-attempts
-
-scaling=fill
-
-# Indicator settings.
-indicator-radius=50
-indicator-thickness=15

@@ -257,7 +257,7 @@ binds {
     // Mod+U
     // Mod+I
     // Mod+O
-    Mod+P              { spawn-sh "$XDG_CONFIG_HOME/swaylock/run -f"; }
+    Mod+P              { spawn "quickshell" "--config" "noctalia-shell" "ipc" "call" "lockScreen" "lock"; }
     // Mod+A
     // Mod+S
     Mod+Shift+S        { screenshot; }
@@ -387,7 +387,6 @@ hotkey-overlay {
 
 spawn-at-startup "ibus" "start" "--type" "wayland"
 spawn-at-startup "quickshell" "--config" "noctalia-shell"
-spawn-at-startup "swayidle"
 
 
 // =====================================================================

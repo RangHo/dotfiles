@@ -5,7 +5,62 @@ This document describes and configures my Emacs instance.
 While most of the configurations are available in this document, there are couple essential settings in the =early-init.el= file.
 Most of them are load- and performance-related options.
 
-* Constants
+* Package Manager
+[[https://github.com/progfolio/elpaca][Elpaca]] is great.
+It supports parallel installation, and installing from Git repositories directly.
+Let's bootstrap the thing.
+
+#+begin_src emacs-lisp
+  (defvar elpaca-installer-version 0.12)
+  (defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
+  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+  (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
+  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                                :ref nil :depth 1 :inherit ignore
+                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                                :build (:not elpaca-activate)))
+  (let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
+         (build (expand-file-name "elpaca/" elpaca-builds-directory))
+         (order (cdr elpaca-order))
+         (default-directory repo))
+    (add-to-list 'load-path (if (file-exists-p build) build repo))
+    (unless (file-exists-p repo)
+      (make-directory repo t)
+      (when (<= emacs-major-version 28) (require 'subr-x))
+      (condition-case-unless-debug err
+          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                    ,@(when-let* ((depth (plist-get order :depth)))
+                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                    ,(plist-get order :repo) ,repo))))
+                    ((zerop (call-process "git" nil buffer t "checkout"
+                                          (or (plist-get order :ref) "--"))))
+                    (emacs (concat invocation-directory invocation-name))
+                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                    ((require 'elpaca))
+                    ((elpaca-generate-autoloads "elpaca" repo)))
+              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+            (error "%s" (with-current-buffer buffer (buffer-string))))
+        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+    (unless (require 'elpaca-autoloads nil t)
+      (require 'elpaca)
+      (elpaca-generate-autoloads "elpaca" repo)
+      (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
+  (add-hook 'after-init-hook #'elpaca-process-queues)
+  (elpaca `(,@elpaca-order))
+#+end_src
+
+Replace ~use-package~ with ~elpaca-use-package~.
+
+#+begin_src emacs-lisp
+  (elpaca elpaca-use-package
+    (elpaca-use-package-mode +1)
+    (setq use-package-always-ensure t))
+  (elpaca-wait)
+#+end_src
+
+* Constants and Environments
 These are some constants that are used throughout the configuration.
 
 ** Name and Email
@@ -64,7 +119,7 @@ These constants resolve to user directories akin to the XDG Base Directory speci
     "Per-user cache directory.")
 #+end_src
 
-* Default Shell
+** Default Shell
 I use different shells on different systems, and Emacs seems to work the best when combined with POSIX-compliant shells.
 Let's fix the shell to ~/bin/sh~ if on a supported platform.
 
@@ -72,65 +127,6 @@ Let's fix the shell to ~/bin/sh~ if on a supported platform.
   (unless (eq system-type 'windows-nt)
     (setq shell-file-name "/bin/sh"))
 #+end_src
-
-* Package Manager
-[[https://github.com/progfolio/elpaca][Elpaca]] is great.
-It supports parallel installation, and installing from Git repositories directly.
-Let's bootstrap the thing.
-
-#+begin_src emacs-lisp
-  (defvar elpaca-installer-version 0.12)
-  (defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
-  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-  (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
-  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil :depth 1 :inherit ignore
-                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                                :build (:not elpaca-activate)))
-  (let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
-         (build (expand-file-name "elpaca/" elpaca-builds-directory))
-         (order (cdr elpaca-order))
-         (default-directory repo))
-    (add-to-list 'load-path (if (file-exists-p build) build repo))
-    (unless (file-exists-p repo)
-      (make-directory repo t)
-      (when (<= emacs-major-version 28) (require 'subr-x))
-      (condition-case-unless-debug err
-          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                    ,@(when-let* ((depth (plist-get order :depth)))
-                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                    ,(plist-get order :repo) ,repo))))
-                    ((zerop (call-process "git" nil buffer t "checkout"
-                                          (or (plist-get order :ref) "--"))))
-                    (emacs (concat invocation-directory invocation-name))
-                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                    ((require 'elpaca))
-                    ((elpaca-generate-autoloads "elpaca" repo)))
-              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-            (error "%s" (with-current-buffer buffer (buffer-string))))
-        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-    (unless (require 'elpaca-autoloads nil t)
-      (require 'elpaca)
-      (elpaca-generate-autoloads "elpaca" repo)
-      (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
-  (add-hook 'after-init-hook #'elpaca-process-queues)
-  (elpaca `(,@elpaca-order))
-#+end_src
-
-Replace ~use-package~ with ~elpaca-use-package~.
-
-#+begin_src emacs-lisp
-  (elpaca elpaca-use-package
-    (elpaca-use-package-mode +1)
-    (setq use-package-always-ensure t))
-  (elpaca-wait)
-#+end_src
-
-* Environments
-Some external environments are managed by utilities outside of Emacs.
-We need to integrate these utilities.
 
 ** Mise Version Manager
 [[https://mise.jdx.dev/][Mise]] is a "unified" version manager that can install multiple versions of various utilities and compilers.

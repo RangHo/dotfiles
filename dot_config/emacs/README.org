@@ -5,10 +5,55 @@ This document describes and configures my Emacs instance.
 While most of the configurations are available in this document, there are couple essential settings in the =early-init.el= file.
 Most of them are load- and performance-related options.
 
-* Package Manager
+* Emacs Initialization
+Before loading any other configuration, 
+
+** Garbage Collection
+Emacs has a tiny GC threshold.
+It may have been useful some 15 years ago, but it is fair to increase the size for modern computers.
+
+Before running this script, the ~early-init.el~ file should have the threshold increased to its maximum.
+Since initialization process requires a lot of computation, we will keep that threshold, and change it once initialization is over.
+
+Also, using the minibuffer will cause the GC threshold to increase, and Emacs will try to collect garbages when focus is lost.
+
+#+begin_src emacs-lisp
+  (defconst rangho--gc-cons-threshold
+    (* 64 1024 1024)
+    "The default value of `gc-cons-threshold'.")
+
+  (defconst rangho--gc-cons-percentage
+    0.4
+    "The default value of `gc-cons-percentage'.")
+
+  (defun rangho--set-excessive-gc ()
+    "Set the garbage collector threshold for high-speed usage."
+    (setq gc-cons-threshold most-positive-fixnum
+          gc-cons-percentage 0.6))
+
+  (defun rangho--set-reasonable-gc ()
+    "Set the garbage collector threshold for normal usage."
+    (setq gc-cons-threshold rangho--gc-cons-threshold
+          gc-cons-percentage rangho--gc-cons-percentage))
+
+  (defun rangho--collect-garbage-on-focus-change ()
+    "Collect garbage when Emacs noticese a focus change event."
+    (unless (frame-focus-state)
+      (garbage-collect)))
+
+  (add-hook 'after-init-hook #'rangho--set-reasonable-gc)
+
+  (add-hook 'minibuffer-setup-hook #'rangho--set-excessive-gc)
+  (add-hook 'minibuffer-exit-hook #'rangho--set-reasonable-gc)
+
+  (add-function :after after-focus-change-function
+                #'rangho--collect-garbage-on-focus-change)
+#+end_src
+
+** Package Manager
 [[https://github.com/progfolio/elpaca][Elpaca]] is great.
 It supports parallel installation, and installing from Git repositories directly.
-Let's bootstrap the thing.
+Let's bootstrap this thing.
 
 #+begin_src emacs-lisp
   (defvar elpaca-installer-version 0.12)
@@ -58,6 +103,88 @@ Replace ~use-package~ with ~elpaca-use-package~.
     (elpaca-use-package-mode +1)
     (setq use-package-always-ensure t))
   (elpaca-wait)
+#+end_src
+
+** Do Not Litter!
+Packages tend to do /whatever/ they want in the ~user-emacs-directory~, and it makes things harder for me to manage what to persist or not.
+Let's address that.
+
+First, define an extended helper function.
+
+#+begin_src emacs-lisp
+  (defvar no-littering-usr-directory
+    (expand-file-name (convert-standard-filename "usr/") user-emacs-directory)
+    "The directory where users place their own files.
+  This variable has to be set before `no-littering' is loaded.")
+
+  (defun no-littering-expand-usr-file-name (file)
+    "Expand filename FILE relative to `no-littering-usr-directory'."
+    (expand-file-name (convert-standard-filename file)
+                      no-littering-usr-directory))
+#+end_src
+
+Then, make sure that my idea of "no littering" is correctly reflected.
+
+#+begin_src emacs-lisp
+  (defun rangho--no-littering-theme-custom ()
+    "Theme the Emacs customization feature."
+    (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+    (when (file-exists-p custom-file)
+      (load custom-file)))
+
+  (defun rangho--no-littering-theme-custom-themes ()
+    "Theme the Emacs custom theme location."
+    (setq custom-theme-directory (no-littering-expand-etc-file-name "themes/")))
+
+  (defun rangho--no-littering-theme-eln-cache ()
+    "Theme the Emacs native compilation cache.
+
+    This function will move the littered eln-cache directory to the no-littering directory."
+    (let ((old-eln-cache (expand-file-name "eln-cache/" user-emacs-directory))
+          (new-eln-cache (no-littering-expand-var-file-name "eln-cache/")))
+      ;; Set the new eln-cache directory
+      (startup-redirect-eln-cache new-eln-cache)
+      ;; Move the contents of the old eln-cache directory to the new eln-cache directory
+      (when (file-exists-p old-eln-cache)
+        (unless (file-exists-p new-eln-cache)
+          (make-directory new-eln-cache t))
+        (dolist (file (directory-files old-eln-cache t))
+          (when (file-regular-p file)
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-eln-cache) t))))
+      ;; Delete the old eln-cache directory
+      (delete-directory old-eln-cache t)))
+
+  (defun rangho--no-littering-theme-load-path ()
+    "Theme the Emacs load path."
+    (add-to-list 'load-path (no-littering-expand-usr-file-name "lib/")))
+
+  (defun rangho--no-littering-theme-treesit ()
+    "Theme the Emacs tree-sitter library.
+
+  This function will move the littered tree-sitter directory to the no-littering directory."
+    (let ((old-tree-sitter (expand-file-name "tree-sitter/" user-emacs-directory))
+          (new-tree-sitter (no-littering-expand-var-file-name "tree-sitter/")))
+      ;; Set the new tree-sitter directory
+      (setq treesit-extra-load-path (list new-tree-sitter))
+      ;; Move the contents of the old tree-sitter directory to the new tree-sitter directory
+      (when (file-exists-p old-tree-sitter)
+        (unless (file-exists-p new-tree-sitter)
+          (make-directory new-tree-sitter t))
+        (dolist (file (directory-files old-tree-sitter t))
+          (when (file-regular-p file)
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-tree-sitter) t))))
+      ;; Delete the old tree-sitter directory
+      (delete-directory old-tree-sitter t)))
+
+  (use-package no-littering
+    :ensure (:wait t) ; packages installed afterwards should be themed correctly
+    :config
+    (no-littering-theme-backups)
+    (rangho--no-littering-theme-custom)
+    (rangho--no-littering-theme-custom-themes)
+    (rangho--no-littering-theme-eln-cache)
+    (rangho--no-littering-theme-load-path)
+    (rangho--no-littering-theme-treesit))
 #+end_src
 
 * Constants and Environments
@@ -138,133 +265,29 @@ If a binary called =mise= is available, load the 3rd-party Emacs integration pac
     :hook (after-init . global-mise-mode))
 #+end_src
 
-* Emacs Behavior Modification
-Default Emacs has quite a lot of quirks.
-Let's address that first.
+* Built-in Settings
+This section contains modifications of built-in functionalities of Emacs.
 
-** Do Not Litter!
-A lot of Emacs packages pollute ~user-emacs-directory~ by creating files in there.
-[[https://github.com/emacscollective/no-littering][no-littering]] package addresses this by modifying internal variables that packages use to determine where to install things.
+** Override Default Packages
+Some packages require newer versions of built-in packages.
+Using ~elpaca~ will pull the entire Emacs codebase which will cost around 2 GiB per package.
+For these, we're better off manually downloading tarballs from ELPA.
 
-Elpaca will wait after this section to ensure that this package is properly installed and running.
+** Startup Items
+Disable some startup routines to make Emacs cleaner.
 
 #+begin_src emacs-lisp
-  (defun rangho--no-littering-theme-custom ()
-    "Theme the Emacs customization feature."
-    (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
-    (when (file-exists-p custom-file)
-      (load custom-file)))
-
-  (defun rangho--no-littering-theme-eln-cache ()
-    "Theme the Emacs native compilation cache.
-
-    This function will move the littered eln-cache directory to the no-littering directory."
-    (let ((old-eln-cache (expand-file-name "eln-cache/" user-emacs-directory))
-          (new-eln-cache (no-littering-expand-var-file-name "eln-cache/")))
-      ;; Set the new eln-cache directory
-      (startup-redirect-eln-cache new-eln-cache)
-      ;; Move the contents of the old eln-cache directory to the new eln-cache directory
-      (when (file-exists-p old-eln-cache)
-        (unless (file-exists-p new-eln-cache)
-          (make-directory new-eln-cache t))
-        (dolist (file (directory-files old-eln-cache t))
-          (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-eln-cache) t))))
-      ;; Delete the old eln-cache directory
-      (delete-directory old-eln-cache t)))
-
-  (defun rangho--no-littering-theme-treesit ()
-    "Theme the Emacs tree-sitter library.
-
-  This function will move the littered tree-sitter directory to the no-littering directory."
-    (let ((old-tree-sitter (expand-file-name "tree-sitter/" user-emacs-directory))
-          (new-tree-sitter (no-littering-expand-var-file-name "tree-sitter/")))
-      ;; Set the new tree-sitter directory
-      (setq treesit-extra-load-path (list new-tree-sitter))
-      ;; Move the contents of the old tree-sitter directory to the new tree-sitter directory
-      (when (file-exists-p old-tree-sitter)
-        (unless (file-exists-p new-tree-sitter)
-          (make-directory new-tree-sitter t))
-        (dolist (file (directory-files old-tree-sitter t))
-          (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-tree-sitter) t))))
-      ;; Delete the old tree-sitter directory
-      (delete-directory old-tree-sitter t)))
-
-  (use-package no-littering
-    :ensure (:wait t) ; packages installed afterwards should be themed correctly
-    :config
-    (no-littering-theme-backups)
-    (rangho--no-littering-theme-custom)
-    (rangho--no-littering-theme-eln-cache)
-    (rangho--no-littering-theme-treesit))
+  (setq inhibit-startup-screen t)
+  (setq inhibit-startup-message t)
+  (setq inhibit-startup-echo-area-message t)
 #+end_src
 
-** Local Emacs Lisp Path
-There are some drop-in packges that are not separately available.
-(Most of them are stolen from [[https://emacswiki.org/][EmacsWiki]] or the mailing list.)
-Since ~no-littering~ creates a directory structure that looks like the [[https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard][Filesystem Hierarchy Standard]], let's add a new directory called =usr= there.
+** Suppress Warnings
+Might not be the best idea, but let me know when things go /really/ bad.
+They are still available in =*Warnings*= buffer, however.
 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path (expand-file-name "usr/lib" user-emacs-directory))
-#+end_src
-
-** Garbage Collection
-Emacs has a tiny GC threshold.
-It may have been useful some 15 years ago, but it is fair to increase the size for modern computers.
-
-Before running this script, the ~early-init.el~ file should have the threshold increased to its maximum.
-Since initialization process requires a lot of computation, we will keep that threshold, and change it once initialization is over.
-
-Also, using the minibuffer will cause the GC threshold to increase, and Emacs will try to collect garbages when focus is lost.
-
-#+begin_src emacs-lisp
-  (defconst rangho--gc-cons-threshold
-    (* 64 1024 1024)
-    "The default value of `gc-cons-threshold'.")
-
-  (defconst rangho--gc-cons-percentage
-    0.4
-    "The default value of `gc-cons-percentage'.")
-
-  (defun rangho--set-excessive-gc ()
-    "Set the garbage collector threshold for high-speed usage."
-    (setq gc-cons-threshold most-positive-fixnum
-          gc-cons-percentage 0.6))
-
-  (defun rangho--set-reasonable-gc ()
-    "Set the garbage collector threshold for normal usage."
-    (setq gc-cons-threshold rangho--gc-cons-threshold
-          gc-cons-percentage rangho--gc-cons-percentage))
-
-  (defun rangho--collect-garbage-on-focus-change ()
-    "Collect garbage when Emacs noticese a focus change event."
-    (unless (frame-focus-state)
-      (garbage-collect)))
-
-  (add-hook 'after-init-hook #'rangho--set-reasonable-gc)
-
-  (add-hook 'minibuffer-setup-hook #'rangho--set-excessive-gc)
-  (add-hook 'minibuffer-exit-hook #'rangho--set-reasonable-gc)
-
-  (add-function :after after-focus-change-function
-                #'rangho--collect-garbage-on-focus-change)
-#+end_src
-
-** History of Buffers and Commands
-Make sure Emacs keeps the history of visited files and executed commands.
-
-#+begin_src emacs-lisp
-  (savehist-mode +1)
-  (recentf-mode +1)
-#+end_src
-
-** Revert Files Automatically
-If files are changed in the background, reflect the latest changes.
-
-#+begin_src emacs-lisp
-  (global-auto-revert-mode +1)
-  (setq auto-revert-interval 1)
+  (setq warning-minimum-level :error)
 #+end_src
 
 ** Input Method
@@ -276,22 +299,6 @@ Let's just use built-in input method here.
   (setq default-input-method "korean-hangul390")
   (when (string= (getenv "XDG_SESSION_TYPE") "wayland")
     (global-set-key (kbd "<Hangul>") 'toggle-input-method))
-#+end_src
-
-Editing Unicode-heavy codes kinda sucks if I need to type LaTeX sources every time.
-Before defining any input methods, any math-related input method can benefit from the data package ~math-symbol-lists~.
-Input method definitions require the data package to be installed at compile time, so we need to have Elpaca wait for its installation.
-
-#+begin_src emacs-lisp
-  (use-package math-symbol-lists
-    :ensure (:wait t))
-#+end_src
-
-At least for Iris-related sources, I nicked the [[https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md][recommended editor setup guide]] from Iris repository.
-
-#+begin_src emacs-lisp
-  (use-package uni-iris
-    :ensure nil)
 #+end_src
 
 ** Mouse Support
@@ -311,6 +318,139 @@ The default scroll movement is pretty aggressive, so we need to tone it down a b
   (setq mouse-wheel-progressive-speed nil)
 #+end_src
 
+** Project Management
+~project~ is built-in project management library in Emacs.
+
+#+begin_src emacs-lisp
+  (use-package project
+    :ensure nil)
+#+end_src
+
+** History of Buffers and Commands
+Make sure Emacs keeps the history of visited files and executed commands.
+
+#+begin_src emacs-lisp
+  (savehist-mode +1)
+  (recentf-mode +1)
+#+end_src
+
+** Tree-sitter Integration
+Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
+It is usually much faster than Emacs's built-in parsing facility.
+
+#+begin_src emacs-lisp
+  (use-package treesit
+    :unless (version< emacs-version "29.1")
+    :ensure nil)
+
+  (defun treesit-install-all-language-grammars (&optional out-dir)
+    "Build and install all tree-sitter language grammar libraries.
+
+  It builds all available grammars specified in `treesit-language-source-alist'.
+  Interactively, it prompts for the directory in which to install the compiled
+  grammar files.  Non-interactively, use OUT-DIR; if it is nil, the grammars are
+  installed to the standard location, the \"tree-sitter\" directory under
+  `user-emacs-directory'."
+    (interactive (list (read-directory-name
+                        "Install to: "
+                        (or (car treesit--install-language-grammar-out-dir-history)
+                            (locate-user-emacs-file "tree-sitter")))))
+    (mapcar (lambda (grammar)
+              (treesit-install-language-grammar
+               (car grammar)
+               (or out-dir
+                   (car treesit--install-language-grammar-out-dir-history
+                        (locate-user-emacs-file "tree-sitter")))))
+            treesit-language-source-alist))
+#+end_src
+
+** Revert Files Automatically
+If files are changed in the background, reflect the latest changes.
+
+#+begin_src emacs-lisp
+  (global-auto-revert-mode +1)
+  (setq auto-revert-interval 1)
+#+end_src
+
+** Electric Modes
+Emacs comes with a few "electric" modes that intervenes and edits text on-the-fly:
+
+- ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
+- ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
+
+#+begin_src emacs-lisp
+  (use-package electric
+    :ensure nil
+    :config
+    (electric-indent-mode +1)
+    (electric-pair-mode +1))
+#+end_src
+
+** Syntax Checking
+There is a syntax version of the spell checker called ~flymake~.
+They collect diagnostic information from multiple sources and display them in a user-friendly way.
+
+#+begin_src emacs-lisp
+  (use-package flymake
+    :ensure nil
+    :hook (prog-mode))
+#+end_src
+
+** Language Server Protocol
+The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :hook (prog-mode . (lambda (&optional mode)
+                         "Enable eglot for MODE if it is supported."
+                         (setq mode (or mode major-mode))
+                         (when (eglot--lookup-mode mode)
+                           (eglot-ensure)))))
+#+end_src
+
+** Word-wrapping for Text
+When writing text, I tend to put a single sentence in a single line.
+But, when the line gets too long, they overflow to the right, making things harder to read.
+~visual-line-mode~ can address this problem.
+
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook #'visual-line-mode)
+#+end_src
+
+** Spell Checking
+Emacs has built-in integration with =ispell=-like spell checkers.
+
+#+begin_src emacs-lisp
+  (use-package ispell
+    :when (executable-find "hunspell")
+    :ensure nil
+    :custom
+    (ispell-program-name (executable-find "hunspell")))
+#+end_src
+
+~flyspell~ enables /on-the-fly/ spell checking, just like other word processors do.
+There are two sub-modes available for this package:
+
+- ~flyspell-mode~ :: Check spelling for all text in the buffer.
+- ~flyspell-prog-mode~ :: Check spelling, only within comments and strings.
+
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :when (executable-find "hunspell")
+    :ensure nil)
+#+end_src
+
+** Documentations
+Let's enable Eldoc mode for all buffers.
+
+#+begin_src emacs-lisp
+  (use-package eldoc
+    :ensure nil
+    :config
+    (global-eldoc-mode +1))
+#+end_src
+
 ** Simple Questions
 Typing =yes= and =no= every time gets old real fast.
 Also, clicking on GUI dialog boxes are lame too.
@@ -320,41 +460,7 @@ Also, clicking on GUI dialog boxes are lame too.
   (setq use-dialog-box nil)
 #+end_src
 
-** Suppress Warnings
-Might not be the best idea, but let me know when things go /really/ bad.
-They are still available in =*Warnings*= buffer, however.
-
-#+begin_src emacs-lisp
-  (setq warning-minimum-level :error)
-#+end_src
-
-** Override Default Packages
-Some packages require newer versions of built-in packages.
-Using ~elpaca~ will pull the entire Emacs codebase which will cost around 2 GiB per package.
-For these, we're better off manually downloading tarballs from ELPA.
-
-*** track-changes
-#+begin_src emacs-lisp
-  (use-package track-changes)
-#+end_src
-
-* Appearances
-Eye-candies are imporant.
-Trust me, *they are*.
-
-** User Interfaces
-User interface tweaks to make Emacs prettier.
-
-*** Startup Items
-Disable some startup routines to make Emacs cleaner.
-
-#+begin_src emacs-lisp
-  (setq inhibit-startup-screen t)
-  (setq inhibit-startup-message t)
-  (setq inhibit-startup-echo-area-message t)
-#+end_src
-
-*** Frame Styles
+** Frame Styles
 Some UI elements are controlled with per-frame alists.
 
 #+begin_src emacs-lisp
@@ -368,8 +474,8 @@ Some UI elements are controlled with per-frame alists.
           (internal-border-width . 20)))
 #+end_src
 
-*** UI Element Minor Modes
-Some UI elements are exposed as minor modes, and they are ugly.
+** UI Element Minor Modes
+Some UI elements are exposed as minor modes, and I'm not happy with the default.
 
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
@@ -379,6 +485,115 @@ Some UI elements are exposed as minor modes, and they are ugly.
 
   (global-hl-line-mode +1)
   (show-paren-mode +1)
+#+end_src
+
+* External Settings
+This section contains anything that is not included in vanilla Emacs.
+
+** Navigation
+~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
+It's really good.
+
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :config
+    (treemacs-follow-mode +1)
+    (treemacs-filewatch-mode +1)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred)
+       (treemacs-git-commit-diff-mode +1))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+
+
+
+  (use-package treemacs-nerd-icons
+    :config
+    (treemacs-load-theme "nerd-icons"))
+#+end_src
+
+
+** View Incomplete Keybindings
+Sometimes, typing =C-h k= is too much.
+Let's just throw shit at the wall and see what sticks.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode +1))
+#+end_src
+
+** Evil Mode
+For text editing and navigation, ~evil~ is still much better than "The Emacs Way".
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :custom
+    (evil-split-window-below t)
+    (evil-undo-system 'undo-redo)
+    (evil-vsplit-window-right t)
+    (evil-want-keybinding nil)
+    :config
+    (evil-mode +1))
+
+  (use-package evil-collection
+    :config
+    (evil-collection-init))
+
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode +1))
+#+end_src
+
+~evil~ has ~treemacs~ integration.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-evil)
+#+end_src
+
+** God Mode
+God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with plain letters.
+
+#+begin_src emacs-lisp
+  (use-package god-mode)
+#+end_src
+
+** Hades Mode
+When God is Evil, He becomes Hades.
+~hades-mode~ integrates ~evil-mode~ and ~god-mode~ into a single package.
+
+You can enter ~god-mode~ state by pressing =,= in the NORMAL state.
+
+#+begin_src emacs-lisp
+  (use-package hades
+    :ensure nil
+    :after (evil god-mode)
+    :config
+    (evil-define-key 'normal global-map "," #'hades-start-execute-in-hades-state)
+    (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
+#+end_src
+
+** Git Integration
+~magit~ is the greatest Git client.
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :hook (git-commit-setup . (lambda () (setq fill-column 72))))
+#+end_src
+
+~magit~ has ~treemacs~ integration.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-magit)
+#+end_src
+
+** Transient Keybindings
+The developers of ~magit~ also provide ~transient~, a keyboard-driven command menu.
+
+#+begin_src emacs-lisp
+  (use-package transient)
 #+end_src
 
 *** Fancy Startup Dashboard
@@ -404,6 +619,125 @@ There is a fancier version of dashboard.
                                   (dashboard-insert-startupify-lists t)
                                   (get-buffer-create dashboard-buffer-name))))
 #+end_src
+
+** Discord Integration
+Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
+Emacs has an unofficial plugin for that, to show off what I'm doing.
+
+#+begin_src emacs-lisp
+  (use-package elcord
+    :custom
+    (elcord-use-major-mode-as-main-icon t)
+    (elcord-quiet t))
+#+end_src
+
+** GitHub Copilot
+I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilot]] now.
+
+#+begin_src emacs-lisp
+  (use-package copilot
+    :bind (("C-c M-f" . copilot-complete)
+           :map copilot-completion-map
+           ("C-g" . 'copilot-clear-overlay)
+           ("M-p" . 'copilot-previous-completion)
+           ("M-n" . 'copilot-next-completion)
+           ("<tab>" . 'copilot-accept-completion)
+           ("M-f" . 'copilot-accept-completion-by-word)
+           ("M-<return>" . 'copilot-accept-completion-by-line))
+    :hook (prog-mode))
+#+end_src
+
+** AI Assistance
+I can even outsource typing to AI agents too.
+
+#+begin_src emacs-lisp
+  (use-package ai-code
+    :after (evil magit)
+    :bind (("C-c a" . ai-code-menu))
+    :custom
+    (ai-code-backends-infra-terminal-backend 'eat)
+    :config
+    (ai-code-set-backend 'claude-code)
+    (ai-code-backends-infra-evil-setup)
+    (ai-code-magit-setup-transients))
+#+end_src
+
+** Terminal Emulator
+Emacs has an ANSI terminal emulator, but it is rather slow.
+~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
+It doesn't work on WIndows, though.
+
+#+begin_src emacs-lisp
+  (use-package eat
+    :unless (eq system-type 'windows-nt)
+    :bind (("C-c RET" . eat))
+    :hook ((eshell-load . eat-eshell-mode)
+           (eshell-load . eat-eshell-visual-command-mode)))
+#+end_src
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Editing Unicode-heavy codes kinda sucks if I need to type LaTeX sources every time.
+Before defining any input methods, any math-related input method can benefit from the data package ~math-symbol-lists~.
+Input method definitions require the data package to be installed at compile time, so we need to have Elpaca wait for its installation.
+
+#+begin_src emacs-lisp
+  (use-package math-symbol-lists
+    :ensure (:wait t))
+#+end_src
+
+At least for Iris-related sources, I nicked the [[https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md][recommended editor setup guide]] from Iris repository.
+
+#+begin_src emacs-lisp
+  (use-package uni-iris
+    :ensure nil)
+#+end_src
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+~dired~ stands for DIRectory EDitor.
+Basically a file explorer in Emacs.
+We can prettify it with Nerd Fonts.
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons-dired
+    :hook (dired-mode))
+#+end_src
+
+* Appearances
+Eye-candies are imporant.
+Trust me, *they are*.
+
+** User Interfaces
+User interface tweaks to make Emacs prettier.
 
 ** Fonts
 Fonts are super important, not because they're pretty, but because it greatly affects the readability of a text.
@@ -1091,7 +1425,6 @@ For text editing and navigation, Evil-mode is still much better than "The Emacs 
 
 #+begin_src emacs-lisp
   (use-package evil
-    :ensure (:wait t) ; required to use `evil-define-key' later
     :custom
     (evil-split-window-below t)
     (evil-undo-system 'undo-redo)
@@ -1131,23 +1464,6 @@ You can enter ~god-mode~ by pressing =,= in normal state.
     (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
 #+end_src
 
-** View Incomplete Keybindings
-Sometimes, typing =C-h k= is too much.
-Let's just throw shit at the wall and see what sticks.
-
-#+begin_src emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode +1))
-#+end_src
-
-** Transient Keybindings
-The developers of ~magit~ also provide ~transient~, a keyboard-driven command menu.
-
-#+begin_src emacs-lisp
-  (use-package transient)
-#+end_src
-
 ** Custom Keybindings
 Couple of keybindings that make my life easier.
 These do not depend on packages, and package-dependent keybindings should go to their respective ~use-package~ declarations.
@@ -1167,57 +1483,6 @@ There should be an easy way to insert a *zero-width space* to delimit them.
 
 * Workspace and Project Management
 Let's keep things nice and organized.
-
-** Project Management
-~project~ is built-in project management library in Emacs.
-
-#+begin_src emacs-lisp
-  (use-package project
-    :ensure nil)
-#+end_src
-
-** Git Integration
-~magit~ is the greatest Git client.
-
-#+begin_src emacs-lisp
-  (use-package magit
-    :hook (git-commit-setup . (lambda () (setq fill-column 72))))
-#+end_src
-
-** Navigation
-~dired~ stands for DIRectory EDitor.
-Basically a file explorer in Emacs.
-We can prettify it with Nerd Fonts.
-
-#+begin_src emacs-lisp
-  (use-package nerd-icons-dired
-    :hook (dired-mode))
-#+end_src
-
-~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
-It's really good.
-
-#+begin_src emacs-lisp
-  (use-package treemacs
-    :config
-    (treemacs-follow-mode +1)
-    (treemacs-filewatch-mode +1)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred)
-       (treemacs-git-commit-diff-mode +1))
-      (`(t . _)
-       (treemacs-git-mode 'simple))))
-
-  (use-package treemacs-evil)
-
-  (use-package treemacs-magit)
-
-  (use-package treemacs-nerd-icons
-    :config
-    (treemacs-load-theme "nerd-icons"))
-#+end_src
 
 * Editing Support
 These settings are useful /specifically/ when editing texts in Emacs.
@@ -1253,14 +1518,6 @@ I wrote a small utility called ~mixed-pitch-mode~ that utilizes ~face-remap~ fac
     :hook (markdown-mode org-mode))
 #+end_src
 
-** Word-wrapping for Text
-When writing text, I tend to put a single sentence in a single line.
-But, when the line gets too long, they overflow to the right, making things harder to read.
-~visual-line-mode~ can address this problem.
-
-#+begin_src emacs-lisp
-  (add-hook 'text-mode-hook #'visual-line-mode)
-#+end_src
 
 There is a small package called ~visual-fill-column~ that extends the built-in ~visual-line-mode~ so that it acknowledges ~fill-column~.
 
@@ -1293,53 +1550,6 @@ For regular texts, usually they are more of an annoyance.
     :hook (prog-mode)
     :custom
     (display-line-numbers-width 3))
-#+end_src
-
-** Spell Checking
-Emacs has built-in integration with =ispell=-like spell checkers.
-
-#+begin_src emacs-lisp
-  (use-package ispell
-    :when (executable-find "hunspell")
-    :ensure nil
-    :custom
-    (ispell-program-name (executable-find "hunspell")))
-#+end_src
-
-~flyspell~ enables /on-the-fly/ spell checking, just like other word processors do.
-There are two sub-modes available for this package:
-
-- ~flyspell-mode~ :: Check spelling for all text in the buffer.
-- ~flyspell-prog-mode~ :: Check spelling, only within comments and strings.
-
-#+begin_src emacs-lisp
-  (use-package flyspell
-    :when (executable-find "hunspell")
-    :ensure nil)
-#+end_src
-
-** Syntax Checking
-There is a syntax version of the spell checker called ~flymake~.
-They collect diagnostic information from multiple sources and display them in a user-friendly way.
-
-#+begin_src emacs-lisp
-  (use-package flymake
-    :ensure nil
-    :hook (prog-mode))
-#+end_src
-
-** Electric Modes
-Emacs comes with a few "electric" modes that intervenes and edits text on-the-fly:
-
-- ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
-- ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
-
-#+begin_src emacs-lisp
-  (use-package electric
-    :ensure nil
-    :config
-    (electric-indent-mode +1)
-    (electric-pair-mode +1))
 #+end_src
 
 ** Rainbow Delimiters
@@ -1464,11 +1674,6 @@ There is a package that shows its content within a child frame.
 Elpaca seems to have some [[https://github.com/progfolio/elpaca/issues/236][trouble]] upgrading built-in ~eldoc~, so an ugly workaround is still here.
 
 #+begin_src emacs-lisp
-  (use-package eldoc
-    :ensure nil
-    :config
-    (global-eldoc-mode +1))
-
   (use-package eldoc-box
     :hook (prog-mode . eldoc-box-hover-at-point-mode)
     :custom
@@ -1481,55 +1686,8 @@ Meanwhile, the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adap
 Both protocols use JSON-RPC to communicate with their respective servers, and we need to update the built-in one.
 
 #+begin_src emacs-lisp
-  (use-package eglot
-    :ensure nil
-    :hook (prog-mode . (lambda (&optional mode)
-                         "Enable eglot for MODE if it is supported."
-                         (setq mode (or mode major-mode))
-                         (when (eglot--lookup-mode mode)
-                           (eglot-ensure)))))
   (use-package dape
     :unless (version< emacs-version "30.0"))
-#+end_src
-
-** Proof Assistant Interface
-[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
-
-#+begin_src emacs-lisp
-  (use-package proof-general
-    :custom
-    (proof-splash-enable nil)
-    (proof-layout-windows 'hybrid))
-#+end_src
-
-** Tree-sitter Integration
-Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
-It is usually much faster than Emacs's built-in parsing facility.
-
-#+begin_src emacs-lisp
-  (use-package treesit
-    :unless (version< emacs-version "29.1")
-    :ensure nil)
-
-  (defun treesit-install-all-language-grammars (&optional out-dir)
-    "Build and install all tree-sitter language grammar libraries.
-
-  It builds all available grammars specified in `treesit-language-source-alist'.
-  Interactively, it prompts for the directory in which to install the compiled
-  grammar files.  Non-interactively, use OUT-DIR; if it is nil, the grammars are
-  installed to the standard location, the \"tree-sitter\" directory under
-  `user-emacs-directory'."
-    (interactive (list (read-directory-name
-                        "Install to: "
-                        (or (car treesit--install-language-grammar-out-dir-history)
-                            (locate-user-emacs-file "tree-sitter")))))
-    (mapcar (lambda (grammar)
-              (treesit-install-language-grammar
-               (car grammar)
-               (or out-dir
-                   (car treesit--install-language-grammar-out-dir-history
-                        (locate-user-emacs-file "tree-sitter")))))
-            treesit-language-source-alist))
 #+end_src
 
 * Per-language Settings
@@ -2047,6 +2205,16 @@ It allows automation by writing object-manipulating commands into a script.
     :ensure nil)
 #+end_src
 
+** Proof General
+[[https://proofgeneral.github.io/][Proof General]] is a general Emacs interface for various proof assistants, and ships with major modes for Coq, EasyCrypt, qRHL, and PhoX.
+
+#+begin_src emacs-lisp
+  (use-package proof-general
+    :custom
+    (proof-splash-enable nil)
+    (proof-layout-windows 'hybrid))
+#+end_src
+
 ** Python
 Python is overrated.
 Still I need to use it, so...
@@ -2322,72 +2490,3 @@ While there are a lot of criticisms, it is still widely used to represent data i
 * Utilities
 These are some external utilities for Emacs.
 
-** Discord Integration
-Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
-Emacs has an unofficial plugin for that, to show off what I'm doing.
-
-#+begin_src emacs-lisp
-  (use-package elcord
-    :custom
-    (elcord-use-major-mode-as-main-icon t)
-    (elcord-quiet t))
-#+end_src
-
-** Easy Draw
-~el-easydraw~ is a drawing tool that runs inside Emacs.
-
-#+begin_src emacs-lisp
-  (use-package edraw
-    :ensure (:host github :repo "misohena/el-easydraw")
-    :config
-    (with-eval-after-load 'org
-      (require 'edraw-org)
-      (edraw-org-setup-default))
-    (with-eval-after-load 'ox
-      (require 'edraw-org)
-      (edraw-org-setup-exporter)))
-#+end_src
-
-** GitHub Copilot
-I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilot]] now.
-
-#+begin_src emacs-lisp
-  (use-package copilot
-    :bind (("C-c M-f" . copilot-complete)
-           :map copilot-completion-map
-           ("C-g" . 'copilot-clear-overlay)
-           ("M-p" . 'copilot-previous-completion)
-           ("M-n" . 'copilot-next-completion)
-           ("<tab>" . 'copilot-accept-completion)
-           ("M-f" . 'copilot-accept-completion-by-word)
-           ("M-<return>" . 'copilot-accept-completion-by-line))
-    :hook (prog-mode))
-#+end_src
-
-** AI Assistance
-I can even outsource typing to AI agents too.
-
-#+begin_src emacs-lisp
-  (use-package ai-code
-    :after (evil magit)
-    :bind (("C-c a" . ai-code-menu))
-    :custom
-    (ai-code-backends-infra-terminal-backend 'eat)
-    :config
-    (ai-code-set-backend 'claude-code)
-    (ai-code-backends-infra-evil-setup)
-    (ai-code-magit-setup-transients))
-#+end_src
-
-** Terminal Emulator
-Emacs has an ANSI terminal emulator, but it is rather slow.
-~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
-It doesn't work on WIndows, though.
-
-#+begin_src emacs-lisp
-  (use-package eat
-    :unless (eq system-type 'windows-nt)
-    :bind (("C-c RET" . eat))
-    :hook ((eshell-load . eat-eshell-mode)
-           (eshell-load . eat-eshell-visual-command-mode)))
-#+end_src

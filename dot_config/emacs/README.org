@@ -55,6 +55,11 @@ Also, using the minibuffer will cause the GC threshold to increase, and Emacs wi
 It supports parallel installation, and installing from Git repositories directly.
 Let's bootstrap this thing.
 
+#+begin_notes
+Make sure to adjust the ~elpaca-directory~ when updating the installer snippet below!
+Without it, Elpaca will attempt to download everything from scratch again...
+#+end_notes
+
 #+begin_src emacs-lisp
   (defvar elpaca-installer-version 0.12)
   (defvar elpaca-directory (expand-file-name "var/elpaca/" user-emacs-directory))
@@ -514,7 +519,6 @@ It's really good.
     (treemacs-load-theme "nerd-icons"))
 #+end_src
 
-
 ** View Incomplete Keybindings
 Sometimes, typing =C-h k= is too much.
 Let's just throw shit at the wall and see what sticks.
@@ -547,10 +551,11 @@ For text editing and navigation, ~evil~ is still much better than "The Emacs Way
     (global-evil-surround-mode +1))
 #+end_src
 
-~evil~ has ~treemacs~ integration.
+~treemacs~ has ~evil~ integration.
 
 #+begin_src emacs-lisp
-  (use-package treemacs-evil)
+  (use-package treemacs-evil
+    :after (treemacs))
 #+end_src
 
 ** God Mode
@@ -583,7 +588,7 @@ You can enter ~god-mode~ state by pressing =,= in the NORMAL state.
     :hook (git-commit-setup . (lambda () (setq fill-column 72))))
 #+end_src
 
-~magit~ has ~treemacs~ integration.
+~treemacs~ has ~magit~ integration.
 
 #+begin_src emacs-lisp
   (use-package treemacs-magit)
@@ -596,7 +601,7 @@ The developers of ~magit~ also provide ~transient~, a keyboard-driven command me
   (use-package transient)
 #+end_src
 
-*** Fancy Startup Dashboard
+** Fancy Startup Dashboard
 By default, Emacs shows the =*scratch*= buffer if startup screen is inhibited.
 There is a fancier version of dashboard.
 

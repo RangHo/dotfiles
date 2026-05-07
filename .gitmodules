@@ -1,3 +1,6 @@
 [submodule "nushell/modules/opam.nu"]
 	path = dot_config/nushell/modules/opam.nu
 	url = https://github.com/RangHo/opam.nu
+[submodule "emacs/no-littering"]
+	path = dot_config/emacs/usr/lib/no-littering
+	url = https://github.com/emacscollective/no-littering

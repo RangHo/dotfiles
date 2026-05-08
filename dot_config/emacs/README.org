@@ -6,7 +6,8 @@ While most of the configurations are available in this document, there are coupl
 Most of them are load- and performance-related options.
 
 * Emacs Initialization
-Before loading any other configuration, 
+Before loading any other configuration, there are some things that need to be taken care of.
+Put those "prerequisite routines" here.
 
 ** Garbage Collection
 Emacs has a tiny GC threshold.
@@ -85,6 +86,7 @@ If I need to load a package right away, simply specify ~:demand t~ to override t
 
 * Constants and Environments
 These are some constants that are used throughout the configuration.
+Also, let's set up some environmental settings.
 
 ** Name and Email
 My name and email address.
@@ -151,6 +153,17 @@ Let's fix the shell to ~/bin/sh~ if on a supported platform.
     (setq shell-file-name "/bin/sh"))
 #+end_src
 
+** Input Method
+Emacs comes with various input methods.
+It seems Wayland + Niri + IBus combo doesn't work well with GTK Emacs.
+Let's just use built-in input method here.
+
+#+begin_src emacs-lisp
+  (setq default-input-method "korean-hangul390")
+  (when (string= (getenv "XDG_SESSION_TYPE") "wayland")
+    (global-set-key (kbd "<Hangul>") 'toggle-input-method))
+#+end_src
+
 ** Mise Version Manager
 [[https://mise.jdx.dev/][Mise]] is a "unified" version manager that can install multiple versions of various utilities and compilers.
 If a binary called =mise= is available, load the 3rd-party Emacs integration package.
@@ -168,7 +181,18 @@ This section contains modifications of built-in functionalities of Emacs.
 Some packages require newer versions of built-in packages.
 For these, we're better off manually downloading tarballs from ELPA.
 
-** Startup Items
+*** 
+
+*** track-changes
+
+
+** Parameter Adjustments
+Some things in Emacs are controlled by their customization variables.
+Since I will not use ~use-package~ for those vanilla Emacs variables, put them all here for organization.
+
+Order it by importance, or rather, how annoying it is if not set up correctly.
+
+*** Startup Items
 Disable some startup routines to make Emacs cleaner.
 
 #+begin_src emacs-lisp
@@ -177,59 +201,77 @@ Disable some startup routines to make Emacs cleaner.
   (setq inhibit-startup-echo-area-message t)
 #+end_src
 
-** Suppress Warnings
-Might not be the best idea, but let me know when things go /really/ bad.
-They are still available in =*Warnings*= buffer, however.
+*** Word-wrapping for Text
+When writing text, I tend to put a single sentence in a single line.
+But, when the line gets too long, they overflow to the right, making things harder to read.
+~visual-line-mode~ can address this problem.
 
 #+begin_src emacs-lisp
-  (setq warning-minimum-level :error)
+  (add-hook 'text-mode-hook #'visual-line-mode)
 #+end_src
 
-** Input Method
-Emacs comes with various input methods.
-It seems Wayland + Niri + IBus combo doesn't work well with GTK Emacs.
-Let's just use built-in input method here.
+*** Frame Styles
+Some UI elements are controlled with per-frame alists.
 
 #+begin_src emacs-lisp
-  (setq default-input-method "korean-hangul390")
-  (when (string= (getenv "XDG_SESSION_TYPE") "wayland")
-    (global-set-key (kbd "<Hangul>") 'toggle-input-method))
+  (setq default-frame-alist
+        `((undecorated . t)
+          (width . 115) ; 80 col of editor + 35 col of treemacs
+          (height . 25)
+          (vertical-scroll-bars . nil)
+          (horizontal-scroll-bars . nil)
+          (right-divider-width . 3)
+          (internal-border-width . 20)))
 #+end_src
 
-** Mouse Support
+** Minor Modes
+Minor modes in Emacs are "optional editing mode that alters the behavior of Emacs in some well-defined way".
+There are a lot of built-in minor modes, including those responsible for some UI elements.
+This section handles and customizes those.
+
+*** Mouse Support
 There are a bit of things to tweak when using mouse.
 
 If Emacs is running in a CLI mode, we can enable mouse support for Xterm.
 
 #+begin_src emacs-lisp
-  (unless (display-graphic-p)
+  (use-package xt-mouse
+    :unless (display-graphic-p)
+    :ensure nil
+    :config
     (xterm-mouse-mode +1))
 #+end_src
 
 The default scroll movement is pretty aggressive, so we need to tone it down a bit.
 
 #+begin_src emacs-lisp
-  (setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
-  (setq mouse-wheel-progressive-speed nil)
+  (use-package mwheel
+    :ensure nil
+    :custom
+    (mouse-wheel-scroll-amount
+     '(3 ((control) . 1) ((shift) . 5))
+     "Scroll 3 lines at a time, 1 line with control, and 5 lines with shift.")
+    (mouse-wheel-progressive-speed
+     nil
+     "Disable progressive speed for mouse wheel scrolling.")) 
 #+end_src
 
-** Project Management
-~project~ is built-in project management library in Emacs.
-
-#+begin_src emacs-lisp
-  (use-package project
-    :ensure nil)
-#+end_src
-
-** History of Buffers and Commands
+*** History of Buffers and Commands
 Make sure Emacs keeps the history of visited files and executed commands.
 
 #+begin_src emacs-lisp
-  (savehist-mode +1)
-  (recentf-mode +1)
+  (use-package savehist
+    :ensure nil
+    :config
+    (savehist-mode +1))
+
+  (use-package recentf
+    :ensure nil
+    :config
+    (recentf-mode +1))
 #+end_src
 
-** Tree-sitter Integration
+*** Tree-sitter Integration
 Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
 It is usually much faster than Emacs's built-in parsing facility.
 
@@ -259,15 +301,19 @@ It is usually much faster than Emacs's built-in parsing facility.
             treesit-language-source-alist))
 #+end_src
 
-** Revert Files Automatically
+*** Revert Files Automatically
 If files are changed in the background, reflect the latest changes.
 
 #+begin_src emacs-lisp
-  (global-auto-revert-mode +1)
-  (setq auto-revert-interval 1)
+  (use-package autorevert
+    :ensure nil
+    :custom
+    (auto-revert-interval 1)
+    :config
+    (global-auto-revert-mode +1))
 #+end_src
 
-** Electric Modes
+*** Electric Modes
 Emacs comes with a few "electric" modes that intervenes and edits text on-the-fly:
 
 - ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
@@ -281,7 +327,7 @@ Emacs comes with a few "electric" modes that intervenes and edits text on-the-fl
     (electric-pair-mode +1))
 #+end_src
 
-** Syntax Checking
+*** Syntax Checking
 There is a syntax version of the spell checker called ~flymake~.
 They collect diagnostic information from multiple sources and display them in a user-friendly way.
 
@@ -291,7 +337,7 @@ They collect diagnostic information from multiple sources and display them in a 
     :hook (prog-mode))
 #+end_src
 
-** Language Server Protocol
+*** Language Server Protocol
 The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
 
 #+begin_src emacs-lisp
@@ -304,16 +350,7 @@ The [[https://microsoft.github.io/language-server-protocol/][Language Server Pro
                            (eglot-ensure)))))
 #+end_src
 
-** Word-wrapping for Text
-When writing text, I tend to put a single sentence in a single line.
-But, when the line gets too long, they overflow to the right, making things harder to read.
-~visual-line-mode~ can address this problem.
-
-#+begin_src emacs-lisp
-  (add-hook 'text-mode-hook #'visual-line-mode)
-#+end_src
-
-** Spell Checking
+*** Spell Checking
 Emacs has built-in integration with =ispell=-like spell checkers.
 
 #+begin_src emacs-lisp
@@ -344,29 +381,6 @@ Let's enable Eldoc mode for all buffers.
     :ensure nil
     :config
     (global-eldoc-mode +1))
-#+end_src
-
-** Simple Questions
-Typing =yes= and =no= every time gets old real fast.
-Also, clicking on GUI dialog boxes are lame too.
-
-#+begin_src emacs-lisp
-  (setq use-short-answers t)
-  (setq use-dialog-box nil)
-#+end_src
-
-** Frame Styles
-Some UI elements are controlled with per-frame alists.
-
-#+begin_src emacs-lisp
-  (setq default-frame-alist
-        `((undecorated . t)
-          (width . 115) ; 80 col of editor + 35 col of treemacs
-          (height . 25)
-          (vertical-scroll-bars . nil)
-          (horizontal-scroll-bars . nil)
-          (right-divider-width . 3)
-          (internal-border-width . 20)))
 #+end_src
 
 ** UI Element Minor Modes
@@ -1152,31 +1166,47 @@ Both of them suck, and Julia performs pretty well.
 
 #+begin_src emacs-lisp
   (defconst rangho--julia-language-server-project
-    (no-littering-expand-var-file-name "eglot/servers/julia/"))
+    (no-littering-expand-var-file-name "eglot/servers/julia"))
 
   (defconst rangho--julia-language-server-script
     (expand-file-name
      (locate-user-emacs-file (file-name-concat "usr" "bin" "eglot-julia"))))
 
-  (defun rangho--julia-mode-contact (interactive)
-    "Produce the Eglot contact information for Julia language server.
-  Ensure that Julia language server is installed when called with INTERACTIVE."
-    ;; Make sure that the Julia project directory is available
+  (defun rangho--julia-mode-contact (interactive project)
+    "Produce the Eglot contact information for Julia language server for PROJECT.
+  If INTERACTIVE is non-nil, then the request was made interactively; in that
+  case, try installing the language server as well."
+    ;; Assume that the existence of the project directory means that the language server is installed.
+    (when interactive
+      (rangho=julia-mode-install-server))
+    (if (file-exists-p rangho--julia-language-server-project)
+        (let (project-directory)
+          (cond
+           ((stringp project)
+            (setq project-directory project))
+           ((consp project)
+            (setq project-directory (project-root project))))
+          (list (executable-find "julia")
+                "--startup-file=no"
+                (concat "--project=" rangho--julia-language-server-project)
+                rangho--julia-language-server-script
+                "serve"
+                project-directory))
+      (user-error "Julia language server is not installed.  Please run `rangho-julia-mode-install-server' to install it")))
+
+  (defun rangho-julia-mode-install-server ()
+    "Install the Julia language server for Eglot."
+    (interactive)
+    ;; Make sure that the Julia project directory is available.
     (unless (file-exists-p rangho--julia-language-server-project)
       (make-directory rangho--julia-language-server-project t))
-    (when interactive
-      (unless (executable-find "julia")
-        (user-error "Julia is not installed"))
-      (process-file "julia" nil t nil
-                    "--startup-file=no"
-                    (concat "--project=" rangho--julia-language-server-project)
-                    rangho--julia-language-server-script))
-    ;; Produce the contact information
-    (list (executable-find "julia")
-          "--startup-file=no"
-          (concat "--project=" rangho--julia-language-server-project)
-          rangho--julia-language-server-script
-          (file-name-directory (buffer-file-name))))
+    (if (executable-find "julia")
+        (make-comint-in-buffer "Julia LSP Install" "*Julia LSP Install*" "julia" nil
+                            "--startup-file=no"
+                            (concat "--project=" rangho--julia-language-server-project)
+                            rangho--julia-language-server-script
+                            "install")
+      (user-error "Julia is not installed")))
 
   (use-package julia-mode
     :init

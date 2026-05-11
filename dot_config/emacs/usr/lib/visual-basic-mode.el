@@ -13,6 +13,8 @@
 ;; This package provides a new mode for Visual Basic and its variants.
 ;; All of them are derived from Microsoft QBASIC dialect.
 
+;;; Code:
+
 (require 'basic-mode)
 
 ;;;###autoload
@@ -24,5 +26,4 @@
 (add-to-list 'auto-mode-alist '("\\.vb[as]?\\'" . visual-basic-mode))
 
 (provide 'visual-basic-mode)
-
 ;;; visual-basic-mode.el ends here

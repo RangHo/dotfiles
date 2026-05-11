@@ -25,6 +25,11 @@
 ;; Incrase GC threshold to reduce GC frequency.
 (setq gc-cons-threshold most-positive-fixnum)
 
+;; Include local library directory and subdirectories to `load-path'.
+(let ((default-directory (expand-file-name "usr/lib" user-emacs-directory)))
+  (add-to-list 'load-path default-directory)
+  (normal-top-level-add-subdirs-to-load-path))
+
 ;; Set up customized no-littering directories and functions before loading the package.
 (with-eval-after-load 'no-littering
   (defvar no-littering-usr-directory
@@ -81,10 +86,6 @@
       ;; Delete the old elpa directory
       (delete-directory old-elpa t)))
 
-  (defun no-littering-theme-load-path ()
-    "Theme the Emacs load path."
-    (add-to-list 'load-path (no-littering-expand-usr-file-name "lib/")))
-
   (defun no-littering-theme-treesit ()
     "Theme the Emacs tree-sitter library.
 
@@ -108,12 +109,10 @@
   (no-littering-theme-custom-themes)
   (no-littering-theme-eln-cache)
   (no-littering-theme-elpa)
-  (no-littering-theme-load-path)
   (no-littering-theme-treesit))
 
 ;; Make Emacs stop litter things everywhere.
-(require 'no-littering
-         (expand-file-name "usr/lib/no-littering/no-littering.el" user-emacs-directory))
+(require 'no-littering)
 
 (provide 'early-init)
 ;;; early-init.el ends here

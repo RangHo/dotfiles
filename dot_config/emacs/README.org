@@ -65,6 +65,12 @@ Let's add [[https://melpa.org][MELPA]] to rectify that.
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 #+end_src
 
+If there is a newer version of built-in packages available, upgrade them.
+
+#+begin_src emacs-lisp
+  (setq package-install-upgrade-built-in t)
+#+end_src
+
 Then, initialize the package repository.
 
 #+begin_src emacs-lisp
@@ -72,14 +78,21 @@ Then, initialize the package repository.
 #+end_src
 
 We're going to use ~use-package~ to wrap the package management functionality.
-Here, we enable the following switches:
+
+#+begin_src emacs-lisp
+  (require 'use-package)
+  (require 'use-package-ensure)
+#+end_src
+
+There are following switches available:
 
 - ~use-package-always-ensure~ :: Make sure that packages get installed if not present in system.
 - ~use-package-always-defer~ :: Defer the actual loading of the package until it is actually needed.
+- ~use-package-always-demand~ :: Force the package to load immediately when specified.
+- ~use-package-always-pin~ :: Pin every package to the specified package archive.
 
 #+begin_src emacs-lisp
   (setq use-package-always-ensure t)
-  (setq use-package-always-defer t)
 #+end_src
 
 If I need to load a package right away, simply specify ~:demand t~ to override the deferral setting.
@@ -177,15 +190,6 @@ If a binary called =mise= is available, load the 3rd-party Emacs integration pac
 * Built-in Settings
 This section contains modifications of built-in functionalities of Emacs.
 
-** Override Default Packages
-Some packages require newer versions of built-in packages.
-For these, we're better off manually downloading tarballs from ELPA.
-
-*** 
-
-*** track-changes
-
-
 ** Parameter Adjustments
 Some things in Emacs are controlled by their customization variables.
 Since I will not use ~use-package~ for those vanilla Emacs variables, put them all here for organization.
@@ -211,7 +215,7 @@ But, when the line gets too long, they overflow to the right, making things hard
 #+end_src
 
 *** Frame Styles
-Some UI elements are controlled with per-frame alists.
+Some UI elements are controlled with per-frame association lists.
 
 #+begin_src emacs-lisp
   (setq default-frame-alist
@@ -222,6 +226,15 @@ Some UI elements are controlled with per-frame alists.
           (horizontal-scroll-bars . nil)
           (right-divider-width . 3)
           (internal-border-width . 20)))
+#+end_src
+
+*** No Tabs
+Fuck tabs, they're different on every platform.
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  (setq-default tab-stop-list (number-sequence 4 120 4))
 #+end_src
 
 ** Minor Modes
@@ -235,40 +248,65 @@ There are a bit of things to tweak when using mouse.
 If Emacs is running in a CLI mode, we can enable mouse support for Xterm.
 
 #+begin_src emacs-lisp
-  (use-package xt-mouse
-    :unless (display-graphic-p)
-    :ensure nil
-    :config
+  (unless (display-graphic-p)
     (xterm-mouse-mode +1))
 #+end_src
 
 The default scroll movement is pretty aggressive, so we need to tone it down a bit.
 
 #+begin_src emacs-lisp
-  (use-package mwheel
-    :ensure nil
-    :custom
-    (mouse-wheel-scroll-amount
-     '(3 ((control) . 1) ((shift) . 5))
-     "Scroll 3 lines at a time, 1 line with control, and 5 lines with shift.")
-    (mouse-wheel-progressive-speed
-     nil
-     "Disable progressive speed for mouse wheel scrolling.")) 
+  (setq mouse-wheel-scroll-amount '(3 ((control) . 1) ((shift) . 5)))
+  (setq mouse-wheel-progressive-speed nil)
 #+end_src
 
 *** History of Buffers and Commands
 Make sure Emacs keeps the history of visited files and executed commands.
 
 #+begin_src emacs-lisp
-  (use-package savehist
-    :ensure nil
-    :config
-    (savehist-mode +1))
+  (savehist-mode +1)
+  (recentf-mode +1)
+#+end_src
 
-  (use-package recentf
-    :ensure nil
-    :config
-    (recentf-mode +1))
+*** Revert Files Automatically
+If files are changed in the background, reflect the latest changes.
+
+#+begin_src emacs-lisp
+  (setq auto-revert-interval 1)
+  (global-auto-revert-mode +1)
+#+end_src
+
+*** Electric Modes
+Emacs comes with a few "electric" modes that intervenes and edits text on-the-fly:
+
+- ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
+- ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
+
+#+begin_src emacs-lisp
+  (electric-indent-mode +1)
+  (electric-pair-mode +1)
+#+end_src
+
+*** Syntax Checking
+There is a syntax version of the spell checker called ~flymake~.
+They collect diagnostic information from multiple sources and display them in a user-friendly way.
+
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook #'flymake-mode)
+#+end_src
+
+*** Spell Checking
+Emacs has built-in integration with =ispell=-like spell checkers.
+
+Also, ~flyspell~ enables /on-the-fly/ spell checking, just like other word processors do.
+There are two sub-modes available for this package:
+
+- ~flyspell-mode~ :: Check spelling for all text in the buffer.
+- ~flyspell-prog-mode~ :: Check spelling, only within comments and strings.
+  
+#+begin_src emacs-lisp
+  (when-let* ((hunspell-program (executable-find "hunspell")))
+    (setq ispell-program-name hunspell-program)
+    (add-hook 'text-mode-hook #'flyspell-mode))
 #+end_src
 
 *** Tree-sitter Integration
@@ -276,9 +314,7 @@ Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-s
 It is usually much faster than Emacs's built-in parsing facility.
 
 #+begin_src emacs-lisp
-  (use-package treesit
-    :unless (version< emacs-version "29.1")
-    :ensure nil)
+  (require 'treesit)
 
   (defun treesit-install-all-language-grammars (&optional out-dir)
     "Build and install all tree-sitter language grammar libraries.
@@ -301,86 +337,26 @@ It is usually much faster than Emacs's built-in parsing facility.
             treesit-language-source-alist))
 #+end_src
 
-*** Revert Files Automatically
-If files are changed in the background, reflect the latest changes.
-
-#+begin_src emacs-lisp
-  (use-package autorevert
-    :ensure nil
-    :custom
-    (auto-revert-interval 1)
-    :config
-    (global-auto-revert-mode +1))
-#+end_src
-
-*** Electric Modes
-Emacs comes with a few "electric" modes that intervenes and edits text on-the-fly:
-
-- ~electric-pair-mode~ :: Insert corresponding closing pair when typing "opening" characters.
-- ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
-
-#+begin_src emacs-lisp
-  (use-package electric
-    :ensure nil
-    :config
-    (electric-indent-mode +1)
-    (electric-pair-mode +1))
-#+end_src
-
-*** Syntax Checking
-There is a syntax version of the spell checker called ~flymake~.
-They collect diagnostic information from multiple sources and display them in a user-friendly way.
-
-#+begin_src emacs-lisp
-  (use-package flymake
-    :ensure nil
-    :hook (prog-mode))
-#+end_src
-
 *** Language Server Protocol
 The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
 
 #+begin_src emacs-lisp
-  (use-package eglot
-    :ensure nil
-    :hook (prog-mode . (lambda (&optional mode)
-                         "Enable eglot for MODE if it is supported."
-                         (setq mode (or mode major-mode))
-                         (when (eglot--lookup-mode mode)
-                           (eglot-ensure)))))
-#+end_src
+  (require 'eglot)
 
-*** Spell Checking
-Emacs has built-in integration with =ispell=-like spell checkers.
+  (defun rangho--ensure-eglot-if-supported (&optional mode)
+    "Enable eglot if it is supported for MODE or the current major mode."
+    (let ((mode (or mode major-mode)))
+      (when (eglot--lookup-mode mode)
+        (eglot-ensure))))
 
-#+begin_src emacs-lisp
-  (use-package ispell
-    :when (executable-find "hunspell")
-    :ensure nil
-    :custom
-    (ispell-program-name (executable-find "hunspell")))
-#+end_src
-
-~flyspell~ enables /on-the-fly/ spell checking, just like other word processors do.
-There are two sub-modes available for this package:
-
-- ~flyspell-mode~ :: Check spelling for all text in the buffer.
-- ~flyspell-prog-mode~ :: Check spelling, only within comments and strings.
-
-#+begin_src emacs-lisp
-  (use-package flyspell
-    :when (executable-find "hunspell")
-    :ensure nil)
+  (add-hook 'prog-mode-hook #'rangho--ensure-eglot-if-supported)
 #+end_src
 
 ** Documentations
 Let's enable Eldoc mode for all buffers.
 
 #+begin_src emacs-lisp
-  (use-package eldoc
-    :ensure nil
-    :config
-    (global-eldoc-mode +1))
+  (global-eldoc-mode +1)
 #+end_src
 
 ** UI Element Minor Modes
@@ -396,384 +372,25 @@ Some UI elements are exposed as minor modes, and I'm not happy with the default.
   (show-paren-mode +1)
 #+end_src
 
-* External Settings
+* External Packages
 This section contains anything that is not included in vanilla Emacs.
 
-** Navigation
-~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
-It's really good.
+** Override Built-in Packages
+There are some packages that need periodic upgrades from ELPA.
+Make sure that we are using the correct version every time.
+
+*** ~compat~
+~compat~ ensures backwards and forwards compatibility with other Emacs versions.
+Usually, the built-in version lags behind by quite a lot, so let's just have it use the version from ELPA.
 
 #+begin_src emacs-lisp
-  (use-package treemacs
-    :config
-    (treemacs-follow-mode +1)
-    (treemacs-filewatch-mode +1)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred)
-       (treemacs-git-commit-diff-mode +1))
-      (`(t . _)
-       (treemacs-git-mode 'simple))))
-
-
-
-  (use-package treemacs-nerd-icons
-    :config
-    (treemacs-load-theme "nerd-icons"))
+  (use-package compat
+    :demand t
+    :pin gnu)
 #+end_src
 
-** View Incomplete Keybindings
-Sometimes, typing =C-h k= is too much.
-Let's just throw shit at the wall and see what sticks.
-
-#+begin_src emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode +1))
-#+end_src
-
-** Evil Mode
-For text editing and navigation, ~evil~ is still much better than "The Emacs Way".
-
-#+begin_src emacs-lisp
-  (use-package evil
-    :custom
-    (evil-split-window-below t)
-    (evil-undo-system 'undo-redo)
-    (evil-vsplit-window-right t)
-    (evil-want-keybinding nil)
-    :config
-    (evil-mode +1))
-
-  (use-package evil-collection
-    :config
-    (evil-collection-init))
-
-  (use-package evil-surround
-    :config
-    (global-evil-surround-mode +1))
-#+end_src
-
-~treemacs~ has ~evil~ integration.
-
-#+begin_src emacs-lisp
-  (use-package treemacs-evil
-    :after (treemacs))
-#+end_src
-
-** God Mode
-God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with plain letters.
-
-#+begin_src emacs-lisp
-  (use-package god-mode)
-#+end_src
-
-** Hades Mode
-When God is Evil, He becomes Hades.
-~hades-mode~ integrates ~evil-mode~ and ~god-mode~ into a single package.
-
-You can enter ~god-mode~ state by pressing =,= in the NORMAL state.
-
-#+begin_src emacs-lisp
-  (use-package hades
-    :ensure nil
-    :after (evil god-mode)
-    :config
-    (evil-define-key 'normal global-map "," #'hades-start-execute-in-hades-state)
-    (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
-#+end_src
-
-** Git Integration
-~magit~ is the greatest Git client.
-
-#+begin_src emacs-lisp
-  (use-package magit
-    :hook (git-commit-setup . (lambda () (setq fill-column 72))))
-#+end_src
-
-~treemacs~ has ~magit~ integration.
-
-#+begin_src emacs-lisp
-  (use-package treemacs-magit)
-#+end_src
-
-** Transient Keybindings
-The developers of ~magit~ also provide ~transient~, a keyboard-driven command menu.
-
-#+begin_src emacs-lisp
-  (use-package transient)
-#+end_src
-
-** Fancy Startup Dashboard
-By default, Emacs shows the =*scratch*= buffer if startup screen is inhibited.
-There is a fancier version of dashboard.
-
-#+begin_src emacs-lisp
-  (use-package dashboard
-    :custom
-    (dashboard-display-icons-p t)
-    (dashboard-set-file-icons t)
-    (dashboard-set-heading-icons t)
-    (dashboard-startup-banner (expand-file-name "usr/share/gnu-emacs.png" user-emacs-directory))
-    (dashboard-image-banner-max-height 400)
-    (dashboard-icon-type 'nerd-icons)
-    :init
-    (add-hook 'after-init-hook #'dashboard-insert-startupify-lists)
-    (add-hook 'after-init-hook #'dashboard-initialize)
-    (add-hook 'window-setup-hook #'dashboard-resize-on-hook)
-    (add-to-list 'window-size-change-functions #'dashboard-resize-on-hook)
-    :config
-    (setq initial-buffer-choice (lambda ()
-                                  (dashboard-insert-startupify-lists t)
-                                  (get-buffer-create dashboard-buffer-name))))
-#+end_src
-
-** Line Numbers
-Display line numbers for computer codes.
-For regular texts, usually they are more of an annoyance.
-
-#+begin_src emacs-lisp
-  (use-package evil-line-numbers
-    :ensure nil
-    :after (evil)
-    :hook (prog-mode)
-    :custom
-    (display-line-numbers-width 3))
-#+end_src
-
-** Vertically Aligned Tables
-Many markup languages (including Markdown and Org-mode) draws tables in a form of ASCII art.
-These look nice when everything is made of monospace texts, but as soon as we put proportional fonts into play, they become a nightmare.
-
-#+begin_src emacs-lisp
-  (use-package valign
-    :hook (markdown-mode org-mode)
-    :custom
-    (valign-fancy-bar t))
-#+end_src
-
-** Discord Integration
-Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
-Emacs has an unofficial plugin for that, to show off what I'm doing.
-
-#+begin_src emacs-lisp
-  (use-package elcord
-    :custom
-    (elcord-use-major-mode-as-main-icon t)
-    (elcord-quiet t))
-#+end_src
-
-** GitHub Copilot
-I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilot]] now.
-
-#+begin_src emacs-lisp
-  (use-package copilot
-    :bind (("C-c M-f" . copilot-complete)
-           :map copilot-completion-map
-           ("C-g" . 'copilot-clear-overlay)
-           ("M-p" . 'copilot-previous-completion)
-           ("M-n" . 'copilot-next-completion)
-           ("<tab>" . 'copilot-accept-completion)
-           ("M-f" . 'copilot-accept-completion-by-word)
-           ("M-<return>" . 'copilot-accept-completion-by-line))
-    :hook (prog-mode))
-#+end_src
-
-** AI Assistance
-I can even outsource typing to AI agents too.
-
-#+begin_src emacs-lisp
-  (use-package ai-code
-    :after (evil magit)
-    :bind (("C-c a" . ai-code-menu))
-    :custom
-    (ai-code-backends-infra-terminal-backend 'eat)
-    :config
-    (ai-code-set-backend 'claude-code)
-    (ai-code-backends-infra-evil-setup)
-    (ai-code-magit-setup-transients))
-#+end_src
-
-** Terminal Emulator
-Emacs has an ANSI terminal emulator, but it is rather slow.
-~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
-It doesn't work on WIndows, though.
-
-#+begin_src emacs-lisp
-  (use-package eat
-    :unless (eq system-type 'windows-nt)
-    :bind (("C-c RET" . eat))
-    :hook ((eshell-load . eat-eshell-mode)
-           (eshell-load . eat-eshell-visual-command-mode)))
-#+end_src
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Editing Unicode-heavy codes kinda sucks if I need to type LaTeX sources every time.
-Before defining any input methods, any math-related input method can benefit from the data package ~math-symbol-lists~.
-Input method definitions require the data package to be installed at compile time, so we need to have Elpaca wait for its installation.
-
-#+begin_src emacs-lisp
-  (use-package math-symbol-lists)
-#+end_src
-
-At least for Iris-related sources, I nicked the [[https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/editor.md][recommended editor setup guide]] from Iris repository.
-
-#+begin_src emacs-lisp
-  (use-package uni-iris
-    :ensure nil)
-#+end_src
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-~dired~ stands for DIRectory EDitor.
-Basically a file explorer in Emacs.
-We can prettify it with Nerd Fonts.
-
-#+begin_src emacs-lisp
-  (use-package nerd-icons-dired
-    :hook (dired-mode))
-#+end_src
-
-* Keybindings
-While emacs has an extensive list of keybindings available, we can make things much better and enjoyable.
-
-** Evil Mode
-For text editing and navigation, Evil-mode is still much better than "The Emacs Way".
-
-#+begin_src emacs-lisp
-  (use-package evil
-    :custom
-    (evil-split-window-below t)
-    (evil-undo-system 'undo-redo)
-    (evil-vsplit-window-right t)
-    (evil-want-keybinding nil)
-    :config
-    (evil-mode +1))
-
-  (use-package evil-collection
-    :config
-    (evil-collection-init))
-
-  (use-package evil-surround
-    :config
-    (global-evil-surround-mode +1))
-#+end_src
-
-** God Mode
-God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with plain letters.
-
-#+begin_src emacs-lisp
-  (use-package god-mode)
-#+end_src
-
-** "Hades" Mode
-When God meets Evil, they become Hades.
-~hades-mode~ integrates ~evil-mode~ and ~god-mode~ into a single package.
-
-You can enter ~god-mode~ by pressing =,= in normal state.
-
-#+begin_src emacs-lisp
-  (use-package hades
-    :ensure nil
-    :after (evil god-mode)
-    :config
-    (evil-define-key 'normal global-map "," #'hades-start-execute-in-hades-state)
-    (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
-#+end_src
-
-** Custom Keybindings
-Couple of keybindings that make my life easier.
-These do not depend on packages, and package-dependent keybindings should go to their respective ~use-package~ declarations.
-
-*** =ZERO WIDTH SPACE= Shortcut
-While Org-mode is great, it doesn't handle markups beginning or ending within a word.
-In English, this is rare, but in Korean and Japanese, it is a pain in the ass.
-There should be an easy way to insert a *zero-width space* to delimit them.
-(It is the [[https://orgmode.org/manual/Escape-Character.html][preferred way of achieving this]].)
-
-#+begin_src emacs-lisp
-  (evil-define-key 'insert global-map (kbd "M-SPC")
-    (lambda ()
-      (interactive)
-      (insert (char-from-name "ZERO WIDTH SPACE"))))
-#+end_src
-
-* Editing Support
-These settings are useful /specifically/ when editing texts in Emacs.
-
-** Code Styling
-Emacs has... /interesting/ default style.
-Let's address that.
-
-Fuck tabs, they're different on every platform.
-
-#+begin_src emacs-lisp
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-  (setq-default tab-stop-list (number-sequence 4 120 4))
-#+end_src
-
-[[https://editorconfig.org/][EditorConfig]] is a pretty widely-supported method of ensuring consistent code style across many developers.
-
-#+begin_src emacs-lisp
-  (use-package editorconfig
-    :config
-    (editorconfig-mode +1))
-#+end_src
-
-** Mixed-pitch Support
-Emacs can display text in a /mixed-pitch/ manner, where both variable-pitch and fixed-pitch fonts can exist in a single buffer.
-I wrote a small utility called ~mixed-pitch-mode~ that utilizes ~face-remap~ facility.
-(There exists a package with the same name that does the same thing, but without proper fontset support, CJK characters are not displayed correctly.)
-
-#+begin_src emacs-lisp
-  (use-package mixed-pitch
-    :ensure nil
-    :hook (markdown-mode org-mode))
-#+end_src
-
-
-There is a small package called ~visual-fill-column~ that extends the built-in ~visual-line-mode~ so that it acknowledges ~fill-column~.
-
-#+begin_src emacs-lisp
-  (use-package visual-fill-column
-    :hook (markdown-mode org-mode)
-    :custom
-    (visual-fill-column-center-text t)
-    (visual-fill-column-width 120))
-#+end_src
-
-** Rainbow Delimiters
+** Enhancements
+*** Rainbow Delimiters
 Colorful parentheses help distinguish which opens and closes which.
 Basically, a must-have for Lisp.
 
@@ -782,7 +399,7 @@ Basically, a must-have for Lisp.
     :hook (prog-mode))
 #+end_src
 
-** Preview Color Codes
+*** Preview Color Codes
 ~rainbow-mode~ changes the background of color representations in a source code.
 This is especially useful for stylesheets, etc.
 
@@ -794,9 +411,9 @@ This is especially useful for stylesheets, etc.
     (rainbow-x-colors nil))
 #+end_src
 
-** Completions
-There are two kinds of completions in Emacs.
-One is *in-buffer completions*, and the other is *minibuffer completions*.
+*** In-buffer Completions
+In-buffer completion engines complete texts in buffers, similar to Visual Studio IntelliSense.
+~corfu~ utilizes the built in ~completion-at-point~ functionalities to provide such completions.
 
 ~corfu~, short for COmpletion in Region FUnction, aims to provide nice UI using child frames.
 
@@ -851,7 +468,10 @@ While it /can/ utilize the built-in completion functions, ~cape~ can provide far
     (add-hook 'completion-at-point-functions #'cape-file))
 #+end_src
 
-From the same developer, ~vertico~ is also a nice solution for minibuffer completions.
+*** Minibuffer Completions
+Minibuffer completions complete anything displayed in the minibuffer.
+
+~vertico~ is `a nice solution for minibuffer completions.
 
 #+begin_src emacs-lisp
   (use-package vertico
@@ -876,7 +496,134 @@ From the same developer, ~vertico~ is also a nice solution for minibuffer comple
     (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
-** Snippets
+*** View Incomplete Keybindings
+Sometimes, typing =C-h k= is too much.
+Let's just throw shit at the wall and see what sticks.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode +1))
+#+end_src
+
+*** Documentations in a Box
+There is a package that shows ~eldoc~ contents within a child frame.
+
+#+begin_src emacs-lisp
+  (use-package eldoc-box
+    :hook (prog-mode . eldoc-box-hover-at-point-mode)
+    :custom
+    (eldoc-echo-area-prefer-doc-buffer t))
+#+end_src
+
+*** Evil Mode
+For text editing and navigation, ~evil~ is still much better than "The Emacs Way".
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :custom
+    (evil-undo-system 'undo-redo)
+    (evil-split-window-below t)
+    (evil-vsplit-window-right t)
+    (evil-want-integration t "Requirement for `evil-collection'.")
+    (evil-want-keybinding nil "Requirement for `evil-collection'.")
+    :config
+    (evil-mode +1))
+
+  (use-package evil-collection
+    :config
+    (evil-collection-init))
+
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode +1))
+#+end_src
+
+~treemacs~ has ~evil~ integration.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-evil
+    :after (treemacs))
+#+end_src
+
+*** God Mode
+God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with plain letters.
+
+#+begin_src emacs-lisp
+  (use-package god-mode)
+#+end_src
+
+*** Text Mode Limited to Fill Column
+There is a small package called ~visual-fill-column~ that extends the built-in ~visual-line-mode~ so that it acknowledges ~fill-column~.
+
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :hook (markdown-mode org-mode)
+    :custom
+    (visual-fill-column-center-text t)
+    (visual-fill-column-width 120))
+#+end_src
+
+*** Vertically Aligned Tables
+Many markup languages (including Markdown and Org-mode) draws tables in a form of ASCII art.
+These look nice when everything is made of monospace texts, but as soon as we put proportional fonts into play, they become a nightmare.
+
+#+begin_src emacs-lisp
+  (use-package valign
+    :hook (markdown-mode org-mode)
+    :custom
+    (valign-fancy-bar t))
+#+end_src
+
+** Utilities
+
+*** Fancy Startup Dashboard
+By default, Emacs shows the =*scratch*= buffer if startup screen is inhibited.
+There is a fancier version of dashboard.
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :hook ((after-init . dashboard-insert-startupify-lists)
+           (after-init . dashboard-initialize)
+           (window-setup . dashboard-resize-on-hook))
+    :custom
+    (dashboard-display-icons-p t)
+    (dashboard-set-file-icons t)
+    (dashboard-set-heading-icons t)
+    (dashboard-startup-banner (expand-file-name "usr/share/gnu-emacs.png" user-emacs-directory))
+    (dashboard-image-banner-max-height 400)
+    (dashboard-icon-type 'nerd-icons)
+    :init
+    (add-to-list 'window-size-change-functions #'dashboard-resize-on-hook)
+    :config
+    (setq initial-buffer-choice (lambda ()
+                                  (dashboard-insert-startupify-lists t)
+                                  (get-buffer-create dashboard-buffer-name))))
+#+end_src
+
+*** Navigation
+~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
+It's really good.
+
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :config
+    (treemacs-follow-mode +1)
+    (treemacs-filewatch-mode +1)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred)
+       (treemacs-git-commit-diff-mode +1))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+
+  (use-package treemacs-nerd-icons
+    :config
+    (treemacs-load-theme "nerd-icons"))
+#+end_src
+
+*** Snippets
 Snippets make life so much easier by creating repetitive boilerplate codes for me.
 
 #+begin_src emacs-lisp
@@ -887,28 +634,162 @@ Snippets make life so much easier by creating repetitive boilerplate codes for m
   (use-package yasnippet-snippets)
 #+end_src
 
-** Documentations
-Viewing a summary of documentation is always great.
-Emacs already has ~eldoc~, which is great for viewing documentations.
-There is a package that shows its content within a child frame.
-
-Elpaca seems to have some [[https://github.com/progfolio/elpaca/issues/236][trouble]] upgrading built-in ~eldoc~, so an ugly workaround is still here.
+*** Debug Adapter Protocol
+The [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]] is similar to the [[https://sourceware.org/gdb/current/onlinedocs/gdb.html/GDB_002fMI.html#GDB_002fMI][GDB/MI]] interface as it provides a server-client relationship between the debugger and the UI.
 
 #+begin_src emacs-lisp
-  (use-package eldoc-box
-    :hook (prog-mode . eldoc-box-hover-at-point-mode)
-    :custom
-    (eldoc-echo-area-prefer-doc-buffer t))
+  (use-package dape)
 #+end_src
 
-** Language Server Protocol and Debug Adapter Protocol
-The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
-Meanwhile, the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]] is similar to the [[https://sourceware.org/gdb/current/onlinedocs/gdb.html/GDB_002fMI.html#GDB_002fMI][GDB/MI]] interface as it provides a server-client relationship between the debugger and the UI.
-Both protocols use JSON-RPC to communicate with their respective servers, and we need to update the built-in one.
+*** Terminal Emulator
+Emacs has an ANSI terminal emulator, but it is rather slow.
+~eat~ is a fast terminal emulator implemented in Emacs Lisp, and supports much more features such as sixels and mouse navigation.
+It doesn't work on WIndows, though.
 
 #+begin_src emacs-lisp
-  (use-package dape
-    :unless (version< emacs-version "30.0"))
+  (use-package eat
+    :unless (eq system-type 'windows-nt)
+    :bind (("C-c RET" . eat))
+    :hook ((eshell-load . eat-eshell-mode)
+           (eshell-load . eat-eshell-visual-command-mode)))
+#+end_src
+
+** Integrations
+
+*** Git Integration
+~magit~ is the greatest Git client.
+
+#+begin_src emacs-lisp
+  (defun rangho--set-fill-column-to-72 ()
+    "Set `fill-column' to 72 for git commit messages."
+    (setq fill-column 72))
+
+  (use-package magit
+    :hook (git-commit-setup . rangho--set-fill-column-to-72))
+#+end_src
+
+~treemacs~ has ~magit~ integration.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-magit)
+#+end_src
+
+*** EditorConfig Integration
+[[https://editorconfig.org/][EditorConfig]] is a pretty widely-supported method of ensuring consistent code style across many developers.
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :config
+    (editorconfig-mode +1))
+#+end_src
+
+*** Discord Integration
+Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
+Emacs has an unofficial plugin for that, to show off what I'm doing.
+
+#+begin_src emacs-lisp
+  (use-package elcord
+    :custom
+    (elcord-use-major-mode-as-main-icon t)
+    (elcord-quiet t))
+#+end_src
+
+*** GitHub Copilot Integration
+I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilot]] now.
+
+#+begin_src emacs-lisp
+  (use-package copilot
+    :bind (("C-c M-f" . copilot-complete)
+           :map copilot-completion-map
+           ("C-g" . 'copilot-clear-overlay)
+           ("M-p" . 'copilot-previous-completion)
+           ("M-n" . 'copilot-next-completion)
+           ("<tab>" . 'copilot-accept-completion)
+           ("M-f" . 'copilot-accept-completion-by-word)
+           ("M-<return>" . 'copilot-accept-completion-by-line))
+    :hook (prog-mode))
+#+end_src
+
+*** AI Agent Integration
+I can even outsource typing to AI agents too.
+
+#+begin_src emacs-lisp
+  (use-package ai-code
+    :after (evil magit)
+    :bind (("C-c a" . ai-code-menu))
+    :custom
+    (ai-code-backends-infra-terminal-backend 'eat)
+    :config
+    (ai-code-set-backend 'claude-code)
+    (ai-code-backends-infra-evil-setup)
+    (ai-code-magit-setup-transients))
+#+end_src
+~dired~ stands for DIRectory EDitor.
+Basically a file explorer in Emacs.
+We can prettify it with Nerd Fonts.
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons-dired
+    :hook (dired-mode))
+#+end_src
+
+* Local Packages
+There are some packages I developed but couldn't care less to package it properly.
+
+** "Hades" Mode
+When God is Evil, He becomes Hades.
+~hades-mode~ integrates ~evil-mode~ and ~god-mode~ into a single package.
+
+You can enter ~god-mode~ state by pressing =,= in the NORMAL state.
+
+#+begin_src emacs-lisp
+  (use-package hades
+    :ensure nil
+    :after (evil god-mode)
+    :config
+    (evil-define-key 'normal global-map "," #'hades-start-execute-in-hades-state)
+    (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
+#+end_src
+
+** Line Numbers
+Display line numbers for computer codes.
+For regular texts, usually they are more of an annoyance.
+
+#+begin_src emacs-lisp
+  (use-package evil-line-numbers
+    :ensure nil
+    :after (evil)
+    :hook (prog-mode)
+    :custom
+    (display-line-numbers-width 3))
+#+end_src
+
+** Mixed-pitch Support
+Emacs can display text in a /mixed-pitch/ manner, where both variable-pitch and fixed-pitch fonts can exist in a single buffer.
+I wrote a small utility called ~mixed-pitch-mode~ that utilizes ~face-remap~ facility.
+(There exists a package with the same name that does the same thing, but without proper fontset support, CJK characters are not displayed correctly.)
+
+#+begin_src emacs-lisp
+  (use-package mixed-pitch
+    :ensure nil
+    :hook (markdown-mode org-mode))
+#+end_src
+
+* Keybindings
+While emacs has an extensive list of keybindings available, we can make things much better and enjoyable.
+
+** =ZERO WIDTH SPACE= Shortcut
+While Org-mode is great, it doesn't handle markups beginning or ending within a word.
+In English, this is rare, but in Korean and Japanese, it is a pain in the ass.
+There should be an easy way to insert a *zero-width space* to delimit them.
+(It is the [[https://orgmode.org/manual/Escape-Character.html][preferred way of achieving this]].)
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'evil
+   (evil-define-key 'insert global-map (kbd "M-SPC")
+    (lambda ()
+      (interactive)
+      (insert (char-from-name "ZERO WIDTH SPACE")))))
 #+end_src
 
 * Per-language Settings
@@ -926,7 +807,7 @@ Its documentation was pretty horrible back in the day, but it has got /a lot/ be
 
 #+begin_src emacs-lisp
   (use-package agda2
-    :ensure nil
+    :defer t
     :when (executable-find "agda")
     :load-path (lambda ()
                  (let ((coding-system-for-read 'utf-8))
@@ -941,11 +822,12 @@ While BASIC is not used a lot, some exotic environments like Microsoft Excel sti
 There is no official support for Visual Basic in =basic-mode=, so we need to define our own.
 
 #+begin_src emacs-lisp
-  (use-package basic-mode)
+  (use-package basic-mode
+    :defer t)
 
   (use-package visual-basic-mode
     :ensure nil
-    :after basic-mode)
+    :defer t)
 #+end_src
 
 ** C, C++, Objective-C
@@ -955,33 +837,27 @@ There are a lot of file extensions that Emacs doesn't recognize out-of-the-box, 
 Also, while we're at it, let's enable Language Server support.
 
 #+begin_src emacs-lisp
-  (use-package cc-mode
-    :ensure nil
-    :mode (("\\.c\\'" . c-mode)
-           ("\\.h\\'" . c-or-c++-mode)
-           ("\\.HC\\'" . c-mode)
-           ("\\.ZC\\'" . c-mode)
-           ("\\.cpp\\'" . c++-mode)
-           ("\\.cppm\\'" . c++-mode)
-           ("\\.hpp\\'" . c++-mode)
-           ("\\.tpp\\'" . c++-mode)
-           ("\\.ipp\\'" . c++-mode)
-           ("\\.cc\\'" . c++-mode)
-           ("\\.hh\\'" . c++-mode)
-           ("\\.tcc\\'" . c++-mode)
-           ("\\.h++\\'" . c++-mode)
-           ("\\.c++\\'" . c++-mode)
-           ("\\.hxx\\'" . c++-mode)
-           ("\\.txx\\'" . c++-mode)
-           ("\\.cxx\\'" . c++-mode)
-           ("\\.inl\\'" . c++-mode)
-           ("\\.ixx\\'" . c++-mode))
-    :custom
-    (c-default-style "k&r"))
-
   (use-package c-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
+    :mode (("\\.c\\'" . c-ts-mode)
+           ("\\.h\\'" . c-or-c++-ts-mode)
+           ("\\.HC\\'" . c-ts-mode)
+           ("\\.ZC\\'" . c-ts-mode)
+           ("\\.cpp\\'" . c++-ts-mode)
+           ("\\.cppm\\'" . c++-ts-mode)
+           ("\\.hpp\\'" . c++-ts-mode)
+           ("\\.tpp\\'" . c++-ts-mode)
+           ("\\.ipp\\'" . c++-ts-mode)
+           ("\\.cc\\'" . c++-ts-mode)
+           ("\\.hh\\'" . c++-ts-mode)
+           ("\\.tcc\\'" . c++-ts-mode)
+           ("\\.h++\\'" . c++-ts-mode)
+           ("\\.c++\\'" . c++-ts-mode)
+           ("\\.hxx\\'" . c++-ts-mode)
+           ("\\.txx\\'" . c++-ts-mode)
+           ("\\.cxx\\'" . c++-ts-mode)
+           ("\\.inl\\'" . c++-ts-mode)
+           ("\\.ixx\\'" . c++-ts-mode))
     :init
     (add-to-list 'treesit-language-source-alist
                  '(c "https://github.com/tree-sitter/tree-sitter-c"))
@@ -999,17 +875,14 @@ Also, while we're at it, let's enable Language Server support.
 Emacs doesn't come with support for build systems, except for Makefile.
 
 #+begin_src emacs-lisp
-  (use-package cmake-mode
-    :unless (featurep 'treesit))
-
   (use-package cmake-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(cmake "https://github.com/uyha/tree-sitter-cmake")))
 
-  (use-package meson-mode)
+  (use-package meson-mode
+    :defer t)
 #+end_src
 
 We can add support for =clang-format= formatter with a bit of RegExp magic.
@@ -1028,15 +901,13 @@ Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
   (use-package csharp-mode
-    :ensure nil
+    :defer t
     :init
-    (when (featurep 'treesit)
-      (add-to-list 'treesit-language-source-alist
-                   '(csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")))
+    (add-to-list 'treesit-language-source-alist
+                 '(csharp "https://github.com/tree-sitter/tree-sitter-c-sharp"))
     :config
-    (when (featurep 'treesit)
-      (add-to-list 'major-mode-remap-alist
-                   '(csharp-mode . csharp-ts-mode))))
+    (add-to-list 'major-mode-remap-alist
+                 '(csharp-mode . csharp-ts-mode)))
 #+end_src
 
 ** Caddyfile
@@ -1044,7 +915,8 @@ Caddy is a simple and easy to use reverse proxy application.
 Perfect solution for small web servers like in a homelab.
 
 #+begin_src emacs-lisp
-  (use-package caddyfile-mode)
+  (use-package caddyfile-mode
+    :defer t)
 #+end_src
 
 ** Conf-mode
@@ -1052,7 +924,7 @@ Perfect solution for small web servers like in a homelab.
 
 #+begin_src emacs-lisp
   (use-package conf-mode
-    :ensure nil
+    :defer t
     :mode ( ; systemd units
            "\\.service\\'" "\\.socket\\'" "\\.device\\'" "\\.mount\\'"
            "\\.automount\\'" "\\.swap\\'" "\\.target\\'" "\\.path\\'"
@@ -1067,6 +939,7 @@ Crystal is a native programming language that looks exactly like Ruby.
 
 #+begin_src emacs-lisp
   (use-package crystal-mode
+    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(crystal-mode . ("crystalline"))))
@@ -1076,19 +949,16 @@ Crystal is a native programming language that looks exactly like Ruby.
 D2 is a diagram scripting language, producing an image.
 
 #+begin_src emacs-lisp
-  (use-package d2-mode)
+  (use-package d2-mode
+    :defer t)
 #+end_src
 
 ** Dockerfile
 Docker is /de facto/ standard container technology these days.
 
 #+begin_src emacs-lisp
-  (use-package dockerfile-mode
-    :unless (featurep 'treesit))
-
   (use-package dockerfile-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")))
@@ -1099,19 +969,34 @@ Elixir is a functional programming langauge based on the great Erlang/OTP BEAM v
 It keeps the great part of the virtual machine while providing highly extensible grammar.
 
 #+begin_src emacs-lisp
-  (use-package elixir-mode
+  (use-package elixir-ts-mode
+    :defer t
     :init
     (add-to-list 'eglot-server-programs
-                 '(elixir-mode . ("elixir-ls"))))
+                 '(elixir-mode . ("elixir-ls")))
+    (add-to-list 'treesit-language-source-alist
+                 '(elixir "https://github.com/elixir-lang/tree-sitter-elixir")))
+#+end_src
+
+HEEx is a template language used by Phoenix Framework, a popular web framework written in Elixir.
+
+#+begin_src emacs-lisp
+  (use-package heex-ts-mode
+    :defer t
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(heex "https://github.com/phoenixframework/tree-sitter-heex")))
 #+end_src
 
 ** F#
 F# is a functional programming language in OCaml family that runs on .NET Common Language Runtime.
 
 #+begin_src emacs-lisp
-  (use-package fsharp-mode)
+  (use-package fsharp-mode
+    :defer t)
 
   (use-package eglot-fsharp
+    :defer t
     :when (featurep 'eglot))
 #+end_src
 
@@ -1119,7 +1004,8 @@ F# is a functional programming language in OCaml family that runs on .NET Common
 Gnuplot is a command-line plotting program.
 
 #+begin_src emacs-lisp
-  (use-package gnuplot)
+  (use-package gnuplot
+    :defer t)
 #+end_src
 
 ** Go
@@ -1129,8 +1015,7 @@ At least it's built-in...
 
 #+begin_src emacs-lisp
   (use-package go-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :mode (("\\.go\\'" . go-ts-mode)
            ("/go\\.mod\\'" . go-mod-ts-mode))
     :init
@@ -1145,7 +1030,8 @@ Haskell, being a purely functional language, has an exceptional support for Emac
 So much so that it doesn't even require LSP!
 
 #+begin_src emacs-lisp
-  (use-package haskell-mode)
+  (use-package haskell-mode
+    :defer t)
 #+end_src
 
 [[https://github.com/fourmolu/fourmolu][Fourmolu]] is a fork of [[https://github.com/tweag/ormolu][Ormolu]] with configurable style.
@@ -1154,6 +1040,7 @@ If =fourmolu= binary is available, integrate it.
 
 #+begin_src emacs-lisp
   (use-package ormolu
+    :defer t
     :when (executable-find "fourmolu")
     :hook (haskell-mode . ormolu-format-on-save-mode)
     :custom
@@ -1209,6 +1096,7 @@ Both of them suck, and Julia performs pretty well.
       (user-error "Julia is not installed")))
 
   (use-package julia-mode
+    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(julia-mode . rangho--julia-mode-contact)))
@@ -1219,7 +1107,7 @@ KDL is a small, pleasant document language with XML-like node semantics that res
 
 #+begin_src emacs-lisp
   (use-package kdl-mode
-    :when (featurep 'treesit)
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")))
@@ -1229,14 +1117,19 @@ KDL is a small, pleasant document language with XML-like node semantics that res
 Lex and Yacc (or more recently, Flex and Bison) are one of the most popular parser generator.
 
 #+begin_src emacs-lisp
-  (use-package bison-mode)
+  (use-package bison-mode
+    :defer t)
 #+end_src
 
 ** Lua
 Lua is a small, yet full-featured embedded language that works with C really well.
 
 #+begin_src emacs-lisp
-  (use-package lua-mode)
+  (use-package lua-ts-mode
+    :defer t
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(lua "https://github.com/tree-sitter-grammars/tree-sitter-lua")))
 #+end_src
 
 ** Markdown
@@ -1245,6 +1138,7 @@ The syntax is... questionable, at best, though.
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
+    :defer t
     :mode (("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode)
            ("\\.mdx\\'". markdown-mode)
@@ -1257,25 +1151,24 @@ The syntax is... questionable, at best, though.
 Mermaid is a diagram and graph scripting language, producing an image.
 
 #+begin_src emacs-lisp
-  (use-package mermaid-mode)
+  (use-package mermaid-mode
+    :defer t)
 #+end_src
 
 ** Nix
 Nix is a functional and declarative expression format used to configure NixOS.
 
 #+begin_src emacs-lisp
-  (use-package nix-mode)
+  (use-package nix-mode
+    :defer t)
 #+end_src
 
 ** Nu
 Nu is a brand-new, data-oriented shell script.
 
 #+begin_src emacs-lisp
-  (use-package nushell-mode
-    :unless (featurep 'treesit))
-
   (use-package nushell-ts-mode
-    :when (featurep 'treesit)
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(nu "https://github.com/nushell/tree-sitter-nu")))
@@ -1285,14 +1178,16 @@ Nu is a brand-new, data-oriented shell script.
 OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in static analysis and formal verification softwares.
 
 #+begin_src emacs-lisp
-  (use-package tuareg)
+  (use-package tuareg
+    :defer t)
 #+end_src
 
 ** OpenSCAD
 OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
-  (use-package scad-mode)
+  (use-package scad-mode
+    :defer t)
 #+end_src
 
 ** Org-mode
@@ -1300,7 +1195,7 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org
-    :ensure nil
+    :defer t
     :bind (("C-c a" . org-agenda)
            ("C-c t" . org-capture))
     :custom
@@ -1321,6 +1216,7 @@ OpenSCAD allows me to make 3D models in code.
     (org-use-sub-superscripts '{}))
 
   (use-package org-appear
+    :defer t
     :hook (org-mode . (lambda ()
                         (org-appear-mode +1)
                         (add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start nil t)
@@ -1334,7 +1230,8 @@ OpenSCAD allows me to make 3D models in code.
     (org-appear-trigger 'manual))
 
   (use-package org-modern
-    :after nerd-icons
+    :defer t
+    :after (nerd-icons)
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda))
     :custom
@@ -1350,12 +1247,14 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org-mem
+    :defer t
     :custom
     (org-mem-do-sync-with-org-id t)
     :config
     (org-mem-updater-mode))
 
   (use-package org-node
+    :defer t
     :bind-keymap ("C-c n" . org-node-global-prefix-map)
     :init
     ;; The :bind-keymap keyword cannot bind a keymap to another map yet.
@@ -1370,11 +1269,13 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org-re-reveal
+    :defer t
     :custom
     (org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js@4")
     (org-re-reveal-revealjs-version "4"))
 
   (use-package org-re-reveal-citeproc
+    :defer t
     :config
     (add-to-list 'org-export-filter-paragraph-functions #'org-re-reveal-citeproc-filter-cite))
 #+end_src
@@ -1383,6 +1284,7 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-d2
+    :defer t
     :when (executable-find "d2")
     :init
     (add-to-list 'org-babel-load-languages '(d2 . t)))
@@ -1392,8 +1294,9 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-gnuplot
-    :when (executable-find "gnuplot")
     :ensure nil
+    :defer t
+    :when (executable-find "gnuplot")
     :init
     (add-to-list 'org-babel-load-languages '(gnuplot . t)))
 #+end_src
@@ -1402,6 +1305,7 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-mermaid
+    :defer t
     :when (executable-find "mmdc")
     :custom (ob-mermaid-cli-path (executable-find "mmdc"))
     :init
@@ -1413,6 +1317,7 @@ OpenSCAD allows me to make 3D models in code.
 #+begin_src emacs-lisp
   (use-package ox-latex
     :ensure nil
+    :defer t
     :custom
     (org-latex-compiler "lualatex")
     (org-latex-src-block-backend 'engraved)
@@ -1426,7 +1331,8 @@ OpenSCAD allows me to make 3D models in code.
 PowerShell is the new shell script language for Windows and .NET platform.
 
 #+begin_src emacs-lisp
-  (use-package powershell)
+  (use-package powershell
+    :defer t)
 #+end_src
 
 ** Praat Script
@@ -1435,7 +1341,8 @@ It allows automation by writing object-manipulating commands into a script.
 
 #+begin_src emacs-lisp
   (use-package praat-mode
-    :ensure nil)
+    :ensure nil
+    :defer t)
 #+end_src
 
 ** Proof General
@@ -1443,6 +1350,7 @@ It allows automation by writing object-manipulating commands into a script.
 
 #+begin_src emacs-lisp
   (use-package proof-general
+    :defer t
     :custom
     (proof-splash-enable nil)
     (proof-layout-windows 'hybrid))
@@ -1454,7 +1362,7 @@ Still I need to use it, so...
 
 #+begin_src emacs-lisp
   (use-package python
-    :ensure nil
+    :defer t
     :init
     (when (featurep 'treesit)
       (add-to-list 'treesit-language-source-alist
@@ -1470,18 +1378,14 @@ Ruby is the father of system scripting language.
 Better than Python.
 
 #+begin_src emacs-lisp
-  (use-package ruby-mode
-    :unless (featurep 'treesit)
-    :ensure nil)
-
   (use-package ruby-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(ruby "https://github.com/tree-sitter/tree-sitter-ruby")))
 
-  (use-package rbs-mode)
+  (use-package rbs-mode
+    :defer t)
 #+end_src
 
 ** Rust
@@ -1492,27 +1396,20 @@ Rust is a modern system programming language that ensures memory safety by langu
     "Add a hook to format Rust code before saving."
     (add-hook 'before-save-hook #'eglot-format-buffer nil t))
 
-  (use-package rust-mode
-    :unless (featurep 'treesit)
-    :hook (rust-mode . rangho--add-rust-mode-before-save-hook))
-
   (use-package rust-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :hook (rust-ts-mode . rangho--add-rust-mode-before-save-hook)
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(rust "https://github.com/tree-sitter/tree-sitter-rust"))
-    :config
-    (add-to-list 'major-mode-remap-alist
-                 '(rust-mode . rust-ts-mode)))
+                 '(rust "https://github.com/tree-sitter/tree-sitter-rust")))
 #+end_src
 
 ** Swift
 Swift is to Objective-C as Kotlin is to Java, on Apple devices.
 
 #+begin_src emacs-lisp
-  (use-package swift-mode)
+  (use-package swift-mode
+    :defer t)
 #+end_src
 
 ** Terraform
@@ -1530,6 +1427,7 @@ Terraform is a cloud provisioning software from Hashicorp.
       (list lsp-server "serve")))
 
   (use-package terraform-mode
+    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(terraform-mode . rangho--terraform-mode-contact)))
@@ -1544,6 +1442,7 @@ On non-UNIX systems this becomes a problem, but I won't be editing LaTeX on Wind
 
 #+begin_src emacs-lisp
   (use-package auctex
+    :defer t
     :hook ((ConTeXt-mode . prettify-symbols-mode)
            (LaTeX-mode . prettify-symbols-mode)))
 #+end_src
@@ -1554,8 +1453,7 @@ Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in
 
 #+begin_src emacs-lisp
   (use-package toml-ts-mode
-    :requires treesit
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(toml "https://github.com/tree-sitter/tree-sitter-toml"))
@@ -1571,7 +1469,7 @@ Note that the major mode for Typst is provided only as a Tree-Sitter grammar.
 
 #+begin_src emacs-lisp
   (use-package typst-ts-mode
-    :when (featurep 'treesit)
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(typst "https://github.com/uben0/tree-sitter-typst")))
@@ -1587,16 +1485,14 @@ There are a few /modern/ extensions to support, namely, PostCSS.
 
 #+begin_src emacs-lisp
   (use-package css-mode
-    :ensure nil
+    :defer t
     :mode ("\\.pcss\\'" "\\.postcss\\'")
     :init
-    (when (featurep 'treesit)
-      (add-to-list 'treesit-language-source-alist
-                   '(css "https://github.com/tree-sitter/tree-sitter-css")))
+    (add-to-list 'treesit-language-source-alist
+                 '(css "https://github.com/tree-sitter/tree-sitter-css"))
     :config
-    (when (featurep 'treesit)
-      (add-to-list 'major-mode-remap-alist
-                   '(css-mode . css-ts-mode))))
+    (add-to-list 'major-mode-remap-alist
+                 '(css-mode . css-ts-mode)))
 #+end_src
 
 *** JavaScript and JSX
@@ -1613,15 +1509,13 @@ To edit TypeScript files, just install Emacs 29.
 
 #+begin_src emacs-lisp
   (use-package js
-    :ensure nil
+    :defer t
     :init
-    (when (featurep 'treesit)
-      (add-to-list 'treesit-language-source-alist
-                   '(javascript "https://github.com/tree-sitter/tree-sitter-javascript")))
+    (add-to-list 'treesit-language-source-alist
+                 '(javascript "https://github.com/tree-sitter/tree-sitter-javascript"))
     :config
-    (when (featurep 'treesit)
-      (add-to-list 'major-mode-remap-alist
-                   '(js-mode . js-ts-mode))))
+    (add-to-list 'major-mode-remap-alist
+                 '(js-mode . js-ts-mode)))
 
 
 #+end_src
@@ -1635,8 +1529,7 @@ While it says TSX, it supports both JSX and TSX no problem.
 
 #+begin_src emacs-lisp
   (use-package typescript-ts-mode
-    :when (featurep 'treesit)
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
@@ -1654,8 +1547,7 @@ Starting from Emacs 29, there is a new JSON major mode powered by Tree-Sitter.
 
 #+begin_src emacs-lisp
   (use-package json-ts-mode
-    :requires treesit
-    :ensure nil
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(json "https://github.com/tree-sitter/tree-sitter-json"))
@@ -1681,6 +1573,7 @@ It primarily targets HTML, but it also supports other HTMLx templates.
       '("echo" "No language server available")))
 
   (use-package web-mode
+    :defer t
     :mode ("\\.php\\'"                      ; PHP
            "\\.rhtml\\'" "\\.html\\.erb\\'" ; Ruby on Rails
            "\\.html\\.heex\\'"              ; Phoenix
@@ -1701,6 +1594,7 @@ X11 uses similar syntax for most of its configurations.
 #+begin_src emacs-lisp
   (use-package xrdb-mode
     :ensure nil
+    :defer t
     :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'"))
 #+end_src
 
@@ -1710,6 +1604,7 @@ While there are a lot of criticisms, it is still widely used to represent data i
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
+    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))
@@ -1719,75 +1614,9 @@ While there are a lot of criticisms, it is still widely used to represent data i
 Eye-candies are imporant.
 Trust me, *they are*.
 
-** User Interfaces
-User interface tweaks to make Emacs prettier.
-
 ** Fonts
 Fonts are super important, not because they're pretty, but because it greatly affects the readability of a text.
 Here is a set of fonts I use.
-
-#+begin_src emacs-lisp
-  ;; Sample sentences to check font support:
-  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
-  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
-  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
-  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
-
-  (defconst rangho--fixed-font-alist
-    '((nil "hesalche" "semteulche"
-           "Noto Sans Mono"
-           "Cascadia Code" "Consolas" "Courier New"
-           "monospace")
-      (hangul "hesalche" "semteulche"
-              "Noto Sans Mono CJK KR"
-              "DotumChe" "GulimChe"
-              "monospace")
-      (kana "Noto Sans Mono CJK JP"
-            "GulimChe" "DotumChe"
-            "monospace")
-      (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
-           "GulimChe" "DotumChe"
-           "monospace")
-      (symbol "Symbols Nerd Font Mono"
-              "Noto Sans Symbols" "Noto Sans Symbols 2"
-              "Segoe UI Symbol")
-      (emoji "Noto Color Emoji"
-             "Segoe UI Emoji"))
-    "List of fixed-pitch fonts, in order of preference.")
-
-  (defconst rangho--variable-font-alist
-    '((nil "Noto Sans" "Noto Serif"
-           "Segoe UI" "Arial"
-           "sans-serif")
-      (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
-              "Malgun Gothic" "Dotum" "Gulim"
-              "sans-serif")
-      (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
-            "Meiryo" "Yu Gothic" "Yu Mincho"
-            "sans-serif")
-      (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
-           ("Noto Sans CJK TC" "Noto Serif CJK TC")
-           "Microsoft YaHei" "Microsoft JhengHei"
-           "sans-serif")
-      (symbol "Symbols Nerd Font"
-              "Noto Sans Symbols" "Noto Sans Symbols 2"
-              "Segoe UI Symbol")
-      (emoji "Noto Color Emoji"
-             "Segoe UI Emoji"))
-    "List of variable-pitch fonts, in order of preference.")
-
-  (defconst rangho--unicode-private-use-areas
-    '((#xe000 . #xf8ff) ; Private Use Area
-      (#xf0000 . #xffffd) ; Supplementary Private Use Area-A
-      (#x100000 . #x10fffd)) ; Supplementary Private Use Area-B
-    "List of Unicode private use areas.")
-#+end_src
-
-Emacs has weird ways of implementing font lookup.
-There are two different concepts:
-
-- Face font :: They govern the fonts for ASCII characters. They *cannot* be overriden by fontsets.
-- Fontsets :: Set of fonts used to show Unicode characters. While they are not documented, one can define a brand-new fontset with ~create-fontset-from-fontset-spec~.
 
 #+begin_notes
 On Linux, dual-width CJK fonts are not aligned correctly if the font height does not match with its intended DPI settings.
@@ -1798,86 +1627,56 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
 #+end_notes
 
 #+begin_src emacs-lisp
-  (defun rangho--font-available-p (font)
-    "Check if the FONT is available."
-    (if (listp font)
-        ;; All fonts in the list must be found
-        (cl-every #'rangho--font-available-p font)
-      ;; Check if the font is available
-      (find-font (font-spec :name font))))
+  ;; Sample sentences to check font support:
+  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
+  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
+  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
+  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
 
-  (defun rangho--find-font-specs (alist charset)
-    "Find a list of font specs for CHARSET in ALIST."
-    (when-let* ((candidates (alist-get charset alist))
-                (found-fonts (cl-loop
-                              for font in candidates
-                              when (rangho--font-available-p font)
-                              return (if (listp font) font (list font)))))
-      (mapcar (apply-partially #'font-spec :name) found-fonts)))
-
-  (defun rangho--find-first-available-font (alist charset)
-    "Find the first available font for CHARSET in ALIST."
-    (when-let ((candidates (alist-get charset alist)))
-      (cl-find-if #'rangho--font-available-p candidates)))
-
-  (defun rangho--set-fontset-fonts (fontset alist)
-    "Set fonts in FONTSET using ALIST."
-    (dolist (item alist)
-      (dolist (font (rangho--find-font-specs alist (car item)))
-        (set-fontset-font fontset (car item) font)))
-    (dolist (area rangho--unicode-private-use-areas)
-      (set-fontset-font fontset area (car (rangho--find-font-specs alist 'symbol)))))
-
-  (defun rangho--set-default-font ()
-    "Set the default font to use throughout Emacs."
-    (interactive)
-    (let ((fixed-font (rangho--find-first-available-font rangho--fixed-font-alist nil))
-          (variable-font (rangho--find-first-available-font rangho--variable-font-alist nil)))
-      ;; Default fontset
-      (rangho--set-fontset-fonts t rangho--fixed-font-alist)
-      ;; Fixed-pitch fontset
-      (create-fontset-from-fontset-spec
-       (font-xlfd-name
-        (font-spec :name fixed-font
-                   :registry "fontset-fixed")))
-      (rangho--set-fontset-fonts "fontset-fixed" rangho--fixed-font-alist)
-      ;; Variable-pitch fontset
-      (create-fontset-from-fontset-spec
-       (font-xlfd-name
-        (font-spec :name variable-font
-                   :registry "fontset-variable")))
-      (rangho--set-fontset-fonts "fontset-variable" rangho--variable-font-alist)
-      ;; Frame-wide face attributes
-      (set-face-attribute 'default nil
-                          :family fixed-font
-                          :height 120)
-      (set-face-attribute 'fixed-pitch nil
-                          :family fixed-font
-                          :fontset "fontset-fixed"
-                          :inherit t)
-      (set-face-attribute 'variable-pitch nil
-                          :family variable-font
-                          :fontset "fontset-variable"
-                          :inherit t)))
-#+end_src
-
-There are differnt ways to set these settings.
-
-1. Daemon mode, then set the font when a new frame is create;
-2. Graphical mode, then envoke the setting right away;
-3. Terminal mode, then do nothing.
-
-#+begin_src emacs-lisp
-  (cond
-   ((daemonp)
-    (add-to-list 'after-make-frame-functions
-                 (lambda (frame)
-                   (select-frame frame)
-                   (if (display-graphic-p frame)
-                       (rangho--set-default-font)))))
-   ((display-graphic-p)
-    (rangho--set-default-font))
-   (t nil))
+  (use-package rangho-fonts
+    :ensure nil
+    :custom
+    (rangho-fonts-fixed-font-alist
+     '((nil "hesalche" "semteulche"
+            "Noto Sans Mono"
+            "Cascadia Code" "Consolas" "Courier New"
+            "monospace")
+       (hangul "hesalche" "semteulche"
+               "Noto Sans Mono CJK KR"
+               "DotumChe" "GulimChe"
+               "monospace")
+       (kana "Noto Sans Mono CJK JP"
+             "GulimChe" "DotumChe"
+             "monospace")
+       (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
+            "GulimChe" "DotumChe"
+            "monospace")
+       (symbol "Symbols Nerd Font Mono"
+               "Noto Sans Symbols" "Noto Sans Symbols 2"
+               "Segoe UI Symbol")
+       (emoji "Noto Color Emoji"
+              "Segoe UI Emoji")))
+    (rangho-fonts-variable-font-alist
+     '((nil "Noto Sans" "Noto Serif"
+            "Segoe UI" "Arial"
+            "sans-serif")
+       (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
+               "Malgun Gothic" "Dotum" "Gulim"
+               "sans-serif")
+       (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
+             "Meiryo" "Yu Gothic" "Yu Mincho"
+             "sans-serif")
+       (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
+            ("Noto Sans CJK TC" "Noto Serif CJK TC")
+            "Microsoft YaHei" "Microsoft JhengHei"
+            "sans-serif")
+       (symbol "Symbols Nerd Font"
+               "Noto Sans Symbols" "Noto Sans Symbols 2"
+               "Segoe UI Symbol")
+       (emoji "Noto Color Emoji"
+              "Segoe UI Emoji")))
+    :config
+    (rangho-fonts-mode +1))
 #+end_src
 
 Ligatures provide alternative combined glyphs for commonly used character combinations (such as operators).
@@ -1924,53 +1723,53 @@ It also generates color codes based on a template file, and places them in =XDG_
 Load that if available; if not, pick a sensible colorscheme based on [[https://draculatheme.com/][Dracula]].
 
 #+begin_src emacs-lisp
-  (if-let* ((pywal-colors-file (expand-file-name "wal--colors.el" user-cache-directory))
+  (if-let* ((pywal-colors-file (expand-file-name "wal/colors.el" user-cache-directory))
             ((file-exists-p pywal-colors-file)))
       (load-file pywal-colors-file)
-    (setq wal--foreground "#f8f8f2"
-          wal--background "#282a36"
-          wal--cursor     "#44475a"
-          wal--color0     "#21222c"
-          wal--color1     "#ff5555"
-          wal--color2     "#50fa7b"
-          wal--color3     "#f1fa8c"
-          wal--color4     "#bd93f9"
-          wal--color5     "#ff79c6"
-          wal--color6     "#8be9fd"
-          wal--color7     "#f8f8f2"
-          wal--color8     "#6272a4"
-          wal--color9     "#ff6e6e"
-          wal--color10    "#69ff94"
-          wal--color11    "#ffffa5"
-          wal--color12    "#d6acff"
-          wal--color13    "#ff92df"
-          wal--color14    "#a4ffff"
-          wal--color15    "#ffffff"))
+    (setq wal/foreground "#f8f8f2"
+          wal/background "#282a36"
+          wal/cursor     "#44475a"
+          wal/color0     "#21222c"
+          wal/color1     "#ff5555"
+          wal/color2     "#50fa7b"
+          wal/color3     "#f1fa8c"
+          wal/color4     "#bd93f9"
+          wal/color5     "#ff79c6"
+          wal/color6     "#8be9fd"
+          wal/color7     "#f8f8f2"
+          wal/color8     "#6272a4"
+          wal/color9     "#ff6e6e"
+          wal/color10    "#69ff94"
+          wal/color11    "#ffffa5"
+          wal/color12    "#d6acff"
+          wal/color13    "#ff92df"
+          wal/color14    "#a4ffff"
+          wal/color15    "#ffffff"))
 #+end_src
 
 Since ANSI color codes are bullshit, let's give them friendly names.
 
 #+begin_src emacs-lisp
   (defvar rangho--color-name-alist
-    `((color--foreground      . ,wal--foreground)
-      (color--background      . ,wal--background)
-      (color--cursor          . ,wal--cursor)
-      (color--black           . ,wal--color0)
-      (color--intense-black   . ,wal--color8)
-      (color--red             . ,wal--color1)
-      (color--intense-red     . ,wal--color9)
-      (color--green           . ,wal--color2)
-      (color--intense-green   . ,wal--color10)
-      (color--yellow          . ,wal--color3)
-      (color--intense-yellow  . ,wal--color11)
-      (color--blue            . ,wal--color4)
-      (color--intense-blue    . ,wal--color12)
-      (color--magenta         . ,wal--color5)
-      (color--intense-magenta . ,wal--color13)
-      (color--cyan            . ,wal--color6)
-      (color--intense-cyan    . ,wal--color14)
-      (color--white           . ,wal--color7)
-      (color--intense-white   . ,wal--color15))
+    `((color--foreground      . ,wal/foreground)
+      (color--background      . ,wal/background)
+      (color--cursor          . ,wal/cursor)
+      (color--black           . ,wal/color0)
+      (color--intense-black   . ,wal/color8)
+      (color--red             . ,wal/color1)
+      (color--intense-red     . ,wal/color9)
+      (color--green           . ,wal/color2)
+      (color--intense-green   . ,wal/color10)
+      (color--yellow          . ,wal/color3)
+      (color--intense-yellow  . ,wal/color11)
+      (color--blue            . ,wal/color4)
+      (color--intense-blue    . ,wal/color12)
+      (color--magenta         . ,wal/color5)
+      (color--intense-magenta . ,wal/color13)
+      (color--cyan            . ,wal/color6)
+      (color--intense-cyan    . ,wal/color14)
+      (color--white           . ,wal/color7)
+      (color--intense-white   . ,wal/color15))
     "Association list to map wal colors to friendly names.")
 #+end_src
 
@@ -2187,72 +1986,6 @@ Mode line indicates what file I'm editing, which mode I am using, etc.
 However, the default mode line isn't really fun.
 Let's customize that.
 
-#+begin_src emacs-lisp
-  (defvar rangho--selected-window
-    (frame-selected-window)
-    "Currently selected window.")
-
-  (defun rangho--selected-window-active-p (&optional target)
-    "Check if TARGET window is active."
-    (eq rangho--selected-window (or target (selected-window))))
-
-  (defun rangho--selected-window-graphic-p (&optional target)
-    "Check if TARGET window's frame is graphical."
-    (display-graphic-p (window-frame (or target (selected-window)))))
-
-  (defun rangho--set-selected-window (&rest _)
-    "Update the selected window cache to a new one."
-    (unless (minibuffer-window-active-p (frame-selected-window))
-      (setq rangho--selected-window (frame-selected-window))))
-
-  (add-to-list 'pre-redisplay-functions #'rangho--set-selected-window)
-
-  (defvar rangho--current-buffer-project
-    (project-current)
-    "Name of the current project, updated whenever active buffer changes.")
-
-  (defun rangho--update-buffer-project (_)
-    "Update the current buffer's project name."
-    (setq rangho--current-buffer-project (project-current)))
-
-  (add-to-list 'window-buffer-change-functions #'rangho--update-buffer-project)
-#+end_src
-
-~rangho--mode-line-buffer-status~ indicates the current status of buffer.
-
-#+begin_src emacs-lisp
-  (defconst rangho--buffer-status-alist
-    `(("*" ; edited, yet to be saved
-       ,(nerd-icons-faicon "nf-fa-plus_circle" :height 0.90 :v-adjust 0.10)
-       :foreground "#19150c" :background "#f0c674")
-      ("-" ; saved
-       ,(nerd-icons-faicon "nf-fa-check_circle" :height 0.90 :v-adjust 0.10)
-       :foreground "#18190e" :background "#b5bd68")
-      ("%" ; read-only
-       ,(nerd-icons-faicon "nf-fa-times_circle" :height 0.90 :v-adjust 0.10)
-       :foreground "#190c0c" :background "#cc6666"))
-    "Alist of icons and faces to indicate the current status of the buffer.")
-
-  (defun rangho--mode-line-buffer-status ()
-    "Modeline component that indicates the current status of buffer."
-    (let* ((current-status (assoc (format-mode-line "%*")
-                                  rangho--buffer-status-alist))
-           (status-icon (cadr current-status))
-           (status-prop (cddr current-status))
-           (status-fore (plist-get status-prop :foreground))
-           (status-back (plist-get status-prop :background))
-           (status-str (concat " " status-icon " ")))
-      (add-face-text-property 0
-                              (length status-str)
-                              `(:foreground ,status-fore
-                                            :background ,status-back
-                                            :box (:color ,status-back))
-                              nil
-                              status-str)
-      status-str))
-#+end_src
-
-~rangho--mode-line-scroll-bar~ shows where I am in a file, but with [[https://www.nyan.cat/][Nyan Cat]]!
 
 #+begin_src emacs-lisp
   (use-package nyan-mode
@@ -2261,140 +1994,21 @@ Let's customize that.
     (nyan-minimum-window-width 100)
     (nyan-animate-nyancat t)
     (nyan-wavy-trail t))
-
-  (defun rangho--mode-line-scroll-bar ()
-    "Modeline component that displays the current position in a file, but nyan cat!"
-    (let* ((nyan-cat-string (concat " " (nyan-create) " "))
-           (nyan-cat-length (length nyan-cat-string))
-           (percent-string " %p"))
-      (if (string= nyan-cat-string "  ")
-          percent-string
-        (add-face-text-property 0
-                                nyan-cat-length
-                                '(:background "#003163" :box (:color "#003163"))
-                                nil
-                                nyan-cat-string)
-        nyan-cat-string)))
 #+end_src
 
-~rangho--mode-line-buffer-description~ shows what the current buffer is in plain English.
-
 #+begin_src emacs-lisp
-  (defun rangho--mode-line-buffer-description ()
-    "Modeline component that shows what file is being edited.
-
-   Basically, it displays the current information in the following form:
-
-       (Editing|Viewing) <filename> [in <project] [on <branch>] [using <major-mode>]"
-    (concat
-     " "
-     ;; "Editing" if rw, "Viewing" if ro
-     (if buffer-read-only "Viewing" "Editing")
-     " "
-     ;; Show the file/buffer name with appropriate icons
-     (nerd-icons-icon-for-file (buffer-name) :height 0.90 :v-adjust 0.0)
-     " "
-     (buffer-name)
-     " "
-     ;; If project is available show that as well
-     (when (and (buffer-file-name) rangho--current-buffer-project)
-       (concat
-        "in "
-        (nerd-icons-octicon "nf-oct-repo" :height 0.90 :v-adjust 0.0)
-        " "
-        (file-name-nondirectory (directory-file-name (project-root rangho--current-buffer-project)))
-        " "))
-     ;; Show the branch name, if available
-     (when nil
-       (concat
-        "on "
-        (nerd-icons-octicon "nf-oct-git_branch" :height 0.90 :v-adjust 0.0)
-        " "
-        branch-name
-        " "))
-     ;; Show the current major mode
-     "using "
-     (when-let (icon (assoc major-mode nerd-icons-mode-icon-alist))
-       (concat
-        (nerd-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
-        " "))
-     (format-mode-line mode-name)
-     " "))
-#+end_src
-
-~rangho--mode-line-position~ shows the =LN:COL= pair.
-Here, the [[https://www.emacswiki.org/emacs/PercentConstruct][%-constructs]] are evaluated when actually drawing the mode line.
-Therefore, the length of the position will be based on the raw string, not the actual line numbers.
-
-#+begin_src emacs-lisp
-  (defun rangho--mode-line-position ()
-    "Modeline component that displays the current line and column number."
-    (propertize " %4l:%2c "
-                'face '(:background "#202124" :foreground "#e8eaed" :box (:color "#202124"))))
-#+end_src
-
-~rangho--mode-line-evil-state~ shows the current state that Evil is in.
-
-#+begin_src emacs-lisp
-  (defconst rangho--evil-state-alist
-    '((emacs "EMACS" :background "#d3d0c8" :foreground "#737373")
-      (normal "NORMAL" :background "#99cc99" :foreground "#394d39")
-      (insert "INSERT" :background "#6699cc" :foreground "#26394d")
-      (replace "REPLACE" :background "#f2777a" :foreground "#733939")
-      (visual "VISUAL" :background "#ffcc66" :foreground "#806330")
-      (hades "HADES" :background "#cc99cc" :foreground "#4d394d"))
-    "List of texts and colors that represent the current evil status.")
-
-  (defun rangho--mode-line-evil-state ()
-    "Modeline component that displays the current state of Evil mode."
-    (when (rangho--selected-window-active-p (selected-window))
-      (let* ((current-state (assq evil-state
-                                  rangho--evil-state-alist))
-             (state-text (cadr current-state))
-             (state-prop (cddr current-state)))
-        (funcall 'propertize
-                 (concat " " state-text " ")
-                 'face (append state-prop
-                               `(:weight bold :box (:color ,(plist-get state-prop :background))))))))
-#+end_src
-
-Components are complete.
-Let's apply it.
-
-#+begin_src emacs-lisp
-  (defun rangho--render-mode-line (lhs rhs)
-    "Render the mode line with LHS and RHS components."
-    (let* ((lhs-rendered (seq-reduce (lambda (acc fun)
-                                       (concat acc (funcall fun)))
-                                     lhs ""))
-           (rhs-rendered (seq-reduce (lambda (acc fun)
-                                       (concat acc (funcall fun)))
-                                     rhs ""))
-           (lhs-length (length (format-mode-line lhs-rendered)))
-           (rhs-length (length (format-mode-line rhs-rendered))))
-      (when (< (window-total-width) (+ lhs-length rhs-length))
-        (setq lhs-rendered
-              (truncate-string-to-width lhs-rendered
-                                        (- (window-total-width) rhs-length)
-                                        nil
-                                        nil
-                                        "..."))
-        (setq lhs-length
-              (length (format-mode-line lhs-rendered))))
-      (concat lhs-rendered
-              (propertize " "
-                          'display
-                          `((space :align-to (- (+ right right-fringe right-margin)
-                                                ,rhs-length))))
-              rhs-rendered)))
-
-  (setq-default mode-line-format
-                '(:eval (rangho--render-mode-line
-                         (list
-                          #'rangho--mode-line-buffer-status
-                          #'rangho--mode-line-scroll-bar
-                          #'rangho--mode-line-buffer-description)
-                         (list
-                          #'rangho--mode-line-position
-                          #'rangho--mode-line-evil-state))))
+  (use-package rangho-modeline
+    :ensure nil
+    :custom
+    (rangho-modeline-lhs-components
+     (list
+      #'rangho-modeline-buffer-status-component
+      #'rangho-modeline-scroll-bar-component
+      #'rangho-modeline-buffer-description-component))
+    (rangho-modeline-rhs-components
+     (list
+      #'rangho-modeline-position-component
+      #'rangho-modeline-evil-state-component))
+    :config
+    (rangho-modeline-mode +1))
 #+end_src

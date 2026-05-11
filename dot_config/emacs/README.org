@@ -71,12 +71,6 @@ If there is a newer version of built-in packages available, upgrade them.
   (setq package-install-upgrade-built-in t)
 #+end_src
 
-Then, initialize the package repository.
-
-#+begin_src emacs-lisp
-  (package-initialize)
-#+end_src
-
 We're going to use ~use-package~ to wrap the package management functionality.
 
 #+begin_src emacs-lisp
@@ -177,6 +171,21 @@ Let's just use built-in input method here.
     (global-set-key (kbd "<Hangul>") 'toggle-input-method))
 #+end_src
 
+** Override Built-in Packages
+There are some packages that need periodic upgrades from ELPA.
+Make sure that we are using the correct version every time.
+
+*** ~compat~
+~compat~ ensures backwards and forwards compatibility with other Emacs versions.
+Usually, the built-in version lags behind by quite a lot, so let's just have it use the version from ELPA.
+
+#+begin_src emacs-lisp
+  (use-package compat
+    :pin gnu
+    :init
+    (unload-feature 'compat t))
+#+end_src
+
 ** Mise Version Manager
 [[https://mise.jdx.dev/][Mise]] is a "unified" version manager that can install multiple versions of various utilities and compilers.
 If a binary called =mise= is available, load the 3rd-party Emacs integration package.
@@ -203,6 +212,13 @@ Disable some startup routines to make Emacs cleaner.
   (setq inhibit-startup-screen t)
   (setq inhibit-startup-message t)
   (setq inhibit-startup-echo-area-message t)
+#+end_src
+
+*** Suppress Warnings
+Let me know when things go /seriously/ wrong.
+
+#+begin_src emacs-lisp
+  (setq warning-minimum-level :error)
 #+end_src
 
 *** Word-wrapping for Text
@@ -374,20 +390,6 @@ Some UI elements are exposed as minor modes, and I'm not happy with the default.
 
 * External Packages
 This section contains anything that is not included in vanilla Emacs.
-
-** Override Built-in Packages
-There are some packages that need periodic upgrades from ELPA.
-Make sure that we are using the correct version every time.
-
-*** ~compat~
-~compat~ ensures backwards and forwards compatibility with other Emacs versions.
-Usually, the built-in version lags behind by quite a lot, so let's just have it use the version from ELPA.
-
-#+begin_src emacs-lisp
-  (use-package compat
-    :demand t
-    :pin gnu)
-#+end_src
 
 ** Enhancements
 *** Rainbow Delimiters

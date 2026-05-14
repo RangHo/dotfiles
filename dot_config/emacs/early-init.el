@@ -25,11 +25,6 @@
 ;; Incrase GC threshold to reduce GC frequency.
 (setq gc-cons-threshold most-positive-fixnum)
 
-;; Include local library directory and subdirectories to `load-path'.
-(let ((default-directory (expand-file-name "usr/lib" user-emacs-directory)))
-  (add-to-list 'load-path default-directory)
-  (normal-top-level-add-subdirs-to-load-path))
-
 ;; Set up customized no-littering directories and functions before loading the package.
 (with-eval-after-load 'no-littering
   (defvar no-littering-usr-directory
@@ -41,6 +36,16 @@
     "Expand filename FILE relative to `no-littering-usr-directory'."
     (expand-file-name (convert-standard-filename file)
                       no-littering-usr-directory))
+
+  (defvar no-littering-lib-directory
+    (expand-file-name (convert-standard-filename "lib/") user-emacs-directory)
+    "The directory where standalone packages are placed.
+  This variable has to be set before `no-littering' is loaded.")
+
+  (defun no-littering-expand-lib-file-name (file)
+    "Expand filename FILE relative to `no-littering-lib-directory'."
+    (expand-file-name (convert-standard-filename file)
+                      no-littering-lib-directory))
 
   (defun no-littering-theme-custom ()
     "Theme the Emacs customization feature."
@@ -60,13 +65,22 @@
     "Theme the Emacs package.el directory."
     (setq package-user-dir (no-littering-expand-var-file-name "elpa/")))
 
-    (no-littering-theme-backups)
-    (no-littering-theme-custom)
-    (no-littering-theme-eln-cache)
-    (no-littering-theme-elpa))
+  (defun no-littering-theme-load-path ()
+    "Theme the Emacs Lisp load path."
+    (let ((default-directory no-littering-lib-directory))
+      (add-to-list 'load-path default-directory)
+      (normal-top-level-add-subdirs-to-load-path))
+    (add-to-list 'load-path (no-littering-expand-usr-file-name "lib/")))
 
-  ;; Make Emacs stop litter things everywhere.
-  (require 'no-littering)
+  (no-littering-theme-backups)
+  (no-littering-theme-custom)
+  (no-littering-theme-eln-cache)
+  (no-littering-theme-elpa)
+  (no-littering-theme-load-path))
 
-  (provide 'early-init)
+;; Make Emacs stop litter things everywhere.
+(require 'no-littering
+         (expand-file-name "lib/no-littering/no-littering.el" user-emacs-directory))
+
+(provide 'early-init)
 ;;; early-init.el ends here

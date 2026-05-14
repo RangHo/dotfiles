@@ -325,6 +325,26 @@ There are two sub-modes available for this package:
     (add-hook 'text-mode-hook #'flyspell-mode))
 #+end_src
 
+*** Documentations
+Let's enable Eldoc mode for all buffers.
+
+#+begin_src emacs-lisp
+  (global-eldoc-mode +1)
+#+end_src
+
+*** UI Elements
+Some UI elements are exposed as minor modes, and I'm not happy with the default.
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+
+  (global-hl-line-mode +1)
+  (show-paren-mode +1)
+#+end_src
+
 *** Tree-sitter Integration
 Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
 It is usually much faster than Emacs's built-in parsing facility.
@@ -366,26 +386,6 @@ The [[https://microsoft.github.io/language-server-protocol/][Language Server Pro
         (eglot-ensure))))
 
   (add-hook 'prog-mode-hook #'rangho--ensure-eglot-if-supported)
-#+end_src
-
-** Documentations
-Let's enable Eldoc mode for all buffers.
-
-#+begin_src emacs-lisp
-  (global-eldoc-mode +1)
-#+end_src
-
-** UI Element Minor Modes
-Some UI elements are exposed as minor modes, and I'm not happy with the default.
-
-#+begin_src emacs-lisp
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (tooltip-mode -1)
-
-  (global-hl-line-mode +1)
-  (show-paren-mode +1)
 #+end_src
 
 * External Packages
@@ -437,11 +437,6 @@ In-buffer completion engines complete texts in buffers, similar to Visual Studio
     :config
     (global-corfu-mode +1)
     (corfu-popupinfo-mode +1))
-
-  (use-package nerd-icons-corfu
-    :after corfu
-    :config
-    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 #+end_src
 
 While it /can/ utilize the built-in completion functions, ~cape~ can provide far more "backends".
@@ -555,7 +550,7 @@ God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with pla
   (use-package god-mode)
 #+end_src
 
-*** Text Mode Limited to Fill Column
+*** Limiting Text Mode to Fill Column
 There is a small package called ~visual-fill-column~ that extends the built-in ~visual-line-mode~ so that it acknowledges ~fill-column~.
 
 #+begin_src emacs-lisp
@@ -575,6 +570,66 @@ These look nice when everything is made of monospace texts, but as soon as we pu
     :hook (markdown-mode org-mode)
     :custom
     (valign-fancy-bar t))
+#+end_src
+
+*** Ligature
+Ligature provide alternative combined glyphs for commonly used character combinations (such as operators).
+
+#+begin_src emacs-lisp
+  (defconst rangho--prog-mode-ligatures
+    '("--" "---" "==" "===" "!=" "!==" "=!="
+      "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
+      "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
+      "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
+      "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
+      "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
+      "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
+      "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
+      "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
+      "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
+      "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
+      ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
+      "<:<" ";;;")
+    "List of ligatures to enable in `prog-mode' buffers.")
+
+  (use-package ligature
+    :config
+    (ligature-set-ligatures 'prog-mode rangho--prog-mode-ligatures)
+    (global-ligature-mode +1))
+#+end_src
+
+*** Nerd Fonts
+[[https://www.nerdfonts.com/][Nerd Fonts]] can be used to show icons in Emacs environment.
+This requires a font called "Symbols Nerd Font Mono" being present on the system.
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons
+    :custom
+    (nerd-icons-font-family "Symbols Nerd Font Mono"))
+#+end_src
+
+~dired~, the Emacs directory editor, can be prettified with Nerd Fonts.
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons-dired
+    :hook (dired-mode))
+#+end_src
+
+~corfu~ can show VSCode-like icons for different completion items.
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons-corfu
+    :after corfu
+    :config
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+#+end_src
+
+~treemacs~ can show Nerd Fonts icons instead of its default icon pack.
+
+#+begin_src emacs-lisp
+  (use-package treemacs-nerd-icons
+    :config
+    (treemacs-load-theme "nerd-icons"))
 #+end_src
 
 ** Utilities
@@ -603,6 +658,18 @@ There is a fancier version of dashboard.
                                   (get-buffer-create dashboard-buffer-name))))
 #+end_src
 
+*** Nyan Cat Scrollbar!
+Nyanyanyanyanyanyanya!
+
+#+begin_src emacs-lisp
+  (use-package nyan-mode
+    :custom
+    (nyan-bar-length 22)
+    (nyan-minimum-window-width 100)
+    (nyan-animate-nyancat t)
+    (nyan-wavy-trail t))
+#+end_src
+
 *** Navigation
 ~treemacs~ is to Emacs as =NerdTree= is to (Neo)Vim.
 It's really good.
@@ -619,10 +686,6 @@ It's really good.
        (treemacs-git-commit-diff-mode +1))
       (`(t . _)
        (treemacs-git-mode 'simple))))
-
-  (use-package treemacs-nerd-icons
-    :config
-    (treemacs-load-theme "nerd-icons"))
 #+end_src
 
 *** Snippets
@@ -654,6 +717,12 @@ It doesn't work on WIndows, though.
     :bind (("C-c RET" . eat))
     :hook ((eshell-load . eat-eshell-mode)
            (eshell-load . eat-eshell-visual-command-mode)))
+#+end_src
+
+*** Embedding Font Lock Faces
+
+#+begin_src emacs-lisp
+  (use-package engrave-faces)
 #+end_src
 
 ** Integrations
@@ -701,38 +770,21 @@ I now outsource thinking to [[https://github.com/features/copilot][GitHub Copilo
 
 #+begin_src emacs-lisp
   (use-package copilot
-    :bind (("C-c M-f" . copilot-complete)
+    :bind (("C-SPC" . copilot-complete)
            :map copilot-completion-map
            ("C-g" . 'copilot-clear-overlay)
            ("M-p" . 'copilot-previous-completion)
            ("M-n" . 'copilot-next-completion)
-           ("<tab>" . 'copilot-accept-completion)
-           ("M-f" . 'copilot-accept-completion-by-word)
-           ("M-<return>" . 'copilot-accept-completion-by-line))
-    :hook (prog-mode))
+           ("TAB" . 'copilot-accept-completion)
+           ("M-TAB" . 'copilot-accept-completion-by-word)
+           ("M-RET" . 'copilot-accept-completion-by-line)))
 #+end_src
 
 *** AI Agent Integration
 I can even outsource typing to AI agents too.
 
 #+begin_src emacs-lisp
-  (use-package ai-code
-    :after (evil magit)
-    :bind (("C-c a" . ai-code-menu))
-    :custom
-    (ai-code-backends-infra-terminal-backend 'eat)
-    :config
-    (ai-code-set-backend 'claude-code)
-    (ai-code-backends-infra-evil-setup)
-    (ai-code-magit-setup-transients))
-#+end_src
-~dired~ stands for DIRectory EDitor.
-Basically a file explorer in Emacs.
-We can prettify it with Nerd Fonts.
-
-#+begin_src emacs-lisp
-  (use-package nerd-icons-dired
-    :hook (dired-mode))
+  (use-package eca)
 #+end_src
 
 * Local Packages
@@ -775,6 +827,93 @@ I wrote a small utility called ~mixed-pitch-mode~ that utilizes ~face-remap~ fac
   (use-package mixed-pitch
     :ensure nil
     :hook (markdown-mode org-mode))
+#+end_src
+
+** Fonts
+Fonts are super important, not because they're pretty, but because it greatly affects the readability of a text.
+Here is a set of fonts I use.
+
+#+begin_notes
+On Linux, dual-width CJK fonts are not aligned correctly if the font height does not match with its intended DPI settings.
+For =hesalche=, the correct height is 120 while for =semteulche=, it is 110.
+
+On Windows, dual-width fonts are not rendered well as all characters are rendered as if they were full-width.
+For now, do not install =hesalche= and =semteulche= on Windows until I find a way to detect dual-width fonts.
+#+end_notes
+
+#+begin_src emacs-lisp
+  ;; Sample sentences to check font support:
+  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
+  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
+  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
+  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
+
+  (use-package rangho-fonts
+    :ensure nil
+    :custom
+    (rangho-fonts-fixed-font-alist
+     '((nil "hesalche" "semteulche"
+            "Noto Sans Mono"
+            "Cascadia Code" "Consolas" "Courier New"
+            "monospace")
+       (hangul "hesalche" "semteulche"
+               "Noto Sans Mono CJK KR"
+               "DotumChe" "GulimChe"
+               "monospace")
+       (kana "Noto Sans Mono CJK JP"
+             "GulimChe" "DotumChe"
+             "monospace")
+       (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
+            "GulimChe" "DotumChe"
+            "monospace")
+       (symbol "Symbols Nerd Font Mono"
+               "Noto Sans Symbols" "Noto Sans Symbols 2"
+               "Segoe UI Symbol")
+       (emoji "Noto Color Emoji"
+              "Segoe UI Emoji")))
+    (rangho-fonts-variable-font-alist
+     '((nil "Noto Sans" "Noto Serif"
+            "Segoe UI" "Arial"
+            "sans-serif")
+       (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
+               "Malgun Gothic" "Dotum" "Gulim"
+               "sans-serif")
+       (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
+             "Meiryo" "Yu Gothic" "Yu Mincho"
+             "sans-serif")
+       (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
+            ("Noto Sans CJK TC" "Noto Serif CJK TC")
+            "Microsoft YaHei" "Microsoft JhengHei"
+            "sans-serif")
+       (symbol "Symbols Nerd Font"
+               "Noto Sans Symbols" "Noto Sans Symbols 2"
+               "Segoe UI Symbol")
+       (emoji "Noto Color Emoji"
+              "Segoe UI Emoji")))
+    :config
+    (rangho-fonts-mode +1))
+#+end_src
+
+** Mode Line
+Mode line indicates what file I'm editing, which mode I am using, etc.
+However, the default mode line isn't really fun.
+Let's customize that.
+
+#+begin_src emacs-lisp
+  (use-package rangho-modeline
+    :ensure nil
+    :custom
+    (rangho-modeline-lhs-components
+     (list
+      #'rangho-modeline-buffer-status-component
+      #'rangho-modeline-scroll-bar-component
+      #'rangho-modeline-buffer-description-component))
+    (rangho-modeline-rhs-components
+     (list
+      #'rangho-modeline-position-component
+      #'rangho-modeline-evil-state-component))
+    :config
+    (rangho-modeline-mode +1))
 #+end_src
 
 * Keybindings
@@ -1258,11 +1397,6 @@ OpenSCAD allows me to make 3D models in code.
   (use-package org-node
     :defer t
     :bind-keymap ("C-c n" . org-node-global-prefix-map)
-    :init
-    ;; The :bind-keymap keyword cannot bind a keymap to another map yet.
-    ;; (https://github.com/jwiegley/use-package/issues/736)
-    (with-eval-after-load 'org
-      (keymap-set org-mode-map "M-o n" org-node-org-prefix-map))
     :config
     (org-node-cache-mode))
 #+end_src
@@ -1325,8 +1459,6 @@ OpenSCAD allows me to make 3D models in code.
     (org-latex-src-block-backend 'engraved)
     :init
     (add-to-list 'org-latex-packages-alist '("" "fvextra")))
-
-  (use-package engrave-faces)
 #+end_src
 
 ** PowerShell
@@ -1610,407 +1742,4 @@ While there are a lot of criticisms, it is still widely used to represent data i
     :init
     (add-to-list 'treesit-language-source-alist
                  '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))
-#+end_src
-
-* Appearances
-Eye-candies are imporant.
-Trust me, *they are*.
-
-** Fonts
-Fonts are super important, not because they're pretty, but because it greatly affects the readability of a text.
-Here is a set of fonts I use.
-
-#+begin_notes
-On Linux, dual-width CJK fonts are not aligned correctly if the font height does not match with its intended DPI settings.
-For =hesalche=, the correct height is 120 while for =semteulche=, it is 110.
-
-On Windows, dual-width fonts are not rendered well as all characters are rendered as if they were full-width.
-For now, do not install =hesalche= and =semteulche= on Windows until I find a way to detect dual-width fonts.
-#+end_notes
-
-#+begin_src emacs-lisp
-  ;; Sample sentences to check font support:
-  ;;   - Latin:  The quick brown fox jumps over the lazy dog.
-  ;;   - Hangul: 다람쥐 헌 쳇바퀴에 타고파.
-  ;;   - Kana:   いろはにほへと ちりぬるを / わかよたれそ つねならむ
-  ;;   - Emoji:  I'm blue, da💨 ba🐋 dee👖 da📘 ba💙 dai🌊
-
-  (use-package rangho-fonts
-    :ensure nil
-    :custom
-    (rangho-fonts-fixed-font-alist
-     '((nil "hesalche" "semteulche"
-            "Noto Sans Mono"
-            "Cascadia Code" "Consolas" "Courier New"
-            "monospace")
-       (hangul "hesalche" "semteulche"
-               "Noto Sans Mono CJK KR"
-               "DotumChe" "GulimChe"
-               "monospace")
-       (kana "Noto Sans Mono CJK JP"
-             "GulimChe" "DotumChe"
-             "monospace")
-       (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
-            "GulimChe" "DotumChe"
-            "monospace")
-       (symbol "Symbols Nerd Font Mono"
-               "Noto Sans Symbols" "Noto Sans Symbols 2"
-               "Segoe UI Symbol")
-       (emoji "Noto Color Emoji"
-              "Segoe UI Emoji")))
-    (rangho-fonts-variable-font-alist
-     '((nil "Noto Sans" "Noto Serif"
-            "Segoe UI" "Arial"
-            "sans-serif")
-       (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
-               "Malgun Gothic" "Dotum" "Gulim"
-               "sans-serif")
-       (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
-             "Meiryo" "Yu Gothic" "Yu Mincho"
-             "sans-serif")
-       (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
-            ("Noto Sans CJK TC" "Noto Serif CJK TC")
-            "Microsoft YaHei" "Microsoft JhengHei"
-            "sans-serif")
-       (symbol "Symbols Nerd Font"
-               "Noto Sans Symbols" "Noto Sans Symbols 2"
-               "Segoe UI Symbol")
-       (emoji "Noto Color Emoji"
-              "Segoe UI Emoji")))
-    :config
-    (rangho-fonts-mode +1))
-#+end_src
-
-Ligatures provide alternative combined glyphs for commonly used character combinations (such as operators).
-
-#+begin_src emacs-lisp
-  (defconst rangho--prog-mode-ligatures
-    '("--" "---" "==" "===" "!=" "!==" "=!="
-      "=:=" "=/=" "<=" ">=" "&&" "&&&" "&=" "++" "+++" "***" ";;" "!!"
-      "??" "???" "?:" "?." "?=" "<:" ":<" ":>" ">:" "<:<" "<>" "<<<" ">>>"
-      "<<" ">>" "||" "-|" "_|_" "|-" "||-" "|=" "||=" "##" "###" "####"
-      "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#=" "^=" "<$>" "<$"
-      "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</" "</>" "/>" "<!--" "<#--"
-      "-->" "->" "->>" "<<-" "<-" "<=<" "=<<" "<<=" "<==" "<=>" "<==>"
-      "==>" "=>" "=>>" ">=>" ">>=" ">>-" ">-" "-<" "-<<" ">->" "<-<" "<-|"
-      "<=|" "|=>" "|->" "<->" "<~~" "<~" "<~>" "~~" "~~>" "~>" "~-" "-~"
-      "~@" "[||]" "|]" "[|" "|}" "{|" "[<" ">]" "|>" "<|" "||>" "<||"
-      "|||>" "<|||" "<|>" "..." ".." ".=" "..<" ".?" "::" ":::" ":=" "::="
-      ":?" ":?>" "//" "///" "/*" "*/" "/=" "//=" "/==" "@_" "__" "???"
-      "<:<" ";;;")
-    "List of ligatures to enable in `prog-mode' buffers.")
-
-  (use-package ligature
-    :config
-    (ligature-set-ligatures 'prog-mode rangho--prog-mode-ligatures)
-    (global-ligature-mode +1))
-#+end_src
-
-[[https://www.nerdfonts.com/][Nerd Fonts]] can be used to show icons in Emacs environment.
-Note that this requires fonts patched with Nerd Fonts to be present.
-
-#+begin_src emacs-lisp
-  (use-package nerd-icons
-    :custom
-    (nerd-icons-font-family "Symbols Nerd Font Mono"))
-#+end_src
-
-** Theme
-Thee decides how text elements and everything are colored.
-There is a face assigned to /everything/ in Emacs, so we can change them, color them, do whatever we want to do with them.
-
-*** Color Scheme
-[[https://github.com/eylles/pywal16][pywal]] is a utility that can extract colorschemes from the current wallpaper.
-It also generates color codes based on a template file, and places them in =XDG_CACHE_HOME/wal--=.
-Load that if available; if not, pick a sensible colorscheme based on [[https://draculatheme.com/][Dracula]].
-
-#+begin_src emacs-lisp
-  (if-let* ((pywal-colors-file (expand-file-name "wal/colors.el" user-cache-directory))
-            ((file-exists-p pywal-colors-file)))
-      (load-file pywal-colors-file)
-    (setq wal/foreground "#f8f8f2"
-          wal/background "#282a36"
-          wal/cursor     "#44475a"
-          wal/color0     "#21222c"
-          wal/color1     "#ff5555"
-          wal/color2     "#50fa7b"
-          wal/color3     "#f1fa8c"
-          wal/color4     "#bd93f9"
-          wal/color5     "#ff79c6"
-          wal/color6     "#8be9fd"
-          wal/color7     "#f8f8f2"
-          wal/color8     "#6272a4"
-          wal/color9     "#ff6e6e"
-          wal/color10    "#69ff94"
-          wal/color11    "#ffffa5"
-          wal/color12    "#d6acff"
-          wal/color13    "#ff92df"
-          wal/color14    "#a4ffff"
-          wal/color15    "#ffffff"))
-#+end_src
-
-Since ANSI color codes are bullshit, let's give them friendly names.
-
-#+begin_src emacs-lisp
-  (defvar rangho--color-name-alist
-    `((color--foreground      . ,wal/foreground)
-      (color--background      . ,wal/background)
-      (color--cursor          . ,wal/cursor)
-      (color--black           . ,wal/color0)
-      (color--intense-black   . ,wal/color8)
-      (color--red             . ,wal/color1)
-      (color--intense-red     . ,wal/color9)
-      (color--green           . ,wal/color2)
-      (color--intense-green   . ,wal/color10)
-      (color--yellow          . ,wal/color3)
-      (color--intense-yellow  . ,wal/color11)
-      (color--blue            . ,wal/color4)
-      (color--intense-blue    . ,wal/color12)
-      (color--magenta         . ,wal/color5)
-      (color--intense-magenta . ,wal/color13)
-      (color--cyan            . ,wal/color6)
-      (color--intense-cyan    . ,wal/color14)
-      (color--white           . ,wal/color7)
-      (color--intense-white   . ,wal/color15))
-    "Association list to map wal colors to friendly names.")
-#+end_src
-
-We can automatically generate a new "color matrix" by mapping a list of shades.
-
-#+begin_src emacs-lisp
-  (require 'color)
-
-  (defvar rangho--color-shade-list
-    (number-sequence -50 50 1)
-    "List of percentage values to lighten/darken the original colors.")
-
-  (defun color-hex-to-rgb (color)
-    "Decompose hex representation of a COLOR to 3-tuple (r, g, b)."
-    (list (/ (string-to-number (substring color 1 3) 16) 255.0)
-          (/ (string-to-number (substring color 3 5) 16) 255.0)
-          (/ (string-to-number (substring color 5) 16) 255.0)))
-
-  (defun rangho--add-color-luminance (color delta)
-    "Return a new color from COLOR with the luminance adjusted by DELTA / 100."
-    (let* ((rgb (color-hex-to-rgb color))
-           (hsl (apply #'color-rgb-to-hsl rgb))
-           (new-luminance (min 1.0 (max 0.0 (+ (nth 2 hsl) (/ delta 100.0)))))
-           (new-hsl `(,(nth 0 hsl) ,(nth 1 hsl) ,new-luminance))
-           (new-rgb (apply #'color-hsl-to-rgb new-hsl)))
-      (apply #'color-rgb-to-hex (nconc new-rgb '(2)))))
-
-  (defun rangho--light-theme-p (color-alist)
-    "Return t if the colors in COLOR-ALIST looks like a light theme."
-    (let* ((color-hex-to-luminance
-            (lambda (hex)
-              (nth 2 (apply #'color-rgb-to-hsl (color-hex-to-rgb hex)))))
-           (foreground-luminance
-            (funcall color-hex-to-luminance
-                     (cdr (assoc 'color--foreground color-alist))))
-           (background-luminance
-            (funcall color-hex-to-luminance
-                     (cdr (assoc 'color--background color-alist)))))
-      (< foreground-luminance background-luminance)))
-
-  (defun rangho--create-color-matrix-alist (color-alist shade-list)
-    "Create a matrix of colors based on a COLOR-ALIST and SHADE-LIST.
-
-    COLOR-ALIST is a list of cons cells where the car is a symbol, and the cdr is a
-    hex color string.  SHADE-LIST is a list of integers that represent the amount to
-    \"intensify\" the color by.
-
-    It returns a \"matrix\" of colors where each color in COLOR-ALIST is associated
-    with each value in SHADE-LIST.  It \"intensifies\" the colors, i.e. based on the
-    theme, it will either lighten or darken the colors so that it stands out more."
-    (let* ((prefix-value
-            (lambda (value)
-              (pcase (cons (rangho--light-theme-p color-alist)
-                           (>= value 0))
-                (`(t . t)
-                 ;; Making it lighter on light theme => diminishing
-                 ;; Value is positive, so append a minus sign to it
-                 (concat "-" (number-to-string value)))
-                (`(t . nil)
-                 ;; Making it darker on light theme => intensifying
-                 ;; Value is negative, so replace minus with plus
-                 (concat "+" (number-to-string (abs value))))
-                (`(nil . t)
-                 ;; Making it lighter on dark theme => intensifying
-                 ;; Value is positive, so prefix with plus sign
-                 (concat "+" (number-to-string value)))
-                (`(nil . nil)
-                 ;; Making it darker on dark theme => diminishing
-                 ;; Value is negative, so minus sign is already there
-                 (number-to-string value)))))
-           (lighten-color-by-value
-            (lambda (color value)
-              (cons (intern (concat
-                             (symbol-name (car color))
-                             (funcall prefix-value value)))
-                    (rangho--add-color-luminance (cdr color) value))))
-           (lighten-color-for-values
-            (lambda (color)
-              (mapcar (lambda (value)
-                        (funcall lighten-color-by-value color value))
-                      shade-list)))
-           (lighten-colors
-            (lambda ()
-              (mapcan lighten-color-for-values color-alist))))
-      (append color-alist
-              (funcall lighten-colors))))
-
-  (defvar rangho--color-matrix-alist
-    (rangho--create-color-matrix-alist rangho--color-name-alist
-                                       rangho--color-shade-list)
-    "Alist of colors with varying brightnesses.")
-#+end_src
-
-*** Faces
-Now that we have all the colors ready, we can actually set the faces.
-This can be done by defining a theme.
-
-#+begin_src emacs-lisp
-  (require 'let-alist)
-
-  (let-alist rangho--color-matrix-alist
-    (custom-set-faces
-     ;; Basic UI elements
-     `(border                     ((t (:foreground ,.color--foreground+10))))
-     `(button                     ((t (:underline t))))
-     `(cursor                     ((t (:foreground ,.color--background :background ,.color--foreground))))
-     `(default                    ((t (:foreground ,.color--foreground :background ,.color--background))))
-     `(default-italic             ((t (:slant italic))))
-     `(error                      ((t (:foreground ,.color--red :weight bold))))
-     `(ffap                       ((t (:foreground ,.color--foreground+20))))
-     `(fringe                     ((t (:background ,.color--background))))
-     `(header-line                ((t (:inherit mode-line))))
-     `(highlight                  ((t (:foreground ,.color--intense-white :background ,.color--intense-black))))
-     `(hl-line                    ((t (:background ,.color--background+5 :extend t))))
-     `(info-quoted-name           ((t (:foreground ,.color--intense-red))))
-     `(info-string                ((t (:foreground ,.color--intense-yellow))))
-     `(line-number                ((t (:foreground ,.color--intense-black :slant italic))))
-     `(link                       ((t (:foreground ,.color--cyan :underline t :weight bold))))
-     `(link-visited               ((t (:foreground ,.color--blue :underline t :weight normal))))
-     `(match                      ((t (:foreground ,.color--background :background ,.color--yellow))))
-     `(menu                       ((t (:inverse-video nil))))
-     `(minibuffer-prompt          ((t (:foreground ,.color--intense-magenta :weight bold))))
-     `(mode-line                  ((t (:foreground ,.color--background-10 :background ,.color--foreground+10 :box (:line-width 3 :color ,.color--foreground+10 :style nil)))))
-     `(mode-line-inactive         ((t (:foreground ,.color--foreground-10 :background ,.color--background+10 :box (:line-width 3 :color ,.color--background+10 :style nil)))))
-     `(mode-line-highlight        ((t (:inherit highlight))))
-     `(mode-line-emphasis         ((t (:weight regular))))
-     `(mode-line-buffer-id        ((t (:weight regular))))
-     `(region                     ((t (:inherit highlight))))
-     `(shadow                     ((t (:foreground ,.color--intense-black))))
-     `(success                    ((t (:foreground ,.color--green :weight bold))))
-     `(tooltip                    ((t (:foregroud ,.color--foreground :background ,.color--cursor))))
-     `(trailing-whitespace        ((t (:background ,.color--intense-yellow))))
-     `(vertical-border            ((t (:foreground ,.color--foreground-10))))
-     `(warning                    ((t (:foreground ,.color--yellow :weight bold))))
-     `(window-divider             ((t (:foreground ,.color--background+10))))
-     `(window-divider-first-pixel ((t (:foreground ,.color--background+10))))
-     `(window-divider-last-pixel  ((t (:foreground ,.color--background+10))))
-
-     ;; font-lock!
-     `(font-lock-builtin-face           ((t (:foreground ,.color--cyan :slant italic))))
-     `(font-lock-comment-face           ((t (:foreground ,.color--intense-black))))
-     `(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face))))
-     `(font-lock-constant-face          ((t (:foreground ,.color--intense-magenta))))
-     `(font-lock-doc-face               ((t (:foreground ,.color--intense-black+20))))
-     `(font-lock-function-name-face     ((t (:foreground ,.color--green))))
-     `(font-lock-keyword-face           ((t (:foreground ,.color--magenta))))
-     `(font-lock-negation-char-face     ((t (:foreground ,.color--cyan))))
-     `(font-lock-number-face            ((t (:inherit font-lock-constant-face))))
-     `(font-lock-operator-face          ((t (:inherit font-lock-keyword-face))))
-     `(font-lock-preprocessor-face      ((t (:foreground ,.color--intense-red))))
-     `(font-lock-string-face            ((t (:foreground ,.color--intense-yellow))))
-     `(font-lock-type-face              ((t (:inherit font-lock-builtin-face))))
-     `(font-lock-variable-name-face     ((t (:foreground ,.color--yellow))))
-     `(font-lock-warning-face           ((t (:inherit warning))))
-
-     ;; ANSI colors
-     `(ansi-color-black          ((t (:foreground ,.color--black :background ,.color--black))))
-     `(ansi-color-blue           ((t (:foreground ,.color--blue :background ,.color--blue))))
-     `(ansi-color-cyan           ((t (:foreground ,.color--cyan :background ,.color--cyan))))
-     `(ansi-color-green          ((t (:foreground ,.color--green :background ,.color--green))))
-     `(ansi-color-magenta        ((t (:foreground ,.color--magenta :background ,.color--magenta))))
-     `(ansi-color-red            ((t (:foreground ,.color--red :background ,.color--red))))
-     `(ansi-color-white          ((t (:foreground ,.color--white :background ,.color--white))))
-     `(ansi-color-yellow         ((t (:foreground ,.color--yellow :background ,.color--yellow))))
-     `(ansi-color-bright-black   ((t (:foreground ,.color--intense-black :background ,.color--intense-black))))
-     `(ansi-color-bright-blue    ((t (:foreground ,.color--intense-blue :background ,.color--intense-blue))))
-     `(ansi-color-bright-cyan    ((t (:foreground ,.color--intense-cyan :background ,.color--intense-cyan))))
-     `(ansi-color-bright-green   ((t (:foreground ,.color--intense-green :background ,.color--intense-green))))
-     `(ansi-color-bright-magenta ((t (:foreground ,.color--intense-magenta :background ,.color--intense-magenta))))
-     `(ansi-color-bright-red     ((t (:foreground ,.color--intense-red :background ,.color--intense-red))))
-     `(ansi-color-bright-white   ((t (:foreground ,.color--intense-white :background ,.color--intense-white))))
-     `(ansi-color-bright-yellow  ((t (:foreground ,.color--intense-yellow :background ,.color--intense-yellow))))
-
-     ;; Company
-     `(company-echo-common ((t (:foreground ,.color--background :background ,.color--foreground))))
-
-     ;; Diff
-     `(diff-added             ((t (:foreground ,.color--foreground :background ,.color--green-40 :extend t))))
-     `(diff-removed           ((t (:foreground ,.color--foreground :background ,.color--red-40 :extend t))))
-     `(diff-refine-added      ((t (:foreground ,.color--background :background ,.color--green))))
-     `(diff-refine-removed    ((t (:foreground ,.color--background :background ,.color--red))))
-     `(diff-indicator-added   ((t (:foreground ,.color--green))))
-     `(diff-indicator-removed ((t (:foreground ,.color--red))))
-     `(diff-indicator-changed ((t (:foreground ,.color--yellow))))
-     `(diff-error             ((t (:foreground ,.color--red :background ,.color--background :weight bold))))
-
-     ;; Org
-     `(org-block                 ((t (:background ,.color--background+5))))
-     `(org-code                  ((t (:foreground ,.color--intense-green))))
-     `(org-document-info         ((t (:foreground ,.color--intense-blue))))
-     `(org-document-info-keyword ((t (:foreground ,.color--intense-black))))
-     `(org-document-title        ((t (:foreground ,.color--intense-red))))
-     `(org-ellipsis              ((t (:foreground ,.color--intense-black))))
-     `(org-footnote              ((t (:foreground ,.color--intense-blue))))
-     `(org-formula               ((t (:foreground ,.color--intense-magenta))))
-     `(org-link                  ((t (:inherit link))))
-     `(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-     `(org-verbatim              ((t (:foreground ,.color--green))))
-     `(org-warning               ((t (:foreground ,.color--yellow))))
-
-     ;; Outline
-     `(outline-1 ((t (:foreground ,.color--foreground+20 :weight bold :height 1.3))))
-     `(outline-2 ((t (:foreground ,.color--foreground+15 :weight bold :height 1.1))))
-     `(outline-3 ((t (:foreground ,.color--foreground+10 :weight bold :height 1.0))))
-     `(outline-4 ((t (:foreground ,.color--foreground+5 :weight bold :height 1.0))))
-     `(outline-5 ((t (:foreground ,.color--foreground+4 :weight bold :height 1.0))))
-     `(outline-6 ((t (:foreground ,.color--foreground+3 :height 1.0))))
-     `(outline-7 ((t (:foreground ,.color--foreground+2 :height 1.0))))
-     `(outline-8 ((t (:foreground ,.color--foreground+1 :height 1.0))))))
-#+end_src
-
-*** Mode Line
-Mode line indicates what file I'm editing, which mode I am using, etc.
-However, the default mode line isn't really fun.
-Let's customize that.
-
-
-#+begin_src emacs-lisp
-  (use-package nyan-mode
-    :custom
-    (nyan-bar-length 22)
-    (nyan-minimum-window-width 100)
-    (nyan-animate-nyancat t)
-    (nyan-wavy-trail t))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package rangho-modeline
-    :ensure nil
-    :custom
-    (rangho-modeline-lhs-components
-     (list
-      #'rangho-modeline-buffer-status-component
-      #'rangho-modeline-scroll-bar-component
-      #'rangho-modeline-buffer-description-component))
-    (rangho-modeline-rhs-components
-     (list
-      #'rangho-modeline-position-component
-      #'rangho-modeline-evil-state-component))
-    :config
-    (rangho-modeline-mode +1))
 #+end_src

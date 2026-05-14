@@ -60,14 +60,12 @@
           (make-directory new-custom-themes t))
         (dolist (file (directory-files old-custom-themes t))
           (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-custom-themes) t)))))
-    ;; Delete the old custom themes directory.
-    (delete-directory old-custom-themes t))
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-custom-themes) t)))
+        ;; Delete the old custom themes directory.
+        (delete-directory old-custom-themes t))))
 
   (defun no-littering-theme-eln-cache ()
-    "Theme the Emacs native compilation cache.
-
-    This function will move the littered eln-cache directory to the no-littering directory."
+    "Theme the Emacs native compilation cache."
     (let ((old-eln-cache (expand-file-name "eln-cache/" user-emacs-directory))
           (new-eln-cache (no-littering-expand-var-file-name "eln-cache/")))
       ;; Set the new eln-cache directory.
@@ -78,9 +76,9 @@
           (make-directory new-eln-cache t))
         (dolist (file (directory-files old-eln-cache t))
           (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-eln-cache) t))))
-      ;; Delete the old eln-cache directory.
-      (delete-directory old-eln-cache t)))
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-eln-cache) t)))
+        ;; Delete the old eln-cache directory.
+        (delete-directory old-eln-cache t))))
 
   (defun no-littering-theme-elpa ()
     "Theme the Emacs package.el directory."
@@ -94,14 +92,12 @@
           (make-directory new-elpa t))
         (dolist (file (directory-files old-elpa t))
           (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-elpa) t))))
-      ;; Delete the old elpa directory.
-      (delete-directory old-elpa t)))
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-elpa) t)))
+        ;; Delete the old elpa directory.
+        (delete-directory old-elpa t))))
 
   (defun no-littering-theme-treesit ()
-    "Theme the Emacs tree-sitter library.
-
-  This function will move the littered tree-sitter directory to the no-littering directory."
+    "Theme the Emacs tree-sitter library."
     (let ((old-tree-sitter (expand-file-name "tree-sitter/" user-emacs-directory))
           (new-tree-sitter (no-littering-expand-var-file-name "tree-sitter/")))
       ;; Set the new tree-sitter directory.
@@ -112,9 +108,9 @@
           (make-directory new-tree-sitter t))
         (dolist (file (directory-files old-tree-sitter t))
           (when (file-regular-p file)
-            (copy-file file (expand-file-name (file-name-nondirectory file) new-tree-sitter) t))))
-      ;; Delete the old tree-sitter directory.
-      (delete-directory old-tree-sitter t)))
+            (copy-file file (expand-file-name (file-name-nondirectory file) new-tree-sitter) t)))
+        ;; Delete the old tree-sitter directory.
+        (delete-directory old-tree-sitter t))))
 
   (no-littering-theme-backups)
   (no-littering-theme-custom)

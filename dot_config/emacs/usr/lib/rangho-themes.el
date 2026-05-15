@@ -34,13 +34,6 @@
     scrim shadow)
   "List of color roles specified by Material Design 3.")
 
-(defconst rangho-themes-material-addon-color-roles
-  '(   primary-fixed primary-fixed-dim     secondary-fixed secondary-fixed-dim     tertiary-fixed tertiary-fixed-dim
-    on-primary-fixed                    on-secondary-fixed                      on-tertiary-fixed
-    on-primary-fixed-variant            on-secondary-fixed-variant              on-tertiary-fixed-variant
-    surface-dim surface-bright)
-  "List of optional addon color roles specified by Material Design 3.")
-
 (defun rangho-themes--hex-to-rgb (color)
   "Decompose hexadecimal representation of COLOR to 3-tuple (R G B)."
   (list (/ (string-to-number (substring color 1 3) 16) 255.0)
@@ -97,37 +90,42 @@ override the default configuration in OVERRIDES."
           ',name
 
           ;; Basic faces.
-          '(border             ((t (:background ,.surface-container     :foreground ,.surface-container))))
-          '(cursor             ((t (:background ,.primary))))
-          '(default            ((t (:background ,.surface               :foreground ,.on-surface))))
-          '(error              ((t (:foreground ,.error))))
-          '(fringe             ((t (:background ,.surface               :foreground ,.outline-variant))))
-          '(highlight          ((t (:background ,.surface-container-high))))
-          '(isearch            ((t (:background ,.tertiary-container    :foreground ,.on-tertiary-container  :weight bold))))
-          '(lazy-highlight     ((t (:background ,.secondary-container   :foreground ,.on-secondary-container))))
-          '(link               ((t (:foreground ,.primary   :underline t))))
-          '(link-visited       ((t (:foreground ,.tertiary  :underline t))))
-          '(match              ((t (:background ,.secondary-container   :foreground ,.on-secondary-container))))
-          '(region             ((t (:background ,.primary-container     :foreground ,.on-primary-container   :extend t))))
-          '(secondary-selection ((t (:background ,.secondary-container  :foreground ,.on-secondary-container :extend t))))
-          '(shadow             ((t (:foreground ,.outline-variant))))
-          '(success            ((t (:foreground ,.tertiary))))
-          '(vertical-border    ((t (:foreground ,.surface-container))))
-          '(warning            ((t (:foreground ,.secondary))))
+          '(border                     ((t (:background ,.surface-container :foreground ,.surface-container))))
+          '(cursor                     ((t (:background ,.primary))))
+          '(default                    ((t (:background ,.surface :foreground ,.on-surface))))
+          '(default-italic             ((t (:background ,.surface :foreground ,.on-surface :slant italic))))
+          '(error                      ((t (:foreground ,.error))))
+          '(fringe                     ((t (:background ,.surface :foreground ,.outline-variant))))
+          '(header-line                ((t (:background ,.surface-container-highest :foreground ,.on-surface :box nil))))
+          '(highlight                  ((t (:background ,.surface-container))))
+          '(isearch                    ((t (:background ,.tertiary-container :foreground ,.on-tertiary-container  :weight bold))))
+          '(lazy-highlight             ((t (:background ,.secondary-container   :foreground ,.on-secondary-container))))
+          '(link                       ((t (:foreground ,.primary   :underline t))))
+          '(link-visited               ((t (:foreground ,.tertiary  :underline t))))
+          '(match                      ((t (:background ,.tertiary-container   :foreground ,.on-tertiary-container))))
+          '(region                     ((t (:background ,.primary-container     :foreground ,.on-primary-container   :extend t))))
+          '(secondary-selection        ((t (:background ,.secondary-container   :foreground ,.on-secondary-container  :extend t))))
+          '(shadow                     ((t (:foreground ,.outline-variant))))
+          '(success                    ((t (:foreground ,.tertiary))))
+          '(vertical-border            ((t (:foreground ,.surface-container))))
+          '(warning                    ((t (:foreground ,.secondary))))
+          '(window-divider             ((t (:foreground ,.outline))))
+          '(window-divider-first-pixel ((t (:foreground ,.outline-variant))))
+          '(window-divider-last-pixel  ((t (:foreground ,.outline-variant))))
 
           ;; Font-lock faces.
-          '(font-lock-builtin-face           ((t (:foreground ,.primary            :weight bold))))
-          '(font-lock-comment-face           ((t (:foreground ,.outline            :slant italic))))
+          '(font-lock-builtin-face           ((t (:foreground ,.primary :weight bold))))
+          '(font-lock-comment-face           ((t (:foreground ,.outline :slant italic))))
           '(font-lock-comment-delimiter-face ((t (:foreground ,.outline-variant))))
-          '(font-lock-constant-face          ((t (:foreground ,.tertiary           :weight bold))))
+          '(font-lock-constant-face          ((t (:foreground ,.tertiary :weight bold))))
           '(font-lock-doc-face               ((t (:foreground ,.on-surface-variant :slant italic))))
-          '(font-lock-function-name-face     ((t (:foreground ,.primary            :weight bold))))
-          '(font-lock-keyword-face           ((t (:foreground ,.secondary          :weight bold))))
+          '(font-lock-function-name-face     ((t (:foreground ,.secondary :weight bold))))
+          '(font-lock-keyword-face           ((t (:foreground ,.primary :weight bold))))
           '(font-lock-string-face            ((t (:foreground ,.tertiary))))
-          '(font-lock-type-face              ((t (:foreground ,.primary))))
+          '(font-lock-type-face              ((t (:foreground ,.secondary))))
           '(font-lock-variable-name-face     ((t (:foreground ,.on-surface))))
-          '(font-lock-warning-face           ((t (:foreground ,.error              :weight bold))))
-          '(font-lock-preprocessor-face      ((t (:foreground ,.secondary-container))))
+          '(font-lock-warning-face           ((t (:foreground ,.error :weight bold))))
+          '(font-lock-preprocessor-face      ((t (:foreground ,.primary-container))))
           '(font-lock-negation-char-face     ((t (:foreground ,.tertiary))))
 
           ;; Show paren.
@@ -135,11 +133,11 @@ override the default configuration in OVERRIDES."
           '(show-paren-mismatch ((t (:background ,.error-container   :foreground ,.on-error-container   :weight bold))))
 
           ;; Mode line.
-          '(mode-line           ((t (:background ,.surface-container-high :foreground ,.on-surface         :box nil))))
-          '(mode-line-inactive  ((t (:background ,.surface               :foreground ,.on-surface-variant :box nil))))
-          '(mode-line-buffer-id ((t (:foreground ,.primary  :weight bold))))
-          '(mode-line-emphasis  ((t (:foreground ,.primary  :weight bold))))
-          '(mode-line-highlight ((t (:foreground ,.primary  :box nil))))
+          '(mode-line           ((t (:background ,.surface-container-highest :foreground ,.on-surface :box nil))))
+          '(mode-line-inactive  ((t (:background ,.surface :foreground ,.on-surface-variant :box nil))))
+          '(mode-line-buffer-id ((t (:foreground ,.primary :weight bold))))
+          '(mode-line-emphasis  ((t (:foreground ,.primary :weight bold))))
+          '(mode-line-highlight ((t (:foreground ,.primary :box nil))))
 
           ;; Org mode.
           '(org-block            ((t (:background ,.surface-container-low                               :extend t :inherit fixed-pitch))))

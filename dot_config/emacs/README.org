@@ -916,6 +916,24 @@ Let's customize that.
     (rangho-modeline-mode +1))
 #+end_src
 
+** Theme
+I have a custom theme that is based on the Material Design 3 color roles.
+On desktop, ~noctalia~ will generate the theme and on laptop, ~pywal16~ will generate the theme.
+
+#+begin_src emacs-lisp
+  (cond
+   ((member 'noctalia (custom-available-themes))
+    ;; If there is a theme named `noctalia', load that theme.
+    (load-theme 'noctalia))
+   ((executable-find "wal")
+    ;; Since pywal-theme.el is always present, load the theme if "wal" binary is
+    ;; available on the system.
+    (load-theme 'pywal))
+   (t
+    ;; No theme support found. Do nothing.
+    nil))
+#+end_src
+
 * Keybindings
 While emacs has an extensive list of keybindings available, we can make things much better and enjoyable.
 

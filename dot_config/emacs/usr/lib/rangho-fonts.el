@@ -4,7 +4,7 @@
 
 ;; Author: RangHo Lee <hello@rangho.me>
 ;; URL: https://github.com/RangHo/dotfiles
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "30.2"))
 
 ;; This file is NOT part of GNU Emacs.
 

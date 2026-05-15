@@ -4,7 +4,7 @@
 
 ;; Author: RangHo Lee <hello@rangho.me>
 ;; URL: https://github.com/RangHo/dotfiles
-;; Package-Requires: ((emacs "26.1") (evil "1.14.2") (nerd-icons "0.1.0") (nyan-mode "1.1.3"))
+;; Package-Requires: ((emacs "30.2") (evil "1.14.2") (nerd-icons "0.1.0") (nyan-mode "1.1.3"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -26,7 +26,8 @@
 
 (defgroup rangho-modeline nil
   "Custom modeline for Emacs."
-  :group 'local)
+  :group 'local
+  :prefix "rangho-modeline-")
 
 (defcustom rangho-modeline-lhs-components
   nil

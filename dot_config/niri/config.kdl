@@ -19,6 +19,10 @@ input {
         scroll-method "two-finger"
     }
 
+    trackball {
+        accel-profile "flat"
+    }
+
     // Focus follows mouse, only if it would scroll less than 50% of the screen.
     focus-follows-mouse max-scroll-amount="50%"
 }

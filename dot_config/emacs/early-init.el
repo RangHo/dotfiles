@@ -51,7 +51,8 @@
     "Theme the Emacs customization feature."
     (setq custom-file            (no-littering-expand-etc-file-name "custom.el"))
     (setq custom-theme-directory (no-littering-expand-etc-file-name "themes/"))
-    (load custom-file))
+    (when (file-exists-p custom-file)
+      (load custom-file)))
 
   (defun no-littering-theme-eln-cache ()
     "Theme the Emacs native compilation cache."

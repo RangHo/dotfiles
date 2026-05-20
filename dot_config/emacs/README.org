@@ -924,11 +924,11 @@ On desktop, ~noctalia~ will generate the theme and on laptop, ~pywal16~ will gen
   (cond
    ((member 'noctalia (custom-available-themes))
     ;; If there is a theme named `noctalia', load that theme.
-    (load-theme 'noctalia))
+    (load-theme 'noctalia t))
    ((executable-find "wal")
     ;; Since pywal-theme.el is always present, load the theme if "wal" binary is
     ;; available on the system.
-    (load-theme 'pywal))
+    (load-theme 'pywal t))
    (t
     ;; No theme support found. Do nothing.
     nil))

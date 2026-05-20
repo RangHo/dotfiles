@@ -6,9 +6,11 @@
 
 (require 'rangho-themes)
 
-(rangho-themes-define-theme material
-  "Purple-colored Material Design theme."
-  ((primary                   . "#e4b5ff")
+(deftheme material "Purple-colored Material Design theme.")
+
+(rangho-themes-set-faces
+ 'material
+ '((primary                   . "#e4b5ff")
    (on-primary                . "#4e0078")
    (primary-container         . "#c267fc")
    (on-primary-container      . "#3a005a")

@@ -11,9 +11,11 @@
 
 (require 'rangho-themes)
 
-(rangho-themes-define-theme noctalia
-  "Theme using Noctalia-generated color scheme."
-  ((primary                  . "{{colors.primary.default.hex}}")
+(deftheme noctalia "Theme using noctalia-generated color scheme.")
+
+(rangho-themes-define-theme
+ 'noctalia
+ '((primary                  . "{{colors.primary.default.hex}}")
    (on-primary               . "{{colors.on_primary.default.hex}}")
    (primary-container        . "{{colors.primary_container.default.hex}}")
    (on-primary-container     . "{{colors.on_primary_container.default.hex}}")

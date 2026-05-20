@@ -13,7 +13,7 @@
 
 (deftheme noctalia "Theme using noctalia-generated color scheme.")
 
-(rangho-themes-define-theme
+(rangho-themes-set-faces
  'noctalia
  '((primary                  . "{{colors.primary.default.hex}}")
    (on-primary               . "{{colors.on_primary.default.hex}}")

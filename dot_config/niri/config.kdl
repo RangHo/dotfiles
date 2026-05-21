@@ -324,7 +324,7 @@ binds {
     Mod+Grave                         { switch-preset-column-width; }
     Mod+Shift+Grave                   { switch-preset-window-height; }
     Mod+Tab repeat=false              { toggle-overview; }
-    Mod+Return                        { spawn-sh "ghostty +new-window"; }
+    Mod+Return                        { spawn-sh "ghostty"; }
     Mod+Space                         { toggle-window-floating; }
     Mod+Shift+Space                   { switch-focus-between-floating-and-tiling; }
     Mod+Comma                         { consume-window-into-column; }
@@ -402,7 +402,6 @@ hotkey-overlay {
 // Autostarts.
 // =====================================================================
 
-spawn-at-startup "ghostty" "--gtk-single-instance=true" "--initial-window=false"
 spawn-at-startup "ibus" "start" "--type" "wayland"
 spawn-at-startup "quickshell" "--config" "noctalia-shell"
 

@@ -138,6 +138,19 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
 }
 
 
+// laptop layout:
+//
+// +---------------+
+// |               |
+// |     eDP-1     |
+// |               |
+// +---------------+
+
+output "eDP-1" {
+    scale 1.0
+}
+
+
 // =====================================================================
 // Appearances.
 // =====================================================================
@@ -389,6 +402,7 @@ hotkey-overlay {
 // Autostarts.
 // =====================================================================
 
+spawn-at-startup "ghostty" "--gtk-single-instance=true" "--initial-window=false"
 spawn-at-startup "ibus" "start" "--type" "wayland"
 spawn-at-startup "quickshell" "--config" "noctalia-shell"
 

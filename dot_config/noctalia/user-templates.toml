@@ -8,3 +8,4 @@ post_hook = "emacsclient -e \"(load-theme 'noctalia t)\""
 [templates.ghostty]
 input_path = "~/.config/noctalia/templates/ghostty.conf"
 output_path = "~/.config/ghostty/themes/noctalia"
+post_hook = "pgrep -f ghostty >/dev/null && pkill -SIGUSR2 ghostty"

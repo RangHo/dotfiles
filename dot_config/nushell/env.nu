@@ -1,5 +1,5 @@
 # Nu modules.
-$env.NU_LIB_DIRS = ls ($nu.default-config-dir | path join "modules") | each { $in.name }
+$env.NU_LIB_DIRS = ls ($nu.default-config-dir | path join "extern") | each { $in.name }
 
 # Generated init scripts.
 def generate-init [tool: string, command: closure] {

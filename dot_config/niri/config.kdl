@@ -148,6 +148,10 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
 
 output "eDP-1" {
     scale 1.0
+
+    layout {
+        default-column-width { proportion 1.0; }
+    }
 }
 
 

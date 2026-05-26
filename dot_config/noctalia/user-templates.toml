@@ -4,3 +4,7 @@
 input_path = "~/.config/noctalia/templates/emacs.el"
 output_path = "~/.config/emacs/etc/themes/noctalia-theme.el"
 post_hook = "emacsclient -e \"(load-theme 'noctalia t)\""
+
+[templates.ghostty]
+input_path = "~/.config/noctalia/templates/ghostty.conf"
+output_path = "~/.config/ghostty/themes/noctalia"

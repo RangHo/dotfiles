@@ -1,26 +1,10 @@
-# .bashrc
+#!/bin/bash
 
-# If not running interactively, don't do anything
+# If not running interactively, don't do anything.
 [[ $- != *i* ]] && return
 
+# Always enable colors for `ls`.
 alias ls='ls --color=auto'
+
+# Set the prompt content.
 PS1='[\u@\h \W]\$ '
-
-
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
-# >>> juliaup initialize >>>
-
-# !! Contents within this block are managed by juliaup !!
-
-case ":$PATH:" in
-    *:/home/rangho/.juliaup/bin:*)
-        ;;
-
-    *)
-        export PATH=/home/rangho/.juliaup/bin${PATH:+:${PATH}}
-        ;;
-esac
-
-# <<< juliaup initialize <<<

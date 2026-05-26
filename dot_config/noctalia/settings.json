@@ -458,7 +458,7 @@
         "firstDayOfWeek": -1,
         "hideWeatherCityName": false,
         "hideWeatherTimezone": false,
-        "name": "Gwanak-gu",
+        "name": "Seodaemun-gu",
         "showCalendarEvents": true,
         "showCalendarWeather": true,
         "showWeekNumberInCalendar": false,
@@ -644,10 +644,6 @@
             },
             {
                 "enabled": true,
-                "id": "ghostty"
-            },
-            {
-                "enabled": true,
                 "id": "niri"
             },
             {
@@ -661,6 +657,10 @@
             {
                 "enabled": true,
                 "id": "zathura"
+            },
+            {
+                "enabled": true,
+                "id": "zenBrowser"
             }
         ],
         "enableUserTheming": true
@@ -680,7 +680,7 @@
         "translucentWidgets": false
     },
     "wallpaper": {
-        "automationEnabled": false,
+        "automationEnabled": true,
         "directory": "/home/rangho/Pictures/Wallpapers",
         "enableMultiMonitorDirectories": false,
         "enabled": true,
@@ -696,7 +696,7 @@
         "overviewEnabled": false,
         "overviewTint": 0.6,
         "panelPosition": "follow_bar",
-        "randomIntervalSec": 300,
+        "randomIntervalSec": 3600,
         "setWallpaperOnAllMonitors": true,
         "showHiddenFiles": false,
         "skipStartupTransition": false,

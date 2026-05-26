@@ -1,14 +1,9 @@
 README.md
 LICENSE
 
-{{- if ne .chezmoi.osRelease.id "void" }}
-# Xmonad is on Void Linux (laptop) hosts.
-.config/xmonad
-.config/picom
-.config/dunst
-.config/rofi
-.config/wal
-.Xresources
-.xinitrc
-.xsession
+{{- if ne .chezmoi.os "linux" }}
+# Ignore desktop environment related things on non-Linux systems.
+.config/fontconfig
+.config/niri
+.config/noctalia
 {{- end }}

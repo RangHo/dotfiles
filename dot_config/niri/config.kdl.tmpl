@@ -1,3 +1,5 @@
+// -*- mode: kdl -*-
+
 // =====================================================================
 // Input devices.
 // =====================================================================
@@ -270,7 +272,11 @@ binds {
     
     // Letter shortcuts.
     Mod+Q repeat=false { close-window; }
-    Mod+W              { spawn "firefox"; }
+//{{- if eq .chezmoi.osRelease.id "arch" }}
+    Mod+W              { spawn "firefox"; } // no flatpak on arch
+//{{- else }}
+    Mod+W              { spawn "flatpak" "run" "app.zen_browser.zen"; }
+//{{- end }}
     Mod+E              { spawn "nautilus"; }
     Mod+R              { spawn "quickshell" "--config" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
     Mod+T              { spawn "emacsclient" "-c"; }
@@ -297,7 +303,11 @@ binds {
     // Mod+V
     // Mod+B
     // Mod+N
-    Mod+M { spawn "thunderbird"; }
+//{{- if eq .chezmoi.osRelease.id "arch" }}
+    Mod+M              { spawn "thunderbird"; } // no flatpak on arch
+//{{- else }}
+    Mod+M              { spawn "flatpak" "run" "org.mozilla.Thunderbird"; }
+//{{- end }}
 
     // Number shortcuts.
     Mod+1      { focus-workspace 1; }
@@ -328,7 +338,7 @@ binds {
     Mod+Grave                         { switch-preset-column-width; }
     Mod+Shift+Grave                   { switch-preset-window-height; }
     Mod+Tab repeat=false              { toggle-overview; }
-    Mod+Return                        { spawn-sh "ghostty"; }
+    Mod+Return                        { spawn "ghostty"; }
     Mod+Space                         { toggle-window-floating; }
     Mod+Shift+Space                   { switch-focus-between-floating-and-tiling; }
     Mod+Comma                         { consume-window-into-column; }

@@ -273,7 +273,7 @@ binds {
     // Letter shortcuts.
     Mod+Q repeat=false { close-window; }
 //{{- if eq .chezmoi.osRelease.id "arch" }}
-    Mod+W              { spawn "firefox"; } // no flatpak on arch
+    Mod+W              { spawn "zen-browser"; } // no flatpak on arch
 //{{- else }}
     Mod+W              { spawn "flatpak" "run" "app.zen_browser.zen"; }
 //{{- end }}

@@ -4,3 +4,6 @@
 [submodule "emacs/no-littering"]
 	path = dot_config/emacs/lib/no-littering
 	url = https://github.com/emacscollective/no-littering
+[submodule "nushell/contrib"]
+	path = dot_config/nushell/contrib
+	url = https://github.com/nushell/nu_scripts

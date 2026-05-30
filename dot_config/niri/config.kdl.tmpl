@@ -34,8 +34,7 @@ input {
 // Monitors.
 // =====================================================================
 
-// espresso-bar layout:
-//
+//{{ if eq .chezmoi.hostname "espresso-bar" }}
 // +-------------------------+
 // |                         |
 // | LG ULTRAWIDE 0x00041309 |
@@ -96,8 +95,22 @@ output "Wacom Tech Wacom One 13 0KQ0171007544" {
     }
 }
 
-// coffeelab layout:
-//
+//{{ else if eq .chezmoi.hostname "RangHo-Framework13" }}
+// +---------------+
+// |               |
+// |     eDP-1     |
+// |               |
+// +---------------+
+
+output "eDP-1" {
+    scale 1.0
+
+    layout {
+        default-column-width { proportion 1.0; }
+    }
+}
+
+//{{ else if eq .chezmoi.hostname "coffeelab" }}
 //                            +--------------+
 //                            |              |
 // +--------------------------+              |
@@ -139,22 +152,9 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
     }
 }
 
-
-// laptop layout:
-//
-// +---------------+
-// |               |
-// |     eDP-1     |
-// |               |
-// +---------------+
-
-output "eDP-1" {
-    scale 1.0
-
-    layout {
-        default-column-width { proportion 1.0; }
-    }
-}
+//{{ else }}
+// No special settings.
+//{{ end }}
 
 
 // =====================================================================
@@ -218,16 +218,9 @@ window-rule {
     draw-border-with-background true
 }
 
-// Open the Firefox picture-in-picture player as floating by default.
+// Open the picture-in-picture player as floating by default.
 window-rule {
-    match app-id="firefox$" title="^Picture-in-Picture$"
-
-    open-floating true
-}
-
-// Open Firefox extension windows in floating mode by default.
-window-rule {
-    match app-id="firefox$" title="^Extension: "
+    match title="^Picture-in-Picture$"
 
     open-floating true
 }
@@ -272,11 +265,11 @@ binds {
     
     // Letter shortcuts.
     Mod+Q repeat=false { close-window; }
-//{{- if eq .chezmoi.osRelease.id "arch" }}
+//{{ if eq .chezmoi.osRelease.id "arch" }}
     Mod+W              { spawn "zen-browser"; } // no flatpak on arch
-//{{- else }}
+//{{ else }}
     Mod+W              { spawn "flatpak" "run" "app.zen_browser.zen"; }
-//{{- end }}
+//{{ end }}
     Mod+E              { spawn "nautilus"; }
     Mod+R              { spawn "quickshell" "--config" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
     Mod+T              { spawn "emacsclient" "-c"; }
@@ -303,11 +296,11 @@ binds {
     // Mod+V
     // Mod+B
     // Mod+N
-//{{- if eq .chezmoi.osRelease.id "arch" }}
+//{{ if eq .chezmoi.osRelease.id "arch" }}
     Mod+M              { spawn "thunderbird"; } // no flatpak on arch
-//{{- else }}
+//{{ else }}
     Mod+M              { spawn "flatpak" "run" "org.mozilla.Thunderbird"; }
-//{{- end }}
+//{{ end }}
 
     // Number shortcuts.
     Mod+1      { focus-workspace 1; }
@@ -338,7 +331,7 @@ binds {
     Mod+Grave                         { switch-preset-column-width; }
     Mod+Shift+Grave                   { switch-preset-window-height; }
     Mod+Tab repeat=false              { toggle-overview; }
-    Mod+Return                        { spawn "ghostty"; }
+    Mod+Return                        { spawn "footclient"; }
     Mod+Space                         { toggle-window-floating; }
     Mod+Shift+Space                   { switch-focus-between-floating-and-tiling; }
     Mod+Comma                         { consume-window-into-column; }
@@ -417,7 +410,7 @@ hotkey-overlay {
 // =====================================================================
 
 spawn-at-startup "ibus" "start" "--type" "wayland"
-spawn-at-startup "quickshell" "--config" "noctalia-shell"
+spawn-at-startup "noctalia"
 
 
 // =====================================================================

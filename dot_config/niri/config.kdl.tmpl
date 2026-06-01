@@ -218,18 +218,21 @@ window-rule {
     draw-border-with-background true
 }
 
+// Floating Noctalia settings window.
+window-rule {
+  match app-id="dev.noctalia.Noctalia.Settings"
+
+  open-floating true
+
+  default-column-width { fixed 1080; }
+  default-window-height { fixed 920; }
+}
+
 // Open the picture-in-picture player as floating by default.
 window-rule {
     match title="^Picture-in-Picture$"
 
     open-floating true
-}
-
-// WezTerm waits for a zero-sized Wayland configure event, so nothing shows up.
-// This is a workaround to give it a default size.
-window-rule {
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
 }
 
 // Waydroid windows have fixed size; maximize them to fill the screen.
@@ -271,7 +274,7 @@ binds {
     Mod+W              { spawn "flatpak" "run" "app.zen_browser.zen"; }
 //{{ end }}
     Mod+E              { spawn "nautilus"; }
-    Mod+R              { spawn "quickshell" "--config" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Mod+R              { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
     Mod+T              { spawn "emacsclient" "-c"; }
     // Mod+Y
     // Mod+U
@@ -346,6 +349,10 @@ binds {
     XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
     XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+
+    // Brightness keys.
+    XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
 
     // Arrow keys.
     Mod+Left             { focus-column-left; }

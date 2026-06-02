@@ -1,0 +1,69 @@
+// =====================================================================
+// Common settings.
+// =====================================================================
+include "./common/arch.kdl";
+
+
+// =====================================================================
+// Monitors.
+// =====================================================================
+
+// +-------------------------+
+// |                         |
+// | LG ULTRAWIDE 0x00041309 |
+// |                         |
+// +-------------------------+
+// |                         |
+// | Dell Inc.               |
+// | DELL S2721DS 44S0R43    |
+// |                         |
+// +-------------------------+
+//      | Wacom Tech    |
+//      | Wacom One 13  |
+//      | U32J59X       |
+//      +---------------+
+
+// Ultrawide monitor at the top for espresso-bar.
+output "LG Electronics LG ULTRAWIDE 0x00041309" {
+    transform "180"
+    position x=0 y=0
+
+    hot-corners {
+        top-left
+        top-right
+    }
+
+    layout {
+        default-column-width { proportion 0.5; }
+    }
+}
+
+// 2K monitor at the bottom for espresso-bar.
+output "Dell Inc. DELL S2721DS 44S0R43" {
+    focus-at-startup
+    position x=0 y=1080
+
+    hot-corners {
+        off
+    }
+
+    layout {
+        default-column-width { proportion 0.666; }
+    }
+}
+
+// Wacom One graphics tablet for espresso-bar
+output "Wacom Tech Wacom One 13 0KQ0171007544" {
+    scale 1.0
+    position x=320 y=2520
+
+    hot-corners {
+        off
+    }
+
+    layout {
+        gaps 0
+
+        default-column-width { proportion 1.0; }
+    }
+}

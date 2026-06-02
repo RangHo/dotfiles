@@ -1,0 +1,50 @@
+// =====================================================================
+// Common settings.
+// =====================================================================
+include "./common/arch.kdl";
+
+
+// =====================================================================
+// Monitors.
+// =====================================================================
+
+//                            +--------------+
+//                            |              |
+// +--------------------------+              |
+// |                          | Samsung      |
+// | Samsung Electric Company | Electric Co. |
+// | LS32D70xE HNBY100538     | U32J59x      |
+// |                          | HMMX102362   |
+// +--------------------------+              |
+//                            |              |
+//                            +--------------+
+
+// Vertical monitor on the right for coffeelab.
+output "Samsung Electric Company U32J59x HNMX102362" {
+    scale 1.25
+    transform "270"
+    position x=0 y=0
+
+    hot-corners {
+        top-right
+    }
+
+    layout {
+        gaps 10
+
+        default-column-width { proportion 1.0; }
+    }
+}
+
+// Horizontal monitor on the left for coffelab.
+output "Samsung Electric Company LS32D70xE HNBY100538" {
+    focus-at-startup
+
+    scale 1.25
+    transform "normal" 
+    position x=-3072 y=790
+
+    layout {
+        default-column-width { proportion 0.666; }
+    }
+}

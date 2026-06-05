@@ -1343,6 +1343,7 @@ Nu is a brand-new, data-oriented shell script.
 #+begin_src emacs-lisp
   (use-package nushell-ts-mode
     :defer t
+    :mode ("\\.nu\\'")
     :init
     (add-to-list 'treesit-language-source-alist
                  '(nu "https://github.com/nushell/tree-sitter-nu")))

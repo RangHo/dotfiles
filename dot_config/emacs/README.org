@@ -1334,7 +1334,8 @@ Nix is a functional and declarative expression format used to configure NixOS.
 
 #+begin_src emacs-lisp
   (use-package nix-mode
-    :defer t)
+    :defer t
+    :mode ("\\.nix\\'"))
 #+end_src
 
 ** Nu

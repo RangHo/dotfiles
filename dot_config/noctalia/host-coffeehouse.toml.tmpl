@@ -1,0 +1,68 @@
+# -*- mode: conf-toml -*-
+
+{{ if eq .chezmoi.hostname "coffeehouse" }}
+# This machine is "coffeehouse".
+
+[bar]
+order = [ "coffeehouse" ]
+
+[bar.coffeehouse]
+background_opacity = 0.5
+capsule = true
+center = [ "media" ]
+enabled = false
+end = [ "tray", "clipboard", "bluetooth", "volume", "control-center", "clock", "notifications" ]
+margin_edge = 25.0
+margin_ends = 25.0
+padding = 25
+position = "top"
+radius = 25
+scale = 1.25
+start = [ "session", "launcher", "wallpaper", "workspaces" ]
+thickness = 50
+widget_spacing = 10
+
+[bar.coffeehouse.monitor.DP-1]
+enabled = true
+
+[idle]
+behavior_order = [ "screen_off" ]
+
+[idle.behavior.screen_off]
+action = "screen_off"
+enabled = true
+timeout = 3600
+
+[shell.panel]
+open_near_click_control_center = true
+open_near_click_session = true
+open_near_click_wallpaper = true
+
+# +-------------------------+
+# |                         |
+# |          DP-3           |
+# |                         |
+# +-------------------------+
+# |                         |
+# |          DP-1           |
+# |                         |
+# |                         |
+# +-------------------------+
+#      |               |
+#      |   HDMI-A-1    |
+#      |               |
+#      +---------------+
+
+[wallpaper.monitor.DP-3]
+directory = "~/Pictures/Wallpapers/Ultrawide"
+
+[wallpaper.monitor.DP-1]
+directory = "~/Pictures/Wallpapers/Landscape"
+
+[wallpaper.monitor.HDMI-A-1]
+directory = "~/Pictures/Wallpapers/Landscape"
+
+{{ else }}
+# This machine is not "coffeehouse".
+
+{{ end }}

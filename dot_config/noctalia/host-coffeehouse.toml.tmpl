@@ -7,18 +7,18 @@
 order = [ "coffeehouse" ]
 
 [bar.coffeehouse]
-background_opacity = 0.5
-capsule = true
-center = [ "media" ]
+background_opacity = 0.75
+capsule = false
+center = [ "audio_visualizer", "media", "volume" ]
 enabled = false
-end = [ "tray", "clipboard", "bluetooth", "volume", "control-center", "clock", "notifications" ]
+end = [ "bluetooth", "clipboard", "notifications", "clock", "control-center" ]
 margin_edge = 25.0
 margin_ends = 25.0
 padding = 25
 position = "top"
-radius = 25
+radius = 15
 scale = 1.25
-start = [ "session", "launcher", "wallpaper", "workspaces" ]
+start = [ "cpu", "temp", "ram" ]
 thickness = 50
 widget_spacing = 10
 
@@ -61,6 +61,29 @@ directory = "~/Pictures/Wallpapers/Landscape"
 
 [wallpaper.monitor.HDMI-A-1]
 directory = "~/Pictures/Wallpapers/Landscape"
+
+[widget.audio_visualizer]
+mirrored = false
+show_when_idle = true
+
+[widget.bongocat]
+script = "scripts/bongocat.lua"
+type = "scripted"
+
+[widget.clock]
+format = "{:%a %d %b %H:%M}"
+
+[widget.cpu]
+display = "graph"
+show_label = false
+
+[widget.ram]
+display = "graph"
+show_label = false
+
+[widget.temp]
+display = "graph"
+show_label = false
 
 {{ else }}
 # This machine is not "coffeehouse".

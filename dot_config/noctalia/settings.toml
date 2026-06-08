@@ -25,7 +25,7 @@ transparency_mode = "glass"
 source = "wallpaper"
 
 [theme.templates]
-builtin_ids = [ "gtk3", "gtk4", "kcolorscheme", "niri", "qt" ]
+builtin_ids = [ "foot", "gtk3", "gtk4", "kcolorscheme", "niri", "qt" ]
 community_ids = [ "spicetify", "zen-browser", "discord", "papirus-icons" ]
 
 [theme.templates.user.emacs]
@@ -36,4 +36,10 @@ post_hook = "emacsclient -e \"(load-theme 'noctalia t)\""
 [wallpaper]
 directory = "~/Pictures/Wallpapers"
 per_monitor_directories = true
-automation.enabled = true
+
+[wallpaper.automation]
+enabled = true
+interval_minutes = 60
+
+[weather]
+auto_locate = true

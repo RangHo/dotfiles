@@ -18,9 +18,6 @@ tint_intensity = 0.5
 niri_overview_type_to_launch_enabled = true
 
 [shell.panel]
-open_near_click_control_center = true
-open_near_click_session = true
-open_near_click_wallpaper = true
 transparency_mode = "glass"
 
 [theme]

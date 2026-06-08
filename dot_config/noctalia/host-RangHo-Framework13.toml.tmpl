@@ -1,0 +1,78 @@
+# -*- mode: conf-toml -*-
+
+{{ if eq .chezmoi.hostname "RangHo-Framework13" }}
+# This machine is "RangHo-Framework13".
+
+[bar]
+order = [ "laptop_top", "laptop_right" ]
+
+[bar.laptop_top]
+background_opacity = 0.75
+center = [ "active_window" ]
+enabled = false
+end = [ "bluetooth", "network", "volume", "brightness", "battery", "clock" ]
+margin_edge = 25
+margin_ends = 25
+padding = 25
+radius = 10
+scale = 1.25
+start = [ "media", "cpu", "ram", "network_rx", "network_tx" ]
+thickness = 50
+widget_spacing = 15
+
+[bar.laptop_top.monitor.eDP-1]
+enabled = true
+
+[bar.laptop_right]
+auto_hide = true
+background_opacity = 0.5
+center = [ "workspaces" ]
+enabled = false
+end = [ "tray" ]
+margin_edge = 0
+margin_ends = 50
+padding = 25
+position = "right"
+radius = 25
+radius_bottom_right = 0
+radius_top_right = 0
+scale = 2.0
+start = [ "control-center", "session" ]
+thickness = 100
+widget_spacing = 15
+
+[bar.laptop_right.monitor.eDP-1]
+enabled = true
+
+[idle]
+behavior_order = [ "lock", "screen-off" ]
+
+[idle.behavior.lock]
+action = "lock"
+enabled = true
+timeout = 900
+
+[idle.behavior.screen-off]
+action = "screen_off"
+enabled = true
+timeout = 3600
+
+[widget.cpu]
+show_label = false
+
+[widget.network_rx]
+show_label = false
+
+[widget.network_tx]
+show_label = false
+
+[widget.ram]
+show_label = false
+
+[widget.temp]
+show_label = false
+
+{{ else }}
+# This machine is not "RangHo-Framework13".
+
+{{ end }}

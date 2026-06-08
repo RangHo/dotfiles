@@ -1,0 +1,62 @@
+# -*- mode: conf-toml -*-
+
+{{ if eq .chezmoi.hostname "coffeelab" }}
+# This machine is "coffeelab".
+
+[bar]
+order = [ "coffeelab" ]
+
+[bar.coffeelab]
+center = [ "workspaces" ]
+contact_shadow = true
+end = [ "tray", "notifications", "clipboard", "bluetooth", "volume", "clock", "control-center" ]
+margin_edge = 25
+margin_ends = 25
+padding = 25
+position = "left"
+radius = 25
+scale = 1.25
+start = [ "session", "launcher", "wallpaper", "media" ]
+thickness = 50
+widget_spacing = 10
+
+[bar.coffeelab.monitor.DP-2]
+enabled = false
+
+[dock]
+active_monitor_only = true
+auto_hide = true
+cross_axis_padding = 10
+enabled = true
+icon_size = 36
+item_spacing = 10
+launcher_position = "start"
+magnification_scale = 2.0
+main_axis_padding = 25
+margin_edge = 10
+monitors = [ "DP-2" ]
+radius = 25
+
+[idle]
+behavior_order = [ "lock", "screen-off" ]
+
+[idle.behavior.lock]
+action = "lock"
+enabled = true
+timeout = 900
+
+[idle.behavior.screen-off]
+action = "screen_off"
+enabled = true
+timeout = 3600
+
+[notification]
+monitors = [ "DP-1" ]
+
+[osd]
+monitors = [ "DP-1" ]
+
+{{ else }}
+# This machine is not "coffeelab".
+
+{{ end }}

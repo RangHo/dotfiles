@@ -1,0 +1,14 @@
+[general]
+import = [
+    "themes/noctalia.toml"
+]
+
+[window]
+padding = { x = 15, y = 15 }
+
+[terminal]
+shell = "/usr/bin/nu"
+
+[font]
+normal = { family = "codespace", style = "Regular" }
+size = 12

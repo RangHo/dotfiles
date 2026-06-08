@@ -16,6 +16,7 @@ tint_intensity = 0.5
 
 [shell]
 niri_overview_type_to_launch_enabled = true
+telemetry_enabled = false
 
 [shell.panel]
 transparency_mode = "glass"

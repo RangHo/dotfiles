@@ -380,14 +380,6 @@ It is usually much faster than Emacs's built-in parsing facility.
             treesit-language-source-alist))
 #+end_src
 
-With Tree-sitter v0.26, the query parameters require ? or ! suffix.
-Emacs 30 and lower versions don't ship with the needed fixes yet, so let's apply hacky workaround for now.
-See [[https://mwolson.org/blog/2026-04-20-fixing-typescript-ts-mode-in-emacs-30-2/][this blog post]] for more information.
-
-#+begin_src emacs-lisp
-  (load-file (no-littering-expand-lib-file-name "treesit-predicate-rewrite.el"))
-#+end_src
-
 *** Language Server Protocol
 The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
 

@@ -151,7 +151,7 @@ binds {
     
     // Letter shortcuts.
     Mod+Q repeat=false { close-window; }
-    // Mod+W is a host-dependent web browser shortcut.
+    Mod+W              { spawn "firefox"; }
     Mod+E              { spawn "nautilus"; }
     Mod+R              { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
     Mod+T              { spawn "emacsclient" "-c"; }
@@ -178,7 +178,7 @@ binds {
     // Mod+V
     // Mod+B
     // Mod+N
-    // Mod+M is a host-dependent mail client shortcut.
+    Mod+M              { spawn "thunderbird"; }
 
     // Number shortcuts.
     Mod+1      { focus-workspace 1; }

@@ -973,7 +973,6 @@ Its documentation was pretty horrible back in the day, but it has got /a lot/ be
 
 #+begin_src emacs-lisp
   (use-package agda2
-    :defer t
     :when (executable-find "agda")
     :load-path (lambda ()
                  (let ((coding-system-for-read 'utf-8))
@@ -988,12 +987,10 @@ While BASIC is not used a lot, some exotic environments like Microsoft Excel sti
 There is no official support for Visual Basic in =basic-mode=, so we need to define our own.
 
 #+begin_src emacs-lisp
-  (use-package basic-mode
-    :defer t)
+  (use-package basic-mode)
 
   (use-package visual-basic-mode
-    :ensure nil
-    :defer t)
+    :ensure nil)
 #+end_src
 
 ** C, C++, Objective-C
@@ -1004,7 +1001,6 @@ Also, while we're at it, let's enable Language Server support.
 
 #+begin_src emacs-lisp
   (use-package c-ts-mode
-    :defer t
     :mode (("\\.c\\'" . c-ts-mode)
            ("\\.h\\'" . c-or-c++-ts-mode)
            ("\\.HC\\'" . c-ts-mode)
@@ -1042,13 +1038,13 @@ Emacs doesn't come with support for build systems, except for Makefile.
 
 #+begin_src emacs-lisp
   (use-package cmake-ts-mode
-    :defer t
+    :mode ("CMakeLists.txt\\'")
     :init
     (add-to-list 'treesit-language-source-alist
                  '(cmake "https://github.com/uyha/tree-sitter-cmake")))
 
   (use-package meson-mode
-    :defer t)
+    :mode ("meson\\(\\.build\\|_options\\.txt\\|\\.options\\)\\'"))
 #+end_src
 
 We can add support for =clang-format= formatter with a bit of RegExp magic.
@@ -1067,7 +1063,7 @@ Emacs C# with Roslyn literally trashes VS Code.
 
 #+begin_src emacs-lisp
   (use-package csharp-mode
-    :defer t
+    :mode ("\\.cs\\'")
     :init
     (add-to-list 'treesit-language-source-alist
                  '(csharp "https://github.com/tree-sitter/tree-sitter-c-sharp"))
@@ -1090,7 +1086,6 @@ Perfect solution for small web servers like in a homelab.
 
 #+begin_src emacs-lisp
   (use-package conf-mode
-    :defer t
     :mode ( ; systemd units
            "\\.service\\'" "\\.socket\\'" "\\.device\\'" "\\.mount\\'"
            "\\.automount\\'" "\\.swap\\'" "\\.target\\'" "\\.path\\'"
@@ -1105,7 +1100,7 @@ Crystal is a native programming language that looks exactly like Ruby.
 
 #+begin_src emacs-lisp
   (use-package crystal-mode
-    :defer t
+    :mode ("\\.cr\\'")
     :init
     (add-to-list 'eglot-server-programs
                  '(crystal-mode . ("crystalline"))))
@@ -1124,7 +1119,6 @@ Docker is /de facto/ standard container technology these days.
 
 #+begin_src emacs-lisp
   (use-package dockerfile-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")))
@@ -1136,7 +1130,6 @@ It keeps the great part of the virtual machine while providing highly extensible
 
 #+begin_src emacs-lisp
   (use-package elixir-ts-mode
-    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(elixir-mode . ("elixir-ls")))
@@ -1148,7 +1141,6 @@ HEEx is a template language used by Phoenix Framework, a popular web framework w
 
 #+begin_src emacs-lisp
   (use-package heex-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(heex "https://github.com/phoenixframework/tree-sitter-heex")))
@@ -1158,11 +1150,9 @@ HEEx is a template language used by Phoenix Framework, a popular web framework w
 F# is a functional programming language in OCaml family that runs on .NET Common Language Runtime.
 
 #+begin_src emacs-lisp
-  (use-package fsharp-mode
-    :defer t)
+  (use-package fsharp-mode)
 
   (use-package eglot-fsharp
-    :defer t
     :when (featurep 'eglot))
 #+end_src
 
@@ -1170,8 +1160,7 @@ F# is a functional programming language in OCaml family that runs on .NET Common
 Gnuplot is a command-line plotting program.
 
 #+begin_src emacs-lisp
-  (use-package gnuplot
-    :defer t)
+  (use-package gnuplot)
 #+end_src
 
 ** Go
@@ -1181,7 +1170,6 @@ At least it's built-in...
 
 #+begin_src emacs-lisp
   (use-package go-ts-mode
-    :defer t
     :mode (("\\.go\\'" . go-ts-mode)
            ("/go\\.mod\\'" . go-mod-ts-mode))
     :init
@@ -1196,8 +1184,7 @@ Haskell, being a purely functional language, has an exceptional support for Emac
 So much so that it doesn't even require LSP!
 
 #+begin_src emacs-lisp
-  (use-package haskell-mode
-    :defer t)
+  (use-package haskell-mode)
 #+end_src
 
 [[https://github.com/fourmolu/fourmolu][Fourmolu]] is a fork of [[https://github.com/tweag/ormolu][Ormolu]] with configurable style.
@@ -1206,7 +1193,6 @@ If =fourmolu= binary is available, integrate it.
 
 #+begin_src emacs-lisp
   (use-package ormolu
-    :defer t
     :when (executable-find "fourmolu")
     :hook (haskell-mode . ormolu-format-on-save-mode)
     :custom
@@ -1262,7 +1248,6 @@ Both of them suck, and Julia performs pretty well.
       (user-error "Julia is not installed")))
 
   (use-package julia-mode
-    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(julia-mode . rangho--julia-mode-contact)))
@@ -1273,7 +1258,6 @@ KDL is a small, pleasant document language with XML-like node semantics that res
 
 #+begin_src emacs-lisp
   (use-package kdl-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")))
@@ -1283,8 +1267,7 @@ KDL is a small, pleasant document language with XML-like node semantics that res
 Lex and Yacc (or more recently, Flex and Bison) are one of the most popular parser generator.
 
 #+begin_src emacs-lisp
-  (use-package bison-mode
-    :defer t)
+  (use-package bison-mode)
 #+end_src
 
 ** Lua
@@ -1292,7 +1275,6 @@ Lua is a small, yet full-featured embedded language that works with C really wel
 
 #+begin_src emacs-lisp
   (use-package lua-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(lua "https://github.com/tree-sitter-grammars/tree-sitter-lua")))
@@ -1303,31 +1285,29 @@ Markdown is a /de facto/ standard for writing README files on modern software pr
 The syntax is... questionable, at best, though.
 
 #+begin_src emacs-lisp
-  (use-package markdown-mode
-    :defer t
-    :mode (("\\.md\\'" . markdown-mode)
-           ("\\.markdown\\'" . markdown-mode)
-           ("\\.mdx\\'". markdown-mode)
-           ("README\\.md\\'" . gfm-mode))
-    :custom
-    (markdown-fontify-code-block-natively t))
+  (use-package markdown-ts-mode
+    :mode ("\\.md\\'" "\\.markdown\\'" "\\.mdx\\'")
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown")))
 #+end_src
 
 ** Mermaid
 Mermaid is a diagram and graph scripting language, producing an image.
 
 #+begin_src emacs-lisp
-  (use-package mermaid-mode
-    :defer t)
+  (use-package mermaid-mode)
 #+end_src
 
 ** Nix
 Nix is a functional and declarative expression format used to configure NixOS.
 
 #+begin_src emacs-lisp
-  (use-package nix-mode
-    :defer t
-    :mode ("\\.nix\\'"))
+  (use-package nix-ts-mode
+    :mode ("\\.nix\\'")
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(nix "https://github.com/nix-community/tree-sitter-nix")))
 #+end_src
 
 ** Nu
@@ -1335,7 +1315,6 @@ Nu is a brand-new, data-oriented shell script.
 
 #+begin_src emacs-lisp
   (use-package nushell-ts-mode
-    :defer t
     :mode ("\\.nu\\'")
     :init
     (add-to-list 'treesit-language-source-alist
@@ -1346,16 +1325,14 @@ Nu is a brand-new, data-oriented shell script.
 OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in static analysis and formal verification softwares.
 
 #+begin_src emacs-lisp
-  (use-package tuareg
-    :defer t)
+  (use-package tuareg)
 #+end_src
 
 ** OpenSCAD
 OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
-  (use-package scad-mode
-    :defer t)
+  (use-package scad-mode)
 #+end_src
 
 ** Org-mode
@@ -1363,7 +1340,6 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org
-    :defer t
     :bind (("C-c a" . org-agenda)
            ("C-c t" . org-capture))
     :custom
@@ -1384,7 +1360,6 @@ OpenSCAD allows me to make 3D models in code.
     (org-use-sub-superscripts '{}))
 
   (use-package org-appear
-    :defer t
     :hook (org-mode . (lambda ()
                         (org-appear-mode +1)
                         (add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start nil t)
@@ -1398,7 +1373,6 @@ OpenSCAD allows me to make 3D models in code.
     (org-appear-trigger 'manual))
 
   (use-package org-modern
-    :defer t
     :after (nerd-icons)
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda))
@@ -1415,14 +1389,12 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org-mem
-    :defer t
     :custom
     (org-mem-do-sync-with-org-id t)
     :config
     (org-mem-updater-mode))
 
   (use-package org-node
-    :defer t
     :bind-keymap ("C-c n" . org-node-global-prefix-map)
     :config
     (org-node-cache-mode))
@@ -1432,13 +1404,11 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package org-re-reveal
-    :defer t
     :custom
     (org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js@4")
     (org-re-reveal-revealjs-version "4"))
 
   (use-package org-re-reveal-citeproc
-    :defer t
     :config
     (add-to-list 'org-export-filter-paragraph-functions #'org-re-reveal-citeproc-filter-cite))
 #+end_src
@@ -1447,7 +1417,6 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-d2
-    :defer t
     :when (executable-find "d2")
     :init
     (add-to-list 'org-babel-load-languages '(d2 . t)))
@@ -1458,7 +1427,6 @@ OpenSCAD allows me to make 3D models in code.
 #+begin_src emacs-lisp
   (use-package ob-gnuplot
     :ensure nil
-    :defer t
     :when (executable-find "gnuplot")
     :init
     (add-to-list 'org-babel-load-languages '(gnuplot . t)))
@@ -1468,9 +1436,9 @@ OpenSCAD allows me to make 3D models in code.
 
 #+begin_src emacs-lisp
   (use-package ob-mermaid
-    :defer t
     :when (executable-find "mmdc")
-    :custom (ob-mermaid-cli-path (executable-find "mmdc"))
+    :custom
+    (ob-mermaid-cli-path (executable-find "mmdc"))
     :init
     (add-to-list 'org-babel-load-languages '(mermaid . t)))
 #+end_src
@@ -1480,7 +1448,6 @@ OpenSCAD allows me to make 3D models in code.
 #+begin_src emacs-lisp
   (use-package ox-latex
     :ensure nil
-    :defer t
     :custom
     (org-latex-compiler "lualatex")
     (org-latex-src-block-backend 'engraved)
@@ -1492,8 +1459,7 @@ OpenSCAD allows me to make 3D models in code.
 PowerShell is the new shell script language for Windows and .NET platform.
 
 #+begin_src emacs-lisp
-  (use-package powershell
-    :defer t)
+  (use-package powershell)
 #+end_src
 
 ** Praat Script
@@ -1502,8 +1468,7 @@ It allows automation by writing object-manipulating commands into a script.
 
 #+begin_src emacs-lisp
   (use-package praat-mode
-    :ensure nil
-    :defer t)
+    :ensure nil)
 #+end_src
 
 ** Proof General
@@ -1511,7 +1476,6 @@ It allows automation by writing object-manipulating commands into a script.
 
 #+begin_src emacs-lisp
   (use-package proof-general
-    :defer t
     :custom
     (proof-splash-enable nil)
     (proof-layout-windows 'hybrid))
@@ -1523,7 +1487,6 @@ Still I need to use it, so...
 
 #+begin_src emacs-lisp
   (use-package python
-    :defer t
     :init
     (when (featurep 'treesit)
       (add-to-list 'treesit-language-source-alist
@@ -1540,13 +1503,11 @@ Better than Python.
 
 #+begin_src emacs-lisp
   (use-package ruby-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(ruby "https://github.com/tree-sitter/tree-sitter-ruby")))
 
-  (use-package rbs-mode
-    :defer t)
+  (use-package rbs-mode)
 #+end_src
 
 ** Rust
@@ -1558,7 +1519,6 @@ Rust is a modern system programming language that ensures memory safety by langu
     (add-hook 'before-save-hook #'eglot-format-buffer nil t))
 
   (use-package rust-ts-mode
-    :defer t
     :hook (rust-ts-mode . rangho--add-rust-mode-before-save-hook)
     :init
     (add-to-list 'treesit-language-source-alist
@@ -1569,8 +1529,7 @@ Rust is a modern system programming language that ensures memory safety by langu
 Swift is to Objective-C as Kotlin is to Java, on Apple devices.
 
 #+begin_src emacs-lisp
-  (use-package swift-mode
-    :defer t)
+  (use-package swift-mode)
 #+end_src
 
 ** Terraform
@@ -1588,7 +1547,6 @@ Terraform is a cloud provisioning software from Hashicorp.
       (list lsp-server "serve")))
 
   (use-package terraform-mode
-    :defer t
     :init
     (add-to-list 'eglot-server-programs
                  '(terraform-mode . rangho--terraform-mode-contact)))
@@ -1603,7 +1561,6 @@ On non-UNIX systems this becomes a problem, but I won't be editing LaTeX on Wind
 
 #+begin_src emacs-lisp
   (use-package auctex
-    :defer t
     :hook ((ConTeXt-mode . prettify-symbols-mode)
            (LaTeX-mode . prettify-symbols-mode)))
 #+end_src
@@ -1614,7 +1571,6 @@ Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in
 
 #+begin_src emacs-lisp
   (use-package toml-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(toml "https://github.com/tree-sitter/tree-sitter-toml"))
@@ -1630,7 +1586,6 @@ Note that the major mode for Typst is provided only as a Tree-Sitter grammar.
 
 #+begin_src emacs-lisp
   (use-package typst-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(typst "https://github.com/uben0/tree-sitter-typst")))
@@ -1646,7 +1601,6 @@ There are a few /modern/ extensions to support, namely, PostCSS.
 
 #+begin_src emacs-lisp
   (use-package css-mode
-    :defer t
     :mode ("\\.pcss\\'" "\\.postcss\\'")
     :init
     (add-to-list 'treesit-language-source-alist
@@ -1670,7 +1624,6 @@ To edit TypeScript files, just install Emacs 29.
 
 #+begin_src emacs-lisp
   (use-package js
-    :defer t
     :mode (("\\.js\\'" . js-ts-mode)
            ("\\.cjs\\'" . js-ts-mode)
            ("\\.mjs\\'" . js-ts-mode))
@@ -1693,7 +1646,6 @@ While it says TSX, it supports both JSX and TSX no problem.
 
 #+begin_src emacs-lisp
   (use-package typescript-ts-mode
-    :defer t
     :mode (("\\.ts\\'" . typescript-ts-mode)
            ("\\.cts\\'" . typescript-ts-mode)
            ("\\.mts\\'" . typescript-ts-mode)
@@ -1716,7 +1668,6 @@ Starting from Emacs 29, there is a new JSON major mode powered by Tree-Sitter.
 
 #+begin_src emacs-lisp
   (use-package json-ts-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(json "https://github.com/tree-sitter/tree-sitter-json"))
@@ -1742,7 +1693,6 @@ It primarily targets HTML, but it also supports other HTMLx templates.
       '("echo" "No language server available")))
 
   (use-package web-mode
-    :defer t
     :mode ("\\.php\\'"                      ; PHP
            "\\.rhtml\\'" "\\.html\\.erb\\'" ; Ruby on Rails
            "\\.html\\.heex\\'"              ; Phoenix
@@ -1763,7 +1713,6 @@ X11 uses similar syntax for most of its configurations.
 #+begin_src emacs-lisp
   (use-package xrdb-mode
     :ensure nil
-    :defer t
     :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'"))
 #+end_src
 
@@ -1773,7 +1722,6 @@ While there are a lot of criticisms, it is still widely used to represent data i
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
-    :defer t
     :init
     (add-to-list 'treesit-language-source-alist
                  '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))

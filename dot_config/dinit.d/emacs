@@ -1,2 +1,0 @@
-type = process
-command = /usr/bin/emacs --fg-daemon

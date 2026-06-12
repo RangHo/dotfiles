@@ -22,11 +22,12 @@ telemetry_enabled = false
 transparency_mode = "glass"
 
 [theme]
+mode = "auto"
 source = "wallpaper"
 
 [theme.templates]
-builtin_ids = [ "foot", "gtk3", "gtk4", "kcolorscheme", "niri", "qt" ]
-community_ids = [ "spicetify", "zen-browser", "discord", "papirus-icons" ]
+builtin_ids = [ "alacritty", "gtk3", "gtk4", "kcolorscheme", "niri", "qt" ]
+community_ids = [ "spicetify", "pywalfox", "discord", "papirus-icons" ]
 
 [theme.templates.user.emacs]
 input_path = "$XDG_CONFIG_HOME/noctalia/templates/emacs.el"

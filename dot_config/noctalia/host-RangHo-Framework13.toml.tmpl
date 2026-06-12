@@ -28,7 +28,7 @@ auto_hide = true
 background_opacity = 0.5
 center = [ "workspaces" ]
 enabled = false
-end = [ "tray" ]
+end = [ "tray", "session" ]
 margin_edge = 0
 margin_ends = 50
 padding = 25
@@ -36,13 +36,24 @@ position = "right"
 radius = 25
 radius_bottom_right = 0
 radius_top_right = 0
+reserve_space = false
 scale = 2.0
-start = [ "control-center", "session" ]
+start = [ "control-center", "notifications", "clipboard", "launcher" ]
 thickness = 100
-widget_spacing = 15
+widget_spacing = 25
 
 [bar.laptop_right.monitor.eDP-1]
 enabled = true
+
+[dock]
+auto_hide = true
+background_opacity = 0.5
+enabled = true
+icon_size = 36
+margin_edge = 0
+monitors = [ "eDP-1" ]
+radius_bottom_left = 0
+radius_bottom_right = 0
 
 [idle]
 behavior_order = [ "lock", "screen-off" ]

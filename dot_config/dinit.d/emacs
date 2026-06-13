@@ -1,0 +1,4 @@
+type = process
+command = /usr/bin/emacs --fg-daemon
+smooth-recovery = true
+env-file = $HOME/.config/environment.d/20-xdg-base-dir.conf

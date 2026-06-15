@@ -1,0 +1,3 @@
+{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "chimera") }}
+SSH_AUTH_SOCK={{ .chezmoi.homeDir }}/.ssh/ssh-agent.sock
+{{ end }}

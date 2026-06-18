@@ -10,7 +10,7 @@ LICENSE
 {{ end }}
 
 
-{{ if hasKey .chezmoi "osRelease" }}
+{{ if or (ne .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id") }}
 # This system has /etc/os-release present.
 
 {{ if ne .chezmoi.osRelease.id "arch" }}

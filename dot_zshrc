@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+# If not runing interactively, don't do anything.
+[[ $- != *i* ]] && return
+
+# Set the prompt content.
+eval "$(starship init zsh)"

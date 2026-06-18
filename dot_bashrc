@@ -3,8 +3,5 @@
 # If not running interactively, don't do anything.
 [[ $- != *i* ]] && return
 
-# Always enable colors for `ls`.
-alias ls='ls --color=auto'
-
 # Set the prompt content.
-PS1='[\u@\h \W]\$ '
+eval "$(starship init bash)"

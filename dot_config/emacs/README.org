@@ -349,7 +349,7 @@ Some UI elements are exposed as minor modes, and I'm not happy with the default.
 Some editing features have been modularized these days, and Emacs has built-in integrations for many of them.
 
 *** Tree-sitter Integration
-Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] support is built-in.
+Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][tree-sitter]] support is built-in.
 It is usually much faster than Emacs's built-in parsing facility.
 
 #+begin_src emacs-lisp
@@ -974,26 +974,31 @@ There are a lot of file extensions that Emacs doesn't recognize out-of-the-box, 
 Also, while we're at it, let's enable Language Server support.
 
 #+begin_src emacs-lisp
+  (use-package cc-mode
+    :mode (("\\.c\\'" . c-mode)
+           ("\\.h\\'" . c-or-c++-mode)
+           ("\\.HC\\'" . c-mode)
+           ("\\.ZC\\'" . c-mode)
+           ("\\.cpp\\'" . c++-mode)
+           ("\\.cppm\\'" . c++-mode)
+           ("\\.hpp\\'" . c++-mode)
+           ("\\.tpp\\'" . c++-mode)
+           ("\\.ipp\\'" . c++-mode)
+           ("\\.cc\\'" . c++-mode)
+           ("\\.hh\\'" . c++-mode)
+           ("\\.tcc\\'" . c++-mode)
+           ("\\.h++\\'" . c++-mode)
+           ("\\.c++\\'" . c++-mode)
+           ("\\.hxx\\'" . c++-mode)
+           ("\\.txx\\'" . c++-mode)
+           ("\\.cxx\\'" . c++-mode)
+           ("\\.inl\\'" . c++-mode)
+           ("\\.ixx\\'" . c++-mode))
+    :custom
+    (c-default-style "k&r"))
+
   (use-package c-ts-mode
-    :mode (("\\.c\\'" . c-ts-mode)
-           ("\\.h\\'" . c-or-c++-ts-mode)
-           ("\\.HC\\'" . c-ts-mode)
-           ("\\.ZC\\'" . c-ts-mode)
-           ("\\.cpp\\'" . c++-ts-mode)
-           ("\\.cppm\\'" . c++-ts-mode)
-           ("\\.hpp\\'" . c++-ts-mode)
-           ("\\.tpp\\'" . c++-ts-mode)
-           ("\\.ipp\\'" . c++-ts-mode)
-           ("\\.cc\\'" . c++-ts-mode)
-           ("\\.hh\\'" . c++-ts-mode)
-           ("\\.tcc\\'" . c++-ts-mode)
-           ("\\.h++\\'" . c++-ts-mode)
-           ("\\.c++\\'" . c++-ts-mode)
-           ("\\.hxx\\'" . c++-ts-mode)
-           ("\\.txx\\'" . c++-ts-mode)
-           ("\\.cxx\\'" . c++-ts-mode)
-           ("\\.inl\\'" . c++-ts-mode)
-           ("\\.ixx\\'" . c++-ts-mode))
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
                  '(c "https://github.com/tree-sitter/tree-sitter-c"))
@@ -1011,13 +1016,18 @@ Also, while we're at it, let's enable Language Server support.
 Emacs doesn't come with support for build systems, except for Makefile.
 
 #+begin_src emacs-lisp
+  (use-package cmake-mode)
+
   (use-package cmake-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(cmake "https://github.com/uyha/tree-sitter-cmake")))
+                 '(cmake "https://github.com/uyha/tree-sitter-cmake"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(cmake-mode . cmake-ts-mode)))
 
-  (use-package meson-mode
-    :mode ("meson\\(\\.build\\|_options\\.txt\\|\\.options\\)\\'"))
+  (use-package meson-mode)
 #+end_src
 
 We can add support for =clang-format= formatter with a bit of RegExp magic.
@@ -1045,14 +1055,34 @@ We can add support for =clang-format= formatter with a bit of RegExp magic.
            "\\.kube\\'" "\\.build\\'"))
 #+end_src
 
+TOML, short for Tom's Obvious Minimal Language, is a minimal configuration file that extends simple INI files.
+Starting from Emacs 29, a dedicated TOML mode powered by tree-sitter is built-in.
+
+#+begin_src emacs-lisp
+  (use-package toml-ts-mode
+    :requires treesit
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(toml "https://github.com/tree-sitter/tree-sitter-toml"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(conf-toml-mode . toml-ts-mode)))
+#+end_src
+
 ** Dockerfile
 Docker is /de facto/ standard container technology these days.
 
 #+begin_src emacs-lisp
+  (use-package dockerfile-mode)
+
   (use-package dockerfile-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")))
+                 '(dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(dockerfile-mode . dockerfile-ts-mode)))
 #+end_src
 
 ** Elixir
@@ -1060,21 +1090,18 @@ Elixir is a functional programming langauge based on the great Erlang/OTP BEAM v
 It keeps the great part of the virtual machine while providing highly extensible grammar.
 
 #+begin_src emacs-lisp
+  (use-package elixir-mode)
+
   (use-package elixir-ts-mode
+    :requires treesit
     :init
     (add-to-list 'eglot-server-programs
                  '(elixir-mode . ("elixir-ls")))
     (add-to-list 'treesit-language-source-alist
-                 '(elixir "https://github.com/elixir-lang/tree-sitter-elixir")))
-#+end_src
-
-HEEx is a template language used by Phoenix Framework, a popular web framework written in Elixir.
-
-#+begin_src emacs-lisp
-  (use-package heex-ts-mode
-    :init
-    (add-to-list 'treesit-language-source-alist
-                 '(heex "https://github.com/phoenixframework/tree-sitter-heex")))
+                 '(elixir "https://github.com/elixir-lang/tree-sitter-elixir"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(elixir-mode . elixir-ts-mode)))
 #+end_src
 
 ** Haskell
@@ -1082,19 +1109,9 @@ Haskell, being a purely functional language, has an exceptional support for Emac
 So much so that it doesn't even require LSP!
 
 #+begin_src emacs-lisp
-  (use-package haskell-mode)
-#+end_src
-
-[[https://github.com/fourmolu/fourmolu][Fourmolu]] is a fork of [[https://github.com/tweag/ormolu][Ormolu]] with configurable style.
-It is opinionated, but can make it into /my style/.
-If =fourmolu= binary is available, integrate it.
-
-#+begin_src emacs-lisp
-  (use-package ormolu
-    :when (executable-find "fourmolu")
-    :hook (haskell-mode . ormolu-format-on-save-mode)
+  (use-package haskell-mode
     :custom
-    (ormolu-process-path "fourmolu"))
+    (haskell-stylish-on-save t))
 #+end_src
 
 ** Julia
@@ -1165,10 +1182,16 @@ KDL is a small, pleasant document language with XML-like node semantics that res
 Lua is a small, yet full-featured embedded language that works with C really well.
 
 #+begin_src emacs-lisp
+  (use-package lua-mode)
+
   (use-package lua-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(lua "https://github.com/tree-sitter-grammars/tree-sitter-lua")))
+                 '(lua "https://github.com/tree-sitter-grammars/tree-sitter-lua"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(lua-mode . lua-ts-mode)))
 #+end_src
 
 ** Markdown
@@ -1176,33 +1199,48 @@ Markdown is a /de facto/ standard for writing README files on modern software pr
 The syntax is... questionable, at best, though.
 
 #+begin_src emacs-lisp
+  (use-package markdown-mode)
+
   (use-package markdown-ts-mode
-    :mode ("\\.md\\'" "\\.markdown\\'" "\\.mdx\\'")
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown")))
+                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(markdown-mode . markdown-ts-mode)))
 #+end_src
 
 ** Nix
 Nix is a functional and declarative expression format used to configure NixOS.
 
 #+begin_src emacs-lisp
+  (use-package nix-mode)
+
   (use-package nix-ts-mode
-    :mode ("\\.nix\\'")
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(nix "https://github.com/nix-community/tree-sitter-nix")))
+                 '(nix "https://github.com/nix-community/tree-sitter-nix"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(nix-mode . nix-ts-mode)))
 #+end_src
 
 ** Nu
 Nu is a brand-new, data-oriented shell script.
 
 #+begin_src emacs-lisp
+  (use-package nushell-mode)
+
   (use-package nushell-ts-mode
-    :mode ("\\.nu\\'")
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(nu "https://github.com/nushell/tree-sitter-nu")))
+                 '(nu "https://github.com/nushell/tree-sitter-nu"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(nushell-mode . nushell-ts-mode)))
 #+end_src
 
 ** OCaml
@@ -1349,9 +1387,8 @@ Still I need to use it, so...
 #+begin_src emacs-lisp
   (use-package python
     :init
-    (when (featurep 'treesit)
-      (add-to-list 'treesit-language-source-alist
-                   '(python "https://github.com/tree-sitter/tree-sitter-python")))
+    (add-to-list 'treesit-language-source-alist
+                 '(python "https://github.com/tree-sitter/tree-sitter-python"))
     :config
     (when (featurep 'treesit)
       (add-to-list 'major-mode-remap-alist
@@ -1363,10 +1400,16 @@ Ruby is the father of system scripting language.
 Better than Python.
 
 #+begin_src emacs-lisp
+  (use-package ruby-mode)
+
   (use-package ruby-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(ruby "https://github.com/tree-sitter/tree-sitter-ruby")))
+                 '(ruby "https://github.com/tree-sitter/tree-sitter-ruby"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(ruby-mode . ruby-ts-mode)))
 
   (use-package rbs-mode)
 #+end_src
@@ -1379,11 +1422,18 @@ Rust is a modern system programming language that ensures memory safety by langu
     "Add a hook to format Rust code before saving."
     (add-hook 'before-save-hook #'eglot-format-buffer nil t))
 
+  (use-package rust-mode
+    :hook (rust-mode . rangho--add-rust-mode-before-save-hook))
+
   (use-package rust-ts-mode
+    :requires treesit
     :hook (rust-ts-mode . rangho--add-rust-mode-before-save-hook)
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(rust "https://github.com/tree-sitter/tree-sitter-rust")))
+                 '(rust "https://github.com/tree-sitter/tree-sitter-rust"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(rust-mode . rust-ts-mode)))
 #+end_src
 
 ** Swift
@@ -1417,36 +1467,21 @@ Terraform is a cloud provisioning software from Hashicorp.
 TeX is a great typesetting engine.
 It is also complicated as fuck.
 
-We need to properly build ~auctex~ before actually loading it.
-On non-UNIX systems this becomes a problem, but I won't be editing LaTeX on Windows anytime soon, so...
-
 #+begin_src emacs-lisp
   (use-package auctex
     :hook ((ConTeXt-mode . prettify-symbols-mode)
-           (LaTeX-mode . prettify-symbols-mode)))
-#+end_src
-
-** TOML
-TOML, short for Tom's Obvious Minimal Language, is a minimal configuration file that extends simple INI files.
-Starting from Emacs 29, a dedicated TOML mode powered by Tree-Sitter is built-in.
-
-#+begin_src emacs-lisp
-  (use-package toml-ts-mode
-    :init
-    (add-to-list 'treesit-language-source-alist
-                 '(toml "https://github.com/tree-sitter/tree-sitter-toml"))
-    :config
-    (add-to-list 'major-mode-remap-alist
-                 '(conf-toml-mode . toml-ts-mode)))
+           (LaTeX-mode . prettify-symbols-mode))
+    :custom
+    (TeX-engine 'lualatex))
 #+end_src
 
 ** Typst
 Typst is a next-generation typesetting system with a markup language significantly easier than TeX.
-
-Note that the major mode for Typst is provided only as a Tree-Sitter grammar.
+Note that the major mode for Typst is provided only as a tree-sitter grammar.
 
 #+begin_src emacs-lisp
   (use-package typst-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
                  '(typst "https://github.com/uben0/tree-sitter-typst")))
@@ -1467,8 +1502,9 @@ There are a few /modern/ extensions to support, namely, PostCSS.
     (add-to-list 'treesit-language-source-alist
                  '(css "https://github.com/tree-sitter/tree-sitter-css"))
     :config
-    (add-to-list 'major-mode-remap-alist
-                 '(css-mode . css-ts-mode)))
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(css-mode . css-ts-mode))))
 #+end_src
 
 *** JavaScript and JSX
@@ -1485,28 +1521,43 @@ To edit TypeScript files, just install Emacs 29.
 
 #+begin_src emacs-lisp
   (use-package js
-    :mode (("\\.js\\'" . js-ts-mode)
-           ("\\.cjs\\'" . js-ts-mode)
-           ("\\.mjs\\'" . js-ts-mode))
+    :mode (("\\.js\\'" . js-mode)
+           ("\\.cjs\\'" . js-mode)
+           ("\\.mjs\\'" . js-mode))
     :init
     (add-to-list 'treesit-language-source-alist
                  '(javascript "https://github.com/tree-sitter/tree-sitter-javascript"))
     :config
+    (when (featurep 'treesit)
+      (add-to-list 'major-mode-remap-alist
+                   '(js-mode . js-ts-mode))))
+#+end_src
+
+JSON, short for JavaScript Object Notation, is a /de facto/ standard serialization method for multi-platform communications.
+
+Starting from Emacs 29, there is a new JSON major mode powered by Tree-Sitter.
+
+#+begin_src emacs-lisp
+  (use-package json-ts-mode
+    :requires treesit
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(json "https://github.com/tree-sitter/tree-sitter-json"))
+    :config
     (add-to-list 'major-mode-remap-alist
-                 '(js-mode . js-ts-mode)))
-
-
+                 '(js-json-mode . json-ts-mode)))
 #+end_src
 
 *** TypeScript and TSX
 React uses JavaScript with inline HTML-like markup syntax embedded within to declare components.
 There is also a TypeScript variant of it, of course.
 
-Until Emacs 28, the ~js~ package declared above handled JSX syntax, but starting from Emacs 29, there is a new major mode using Tree-Sitter.
+Until Emacs 28, the ~js~ package declared above handled JSX syntax, but starting from Emacs 29, there is a new major mode using tree-sitter.
 While it says TSX, it supports both JSX and TSX no problem.
 
 #+begin_src emacs-lisp
   (use-package typescript-ts-mode
+    :requires treesit
     :mode (("\\.ts\\'" . typescript-ts-mode)
            ("\\.cts\\'" . typescript-ts-mode)
            ("\\.mts\\'" . typescript-ts-mode)
@@ -1520,21 +1571,6 @@ While it says TSX, it supports both JSX and TSX no problem.
     :config
     (add-to-list 'major-mode-remap-alist
                  '(js-jsx-mode . tsx-ts-mode)))
-#+end_src
-
-*** JSON
-JSON, short for JavaScript Object Notation, is a /de facto/ standard serialization method for multi-platform communiations.
-
-Starting from Emacs 29, there is a new JSON major mode powered by Tree-Sitter.
-
-#+begin_src emacs-lisp
-  (use-package json-ts-mode
-    :init
-    (add-to-list 'treesit-language-source-alist
-                 '(json "https://github.com/tree-sitter/tree-sitter-json"))
-    :config
-    (add-to-list 'major-mode-remap-alist
-                 '(js-json-mode . json-ts-mode)))
 #+end_src
 
 *** Web-mode
@@ -1568,13 +1604,15 @@ It primarily targets HTML, but it also supports other HTMLx templates.
                  '(web-mode . rangho--web-mode-contact)))
 #+end_src
 
-** X Resource Database
-X11 uses similar syntax for most of its configurations.
+HEEx is a template language used by Phoenix Framework, a popular web framework written in Elixir.
+It has a specific tree-sitter mode.
 
 #+begin_src emacs-lisp
-  (use-package xrdb-mode
-    :ensure nil
-    :mode ("\\.Xdefaults\\'" "\\.Xenvironment\\'" "\\.Xresources\\'"))
+  (use-package heex-ts-mode
+    :requires treesit
+    :init
+    (add-to-list 'treesit-language-source-alist
+                 '(heex "https://github.com/phoenixframework/tree-sitter-heex")))
 #+end_src
 
 ** YAML
@@ -1582,8 +1620,14 @@ X11 uses similar syntax for most of its configurations.
 While there are a lot of criticisms, it is still widely used to represent data in a human-readable format.
 
 #+begin_src emacs-lisp
-  (use-package yaml-mode
+  (use-package yaml-mode)
+
+  (use-package yaml-ts-mode
+    :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml")))
+                 '(yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
+    :config
+    (add-to-list 'major-mode-remap-alist
+                 '(yaml-mode . yaml-ts-mode)))
 #+end_src

@@ -58,12 +58,8 @@
   "List of Unicode Private Use Areas, defined as pairs of (START . END) code points.")
 
 (defun rangho-fonts--font-available-p (font)
-  "Check if the FONT is available."
-  (if (listp font)
-      ;; All fonts in the list must be found
-      (cl-every #'rangho-fonts--font-available-p font)
-    ;; Check if the font is available
-    (find-font (font-spec :name font))))
+  "Check if FONT is available."
+  (find-font (font-spec :name font)))
 
 (defun rangho-fonts--find-font-specs (alist charset)
   "Find a list of font specs for CHARSET in ALIST."

@@ -860,43 +860,50 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
     :custom
     (rangho-fonts-fixed-font-alist
      '((nil "hesalche" "semteulche"
+            "Sarasa Mono CL"
             "Noto Sans Mono"
             "Cascadia Code" "Consolas" "Courier New"
             "monospace")
        (hangul "hesalche" "semteulche"
+               "Sarasa Mono K"
                "Noto Sans Mono CJK KR"
                "DotumChe" "GulimChe"
                "monospace")
-       (kana "Noto Sans Mono CJK JP"
-             "GulimChe" "DotumChe"
+       (kana "Sarasa Mono J"
+             "Noto Sans Mono CJK JP"
+             "Meiryo" "Yu Gothic" "Yu Mincho"
              "monospace")
-       (han ("Noto Sans Mono CJK SC" "Noto Sans Mono CJK TC")
+       (han "Sarasa Mono TC" "Sarasa Mono SC"
+            "Noto Sans Mono CJK TC" "Noto Sans Mono CJK SC"
             "GulimChe" "DotumChe"
             "monospace")
        (symbol "Symbols Nerd Font Mono"
                "Noto Sans Symbols" "Noto Sans Symbols 2"
                "Segoe UI Symbol")
        (emoji "Noto Color Emoji"
-              "Segoe UI Emoji")))
+              "Segoe UI Emoji"
+              "Apple Color Emoji")))
     (rangho-fonts-variable-font-alist
      '((nil "Noto Sans" "Noto Serif"
             "Segoe UI" "Arial"
             "sans-serif")
        (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
-               "Malgun Gothic" "Dotum" "Gulim"
+               "Malgun Gothic" "Gulim" "Dotum"
+               "Apple SD Gothic Neo" "AppleGothic" "AppleMyungjo"
                "sans-serif")
        (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
              "Meiryo" "Yu Gothic" "Yu Mincho"
              "sans-serif")
-       (han ("Noto Sans CJK SC" "Noto Serif CJK SC")
-            ("Noto Sans CJK TC" "Noto Serif CJK TC")
-            "Microsoft YaHei" "Microsoft JhengHei"
-            "sans-serif")
+       (han  "Noto Sans CJK TC" "Noto Serif CJK TC"
+             "Noto Sans CJK SC" "Noto Serif CJK SC"
+             "Microsoft YaHei" "Microsoft JhengHei"
+             "sans-serif")
        (symbol "Symbols Nerd Font"
                "Noto Sans Symbols" "Noto Sans Symbols 2"
                "Segoe UI Symbol")
        (emoji "Noto Color Emoji"
-              "Segoe UI Emoji")))
+              "Segoe UI Emoji"
+              "Apple Color Emoji")))
     :config
     (rangho-fonts-mode +1))
 #+end_src

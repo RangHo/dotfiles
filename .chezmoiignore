@@ -1,31 +1,25 @@
 README.md
 LICENSE
 
-
 {{ if ne .chezmoi.os "linux" }}
 # Ignore desktop environment related things on non-Linux systems.
+.config/alacritty
 .config/fontconfig
 .config/niri
 .config/noctalia
 {{ end }}
 
-
-{{ if or (ne .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id") }}
-# This system has /etc/os-release present.
-
-{{ if ne .chezmoi.osRelease.id "arch" }}
+{{ if or (ne .chezmoi.os "linux") (ne .chezmoi.osRelease.id "arch") }}
 # Ignore systemd-related things on non-Arch systems.
 .config/systemd
 {{ end }}
 
-{{ if ne .chezmoi.osRelease.id "chimera" }}
+{{ if or (ne .chezmoi.os "linux") (ne .chezmoi.osRelease.id "chimera") }}
 # Ingore dinit-related things on non-Chimera systems.
 .config/dinit.d
 {{ end }}
 
-{{ if ne .chezmoi.osRelease.id "void" }}
+{{ if or (ne .chezmoi.os "linux") (ne .chezmoi.osRelease.id "void") }}
 # Ignore runit-related things on non-Void systems.
 .config/sv
-{{ end }}
-
 {{ end }}

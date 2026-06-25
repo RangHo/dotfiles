@@ -235,13 +235,18 @@ Some UI elements are controlled with per-frame association lists.
 
 #+begin_src emacs-lisp
   (setq default-frame-alist
-        `((undecorated . t)
-          (width . 115) ; 80 col of editor + 35 col of treemacs
-          (height . 25)
-          (vertical-scroll-bars . nil)
+        `((vertical-scroll-bars . nil)
           (horizontal-scroll-bars . nil)
           (right-divider-width . 3)
           (internal-border-width . 20)))
+#+end_src
+
+On Linux systems, I basically only use tiling window managers.
+In that case, we can drop the window decorations.
+
+#+begin_src emacs-lisp
+  (when (eq system-type 'gnu/linux)
+    (add-to-list 'default-frame-alist '(undecorated . t)))
 #+end_src
 
 *** No Tabs

@@ -23,6 +23,9 @@
 ;; Load configurations
 (org-babel-load-file (expand-file-name "README.org" user-emacs-directory))
 
+;; Load customizations
+(load-file (no-littering-expand-etc-file-name "custom.el"))
+
 (provide 'init)
 
 ;;; init.el ends here

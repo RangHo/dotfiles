@@ -949,8 +949,8 @@ On desktop, ~noctalia~ will generate the theme and on laptop, ~pywal16~ will gen
     ;; available on the system.
     (load-theme 'pywal t))
    (t
-    ;; Since no colorscheme generator is found, load the default material theme.
-    (load-theme 'material t)))
+    ;; Since no colorscheme generator is found, don't do anything.
+    nil))
 #+end_src
 
 * Keybindings

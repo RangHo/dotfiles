@@ -58,4 +58,5 @@
 (provide-theme 'pywal)
 
 (provide 'pywal-theme)
+
 ;;; pywal-theme.el ends here

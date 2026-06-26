@@ -1,4 +1,4 @@
-;;; material-theme.el --- Purple-colored Emacs colorscheme
+;;; material-purple-theme.el --- Purple-colored Emacs colorscheme
 
 ;;; Commentary:
 
@@ -6,10 +6,10 @@
 
 (require 'rangho-themes)
 
-(deftheme material "Purple-colored Material Design theme.")
+(deftheme material-purple "Purple-colored Material Design theme.")
 
 (rangho-themes-set-faces
- 'material
+ 'material-purple
  '((primary                   . "#e4b5ff")
    (on-primary                . "#4e0078")
    (primary-container         . "#c267fc")
@@ -42,7 +42,8 @@
    (scrim                     . "#000000")
    (shadow                    . "#000000")))
 
-(provide-theme 'material)
+(provide-theme 'material-purple)
 
-(provide 'material-theme)
-;;; material-theme.el ends here
+(provide 'material-purple-theme)
+
+;;; material-purple-theme.el ends here

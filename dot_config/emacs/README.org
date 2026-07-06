@@ -766,6 +766,14 @@ It doesn't work on WIndows, though.
     (editorconfig-mode +1))
 #+end_src
 
+*** Opam Switch Integration
+opam (OCaml Package Manager) has a feature called "switches", which is an isolated installation of a specific version of the OCaml Compiler.
+Essentially, this is a OCaml version of rbenv.
+
+#+begin_src emacs-lisp
+  (use-package opam-switch-mode)
+#+end_src
+
 *** Discord Integration
 Discord has a feature called *Rich Presence* where a process can send an update to the Discord socket to display things under the user profile.
 Emacs has an unofficial plugin for that, to show off what I'm doing.
@@ -1259,7 +1267,8 @@ Nu is a brand-new, data-oriented shell script.
 OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in static analysis and formal verification softwares.
 
 #+begin_src emacs-lisp
-  (use-package tuareg)
+  (use-package tuareg
+    :hook (tuareg-mode . opam-switch-mode))
 #+end_src
 
 ** Org-mode
@@ -1390,6 +1399,14 @@ OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in 
     :custom
     (proof-splash-enable nil)
     (proof-layout-windows 'hybrid))
+#+end_src
+
+For Coq modes, enable ~opam-switch-mode~.
+
+#+begin_src emacs-lisp
+  (use-package coq-mode
+    :ensure nil
+    :hook (coq-mode . opam-switch-mode))
 #+end_src
 
 ** Python

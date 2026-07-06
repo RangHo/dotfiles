@@ -67,8 +67,8 @@ output "Wacom Tech Wacom One 13 0KQ0171007544" {
 // Autostarts.
 // =====================================================================
 
-// IBus input method engine.
-spawn-at-startup "ibus" "start" "--type" "wayland"
+// Fcitx5 input method engine.
+spawn-at-startup "fcitx5"
 
 
 // =====================================================================
@@ -77,5 +77,5 @@ spawn-at-startup "ibus" "start" "--type" "wayland"
 
 environment {
     // Input method settings.
-    XMODIFIERS "@im=ibus"
+    XMODIFIERS "@im=fcitx5"
 }

@@ -48,8 +48,8 @@ output "Samsung Electric Company U32J59x HNMX102362" {
 // Autostarts.
 // =====================================================================
 
-// IBus input method engine.
-spawn-at-startup "ibus" "start" "--type" "wayland"
+// Kime input method engine.
+spawn-at-startup "kime"
 
 
 // =====================================================================
@@ -58,5 +58,5 @@ spawn-at-startup "ibus" "start" "--type" "wayland"
 
 environment {
     // Input method settings.
-    XMODIFIERS "@im=ibus"
+    XMODIFIERS "@im=fcitx5"
 }

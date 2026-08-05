@@ -58,5 +58,5 @@ spawn-at-startup "kime"
 
 environment {
     // Input method settings.
-    XMODIFIERS "@im=fcitx5"
+    XMODIFIERS "@im=kime"
 }

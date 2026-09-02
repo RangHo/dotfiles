@@ -1,4 +1,4 @@
-;;; rangho-modeline.el --- A custom modeline for Emacs
+;;; rangho-modeline.el --- A custom modeline for Emacs  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 RangHo Lee
 

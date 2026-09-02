@@ -1,4 +1,4 @@
-;;; rangho-fonts.el --- Font settings for Emacs
+;;; rangho-fonts.el --- Font settings for Emacs  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 RangHo Lee
 

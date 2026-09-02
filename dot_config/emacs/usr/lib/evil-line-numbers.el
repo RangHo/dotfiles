@@ -1,4 +1,4 @@
-;;; evil-line-numbers.el --- Evil-powered line numbers display
+;;; evil-line-numbers.el --- Evil-powered line numbers display  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024 RangHo Lee
 

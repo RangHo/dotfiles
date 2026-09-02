@@ -1,4 +1,4 @@
-;;; mixed-pitch.el --- Mixed pitch support with CJK characters
+;;; mixed-pitch.el --- Mixed pitch support with CJK characters  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023--2024 RangHo Lee
 

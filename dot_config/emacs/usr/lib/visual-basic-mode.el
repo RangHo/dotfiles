@@ -1,4 +1,4 @@
-;;; visual-basic-mode.el --- Major mode for editing variants of Visual Basic code
+;;; visual-basic-mode.el --- Major mode for editing variants of Visual Basic code  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024 RangHo Lee
 

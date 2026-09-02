@@ -1,4 +1,4 @@
-;;; rangho-themes.el --- A custom base theme based on Material Design 3 color system
+;;; rangho-themes.el --- A custom base theme based on Material Design 3 color system  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 RangHo Lee
 

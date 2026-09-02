@@ -1,4 +1,4 @@
-;;; hades.el --- Evil-integrated God mode
+;;; hades.el --- Evil-integrated God mode  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 RangHo Lee
 

@@ -67,8 +67,8 @@ output "Wacom Tech Wacom One 13 0KQ0171007544" {
 // Autostarts.
 // =====================================================================
 
-// Fcitx5 input method engine.
-spawn-at-startup "fcitx5"
+// Kime input method engine.
+spawn-at-startup "kime"
 
 
 // =====================================================================
@@ -77,5 +77,5 @@ spawn-at-startup "fcitx5"
 
 environment {
     // Input method settings.
-    XMODIFIERS "@im=fcitx5"
+    XMODIFIERS "@im=kime"
 }

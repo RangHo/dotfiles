@@ -3,23 +3,23 @@
 // =====================================================================
 
 //                            +--------------+
-//                            |              |
+//                            | [DP-1]       |
 // +--------------------------+              |
-// |                          | Samsung      |
+// | [DP-2]                   | Samsung      |
 // | Samsung Electric Company | Electric Co. |
-// | LS32D70xE HNBY100538     | U32J59x      |
-// |                          | HMMX102362   |
+// | LS32D70xE HNBY100538     | LS32D70xE    |
+// |                          | HNBY110538   |
 // +--------------------------+              |
 //                            |              |
 //                            +--------------+
 
 // Horizontal monitor on the left for coffelab.
-output "Samsung Electric Company LS32D70xE HNBY100538" {
+output "DP-2" {
     focus-at-startup
 
     scale 1.25
     transform "normal"
-    position x=-3072 y=790
+    position x=-3072 y=600
 
     layout {
         default-column-width { proportion 0.666; }
@@ -27,9 +27,9 @@ output "Samsung Electric Company LS32D70xE HNBY100538" {
 }
 
 // Vertical monitor on the right for coffeelab.
-output "Samsung Electric Company U32J59x HNMX102362" {
+output "DP-1" {
     scale 1.25
-    transform "270"
+    transform "90"
     position x=0 y=0
 
     hot-corners {

@@ -1222,13 +1222,11 @@ The syntax is... questionable, at best, though.
   (use-package markdown-mode)
 
   (use-package markdown-ts-mode
+    :ensure nil
     :requires treesit
     :init
     (add-to-list 'treesit-language-source-alist
-                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown"))
-    :config
-    (add-to-list 'major-mode-remap-alist
-                 '(markdown-mode . markdown-ts-mode)))
+                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown")))
 #+end_src
 
 ** Nix
@@ -1331,7 +1329,9 @@ OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in 
     (org-mem-updater-mode))
 
   (use-package org-node
-    :bind-keymap ("C-c n" . org-node-global-prefix-map)
+    :init
+    (keymap-global-set "C-c n" org-node-global-prefix-map)
+    (keymap-set org-mode-map "C-c n" org-node-org-prefix-map)
     :config
     (org-node-cache-mode))
 #+end_src
@@ -1379,13 +1379,13 @@ OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in 
     (add-to-list 'org-babel-load-languages '(mermaid . t)))
 #+end_src
 
-~ox-latex~ is a built-in package, but I need to use LuaLaTex if I want to do anything remotely related to CJK characters.
+~ox-latex~ is a built-in package, but I need to use LuaTeX if I want to do anything remotely related to CJK characters.
 
 #+begin_src emacs-lisp
   (use-package ox-latex
     :ensure nil
     :custom
-    (org-latex-compiler "lualatex")
+    (org-latex-compiler "luatex")
     (org-latex-src-block-backend 'engraved)
     :init
     (add-to-list 'org-latex-packages-alist '("" "fvextra")))

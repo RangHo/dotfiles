@@ -32,20 +32,20 @@
   :prefix "rangho-fonts-")
 
 (defcustom rangho-fonts-fixed-font-alist
-  '((nil "monospace")
-    (hangul "monospace")
-    (kana "monospace")
-    (han "monospace"))
+  '((nil "Noto Sans Mono")
+    (hangul "Noto Sans Mono CJK KR")
+    (kana "Noto Sans Mono CJK JP")
+    (han "Noto Sans Mono CJK SC"))
   "Association list of fixed-width fonts for different character sets."
   :type '(repeat (cons (choice (const :tag "Default" nil)
                                (const :tag "Character set" symbol))
                        (repeat string))))
 
 (defcustom rangho-fonts-variable-font-alist
-  '((nil "sans-serif")
-    (hangul "sans-serif")
-    (kana "sans-serif")
-    (han "sans-serif"))
+  '((nil "Noto Sans")
+    (hangul "Noto Sans CJK KR")
+    (kana "Noto Sans CJK JP")
+    (han "Noto Sans CJK SC"))
   "Association list of variable-width fonts for different character sets."
   :type '(repeat (cons (choice (const :tag "Default" nil)
                                (const :tag "Character set" symbol))

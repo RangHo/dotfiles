@@ -875,21 +875,17 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
      '((nil "hesalche" "semteulche"
             "Sarasa Mono CL"
             "Noto Sans Mono"
-            "Cascadia Code" "Consolas" "Courier New"
-            "monospace")
+            "Cascadia Code" "Consolas" "Courier New")
        (hangul "hesalche" "semteulche"
                "Sarasa Mono K"
                "Noto Sans Mono CJK KR"
-               "DotumChe" "GulimChe"
-               "monospace")
+               "DotumChe" "GulimChe")
        (kana "Sarasa Mono J"
              "Noto Sans Mono CJK JP"
-             "Meiryo" "Yu Gothic" "Yu Mincho"
-             "monospace")
+             "Meiryo" "Yu Gothic" "Yu Mincho")
        (han "Sarasa Mono TC" "Sarasa Mono SC"
             "Noto Sans Mono CJK TC" "Noto Sans Mono CJK SC"
-            "GulimChe" "DotumChe"
-            "monospace")
+            "GulimChe" "DotumChe")
        (symbol "Symbols Nerd Font Mono"
                "Noto Sans Symbols" "Noto Sans Symbols 2"
                "Segoe UI Symbol")
@@ -898,19 +894,15 @@ For now, do not install =hesalche= and =semteulche= on Windows until I find a wa
               "Apple Color Emoji")))
     (rangho-fonts-variable-font-alist
      '((nil "Noto Sans" "Noto Serif"
-            "Segoe UI" "Arial"
-            "sans-serif")
+            "Segoe UI" "Arial")
        (hangul "Noto Sans CJK KR" "Noto Serif CJK KR"
                "Malgun Gothic" "Gulim" "Dotum"
-               "Apple SD Gothic Neo" "AppleGothic" "AppleMyungjo"
-               "sans-serif")
+               "Apple SD Gothic Neo" "AppleGothic" "AppleMyungjo")
        (kana "Noto Sans CJK JP" "Noto Serif CJK JP"
-             "Meiryo" "Yu Gothic" "Yu Mincho"
-             "sans-serif")
+             "Meiryo" "Yu Gothic" "Yu Mincho")
        (han  "Noto Sans CJK TC" "Noto Serif CJK TC"
              "Noto Sans CJK SC" "Noto Serif CJK SC"
-             "Microsoft YaHei" "Microsoft JhengHei"
-             "sans-serif")
+             "Microsoft YaHei" "Microsoft JhengHei")
        (symbol "Symbols Nerd Font"
                "Noto Sans Symbols" "Noto Sans Symbols 2"
                "Segoe UI Symbol")

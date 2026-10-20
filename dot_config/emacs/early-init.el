@@ -1,4 +1,4 @@
-;;; early-init.el --- RangHo's early init file.
+;;; early-init.el --- RangHo's early init file.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023 RangHo Lee
 

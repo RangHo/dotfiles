@@ -1,4 +1,4 @@
-;;; init.el --- RangHo's Emacs Configurations
+;;; init.el --- RangHo's Emacs Configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019--2023 RangHo Lee
 

@@ -9,6 +9,14 @@ Most of them are load- and performance-related options.
 Before loading any other configuration, there are some things that need to be taken care of.
 Put those "prerequisite routines" here.
 
+** Lexical Binding
+Since Emacs 31, Emacs complains if lexical binding is not enabled.
+This code block enables it.
+
+#+begin_src emacs-lisp :comments no
+  ;;; -*- lexical-binding: t; -*-
+#+end_src
+
 ** Garbage Collection
 Emacs has a tiny GC threshold.
 It may have been useful some 15 years ago, but it is fair to increase the size for modern computers.

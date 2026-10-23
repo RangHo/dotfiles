@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# If not runing interactively, don't do anything.
+# If not running interactively, don't do anything.
 [[ $- != *i* ]] && return
 
 # Set the prompt content.

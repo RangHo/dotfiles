@@ -1,7 +1,7 @@
+# -*- mode: toml -*-
+
 [backdrop]
 enabled = true
-blur-intensity = 0.75
-tint-intensity = 0.5
 
 [control_center]
 sidebar = "full"
@@ -15,7 +15,7 @@ blur_intensity = 0.9
 tint_intensity = 0.5
 
 [shell]
-niri_overview_type_to_launch_enabled = true
+avatar_path = "{{ .chezmoi.homeDir }}/.face"
 telemetry_enabled = false
 
 [shell.panel]
@@ -26,8 +26,8 @@ mode = "auto"
 source = "wallpaper"
 
 [theme.templates]
-builtin_ids = [ "alacritty", "gtk3", "gtk4", "kcolorscheme", "niri", "qt" ]
-community_ids = [ "spicetify", "pywalfox", "discord", "papirus-icons" ]
+builtin_ids = [ "foot", "gtk3", "gtk4", "qt", "umbriel" ]
+community_ids = [ "papirus-icons" ]
 
 [theme.templates.user.emacs]
 input_path = "$XDG_CONFIG_HOME/noctalia/templates/emacs.el"
@@ -40,7 +40,6 @@ per_monitor_directories = true
 
 [wallpaper.automation]
 enabled = true
-interval_minutes = 60
+interval_seconds = 600
 
-[weather]
-auto_locate = true
+[include]

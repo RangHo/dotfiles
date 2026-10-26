@@ -9,4 +9,6 @@ source ./contrib/custom-completions/man/man-completions.nu
 source ./contrib/custom-completions/pnpm/pnpm-completions.nu
 
 # Other packages.
-overlay use opam
+if (which opam | is-not-empty) {
+  overlay use opam
+}

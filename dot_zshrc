@@ -3,5 +3,17 @@
 # If not running interactively, don't do anything.
 [[ $- != *i* ]] && return
 
-# Set the prompt content.
-eval "$(starship init zsh)"
+# Activate mise if available.
+if [[ -x $(command -v mise) ]]; then
+    eval "$(mise activate zsh)"
+fi
+
+# Intiialize opam if available.
+if [[ -f ~/.opam/opam-init/init.zsh ]]; then
+    . ~/.opam/opam-init/init.zsh
+fi
+
+# Initalize starship if available.
+if [[ -x $(command -v starship) ]] then
+    eval "$(starship init zsh)"
+fi

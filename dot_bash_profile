@@ -1,3 +1,7 @@
 #!/bin/bash
 
+for profile in ~/.config/profile.d/*; do
+    . $profile
+done
+
 [[ -f ~/.bashrc ]] && . ~/.bashrc

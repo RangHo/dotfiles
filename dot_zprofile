@@ -1,3 +1,7 @@
 #!/bin/zsh
 
+for profile in ~/.config/profile.d/*; do
+    . $profile
+done
+
 [[ -f ~/.zshrc ]] && . ~/.zshrc

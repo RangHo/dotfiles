@@ -1,0 +1,6 @@
+# Enble blur for Noctalia bars.
+[[layer_rule]]
+  match.namespace = "^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
+  blur = true
+  blur_ignore_alpha = 0.6
+  blur_optimized = false

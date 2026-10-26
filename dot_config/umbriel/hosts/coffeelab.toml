@@ -1,0 +1,91 @@
+# -*- mode: toml -*-
+
+# ==============================================================================
+# Monitors
+# Outputs are matched by monitor identity ("<make> <model> <serial>", as shown
+# by `umbriel outputs`), so the settings follow each monitor across ports.
+# Positions are in logical coordinates (after scale and transform): a 3840x2160
+# panel at scale 1.25 is 3072x1728 when horizontal and 1728x3072 when vertical.
+# https://docs.noctalia.dev/umbriel/outputs/
+#
+#                            +--------------+
+#                            |              |
+# +--------------------------+              |
+# | Samsung Electric Company | Samsung      |
+# | LS32D70xE                | Electric Co. |
+# | HNBY100050               | LS32D70xE    |
+# |                          | HNBY100538   |
+# +--------------------------+              |
+#                            |              |
+#                            +--------------+
+
+# Horizontal monitor on the left for coffeelab.
+[output."Samsung Electric Company LS32D70xE HNBY100050"]
+focus_at_startup = true
+scale = 1.0
+transform = "normal"
+position = [-3840, 750]
+layout.scrolling.default_extent_fraction = 0.666
+
+# Vertical monitor on the right for coffeelab.
+[output."Samsung Electric Company LS32D70xE HNBY100538"]
+scale = 1.0
+transform = "270"
+position = [0, 0]
+layout.scrolling.default_extent_fraction = 1.0
+
+# Narrower gaps on the vertical monitor. Umbriel has no per-output gap setting,
+# so this is applied through workspace rules, which must select a workspace by
+# index or name; indices 1-9 cover every workspace reachable via keybinds.
+[[workspace]]
+index = 1
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 2
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 3
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 4
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 5
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 6
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 7
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 8
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+[[workspace]]
+index = 9
+output = "Samsung Electric Company LS32D70xE HNBY100538"
+layout.gap = 10
+
+# Niri enabled only the top-right hot corner on the vertical monitor. Umbriel's
+# hot corners are global (top-left is enabled in config.toml), so this cannot be
+# limited to one monitor. Uncomment to enable top-right on every monitor.
+# [hot_corners.top_right]
+# enabled = true
+# delay_ms = 500
+# action = "overview-open"

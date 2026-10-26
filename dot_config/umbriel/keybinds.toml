@@ -1,0 +1,130 @@
+[keybinds]
+
+# Session
+"Ctrl+Alt+Delete" = "spawn:noctalia msg panel-toggle session"
+"Ctrl+Alt+BackSpace" = "session-quit"
+
+# Letter shortcuts
+"Mod+Q" = { action = "window-close", repeat = false }
+"Mod+W" = "spawn:firefox"
+"Mod+E" = "spawn:nautilus"
+"Mod+R" = "spawn:noctalia msg panel-toggle launcher"
+"Mod+T" = "spawn:emacsclient -c"
+# Mod+Y
+# Mod+U
+# Mod+I
+# Mod+O
+# Mod+P
+# Mod+A
+# Mod+S
+"Mod+Shift+S" = "spawn:noctalia msg screenshot-region"
+# Mod+D
+"Mod+F" = "window-toggle-maximize"
+"Mod+Alt+F" = "window-toggle-maximize-to-edges"
+"Mod+Shift+F" = "window-toggle-fullscreen"
+# Mod+G
+# Mod+H is reserved as an alternative to arrow keys.
+# Mod+J is reserved as an alternative to arrow keys.
+# Mod+K is reserved as an alternative to arrow keys.
+# Mod+L is reserved as an alternative to arrow keys.
+# Mod+Z
+# Mod+X
+# Mod+C
+# Mod+V
+# Mod+B
+# Mod+N
+"Mod+M" = "spawn:thunderbird"
+
+# Number shortcuts
+"Mod+1" = "workspace-switch:1"
+"Mod+Ctrl+1" = "column-move-to-workspace:1"
+"Mod+2" = "workspace-switch:2"
+"Mod+Ctrl+2" = "column-move-to-workspace:2"
+"Mod+3" = "workspace-switch:3"
+"Mod+Ctrl+3" = "column-move-to-workspace:3"
+"Mod+4" = "workspace-switch:4"
+"Mod+Ctrl+4" = "column-move-to-workspace:4"
+"Mod+5" = "workspace-switch:5"
+"Mod+Ctrl+5" = "column-move-to-workspace:5"
+"Mod+6" = "workspace-switch:6"
+"Mod+Ctrl+6" = "column-move-to-workspace:6"
+"Mod+7" = "workspace-switch:7"
+"Mod+Ctrl+7" = "column-move-to-workspace:7"
+"Mod+8" = "workspace-switch:8"
+"Mod+Ctrl+8" = "column-move-to-workspace:8"
+"Mod+9" = "workspace-switch:9"
+"Mod+Ctrl+9" = "column-move-to-workspace:9"
+
+# Function keys and symbols
+"Mod+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true }
+"Mod+Minus" = "window-modify-primary-extent:-0.1"
+"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1"
+"Mod+Equal" = "window-modify-primary-extent:+0.1"
+"Mod+Shift+Equal" = "window-modify-secondary-extent:+0.1"
+"Mod+Grave" = "window-cycle-primary-extent"
+"Mod+Shift+Grave" = "window-cycle-secondary-extent"
+"Mod+Tab" = { action = "overview-toggle", repeat = false }
+"Mod+Return" = "spawn:foot"
+"Mod+Space" = "window-toggle-floating"
+"Mod+Shift+Space" = "window-focus-switch-floating"
+"Mod+Comma" = "window-consume-from-right"
+"Mod+Period" = "window-consume-or-expel-right"
+"Mod+Slash" = "cheatsheet-toggle"
+"Print" = "spawn:noctalia msg screenshot-region"
+"Ctrl+Print" = "spawn:noctalia msg screenshot-fullscreen"
+# Niri's `screenshot-window` has no Umbriel/Noctalia equivalent yet.
+# "Alt+Print" = "..."
+
+# Multimedia keys
+"XF86AudioRaiseVolume" = { action = "spawn:noctalia msg volume-up", allow_when_locked = true }
+"XF86AudioLowerVolume" = { action = "spawn:noctalia msg volume-down", allow_when_locked = true }
+"XF86AudioMute" = { action = "spawn:noctalia msg volume-mute", allow_when_locked = true }
+"XF86AudioMicMute" = { action = "spawn:noctalia msg mic-mute", allow_when_locked = true }
+
+# Brightness keys
+"XF86MonBrightnessUp" = "spawn:noctalia msg brightness-up"
+"XF86MonBrightnessDown" = "spawn:noctalia msg brightness-down"
+
+# Arrow keys
+"Mod+Left" = "window-focus-left"
+"Mod+Down" = "window-focus-down"
+"Mod+Up" = "window-focus-up"
+"Mod+Right" = "window-focus-right"
+"Mod+H" = "window-focus-left"
+"Mod+J" = "window-focus-down"
+"Mod+K" = "window-focus-up"
+"Mod+L" = "window-focus-right"
+"Mod+Shift+Left" = "column-move-left"
+"Mod+Shift+Down" = "window-move-down"
+"Mod+Shift+Up" = "window-move-up"
+"Mod+Shift+Right" = "column-move-right"
+"Mod+Shift+H" = "column-move-left"
+"Mod+Shift+J" = "window-move-down"
+"Mod+Shift+K" = "window-move-up"
+"Mod+Shift+L" = "column-move-right"
+"Mod+Ctrl+Left" = "output-focus-left"
+"Mod+Ctrl+Down" = "workspace-next"
+"Mod+Ctrl+Up" = "workspace-previous"
+"Mod+Ctrl+Right" = "output-focus-right"
+"Mod+Ctrl+H" = "output-focus-left"
+"Mod+Ctrl+J" = "workspace-next"
+"Mod+Ctrl+K" = "workspace-previous"
+"Mod+Ctrl+L" = "output-focus-right"
+"Mod+Shift+Ctrl+Left" = "column-move-to-output-left"
+"Mod+Shift+Ctrl+Down" = "column-move-to-workspace-next"
+"Mod+Shift+Ctrl+Up" = "column-move-to-workspace-previous"
+"Mod+Shift+Ctrl+Right" = "column-move-to-output-right"
+"Mod+Shift+Ctrl+H" = "column-move-to-output-left"
+"Mod+Shift+Ctrl+J" = "column-move-to-workspace-next"
+"Mod+Shift+Ctrl+K" = "column-move-to-workspace-previous"
+"Mod+Shift+Ctrl+L" = "column-move-to-output-right"
+
+# Mouse shortcuts
+"Mod+WheelDown" = { action = "window-focus-right", cooldown_ms = 50 }
+"Mod+WheelUp" = { action = "window-focus-left", cooldown_ms = 50 }
+"Mod+Shift+WheelDown" = { action = "window-focus-right", cooldown_ms = 150 }
+"Mod+Shift+WheelUp" = { action = "window-focus-left", cooldown_ms = 150 }
+"Mod+Ctrl+WheelDown" = { action = "workspace-next", cooldown_ms = 50 }
+"Mod+Ctrl+WheelUp" = { action = "workspace-previous", cooldown_ms = 50 }
+"Mod+Ctrl+Shift+WheelDown" = { action = "column-move-right", cooldown_ms = 150 }
+"Mod+Ctrl+Shift+WheelUp" = { action = "column-move-left", cooldown_ms = 150 }

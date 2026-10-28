@@ -6,18 +6,19 @@
 
 # Letter shortcuts
 "Mod+Q" = { action = "window-close", repeat = false }
-"Mod+W" = "spawn:firefox"
-"Mod+E" = "spawn:nautilus"
+# Mod+W is defined in the host configuration file to open web browsers.
+# Mod+E is defined in the host configuration file to open file managers.
 "Mod+R" = "spawn:noctalia msg panel-toggle launcher"
-"Mod+T" = "spawn:emacsclient -c"
+# Mod+T is defined in the host configuration file to open text editors.
 # Mod+Y
 # Mod+U
 # Mod+I
 # Mod+O
 # Mod+P
 # Mod+A
-# Mod+S
-"Mod+Shift+S" = "spawn:noctalia msg screenshot-region"
+"Mod+S" = "spawn:noctalia msg screenshot-region"
+"Mod+Alt+S" = "spawn:noctalia msg screenshot-annotate"
+"Mod+Shift+S" = "spawn:noctalia msg screenshot-fullscreen"
 # Mod+D
 "Mod+F" = "window-toggle-maximize"
 "Mod+Alt+F" = "window-toggle-maximize-to-edges"
@@ -33,7 +34,7 @@
 # Mod+V
 # Mod+B
 # Mod+N
-"Mod+M" = "spawn:thunderbird"
+# Mod+M is defined in the host configuration file to open email clients.
 
 # Number shortcuts
 "Mod+1" = "workspace-switch:1"

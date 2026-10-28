@@ -1,12 +1,25 @@
 # -*- mode: toml -*-
 
 # ==============================================================================
+# Applications
+# ==============================================================================
+
+[keybinds]
+
+# Web browser.
+"Mod+W" = "spawn:google-chrome-stable"
+
+# File manager.
+"Mod+E" = "spawn:nautilus"
+
+# Text editor.
+"Mod+T" = "spawn:emacsclient -c"
+
+# Email client.
+"Mod+M" = "spawn:thunderbird"
+
+# ==============================================================================
 # Monitors
-# Outputs are matched by monitor identity ("<make> <model> <serial>", as shown
-# by `umbriel outputs`), so the settings follow each monitor across ports.
-# Positions are in logical coordinates (after scale and transform): a 3840x2160
-# panel at scale 1.25 is 3072x1728 when horizontal and 1728x3072 when vertical.
-# https://docs.noctalia.dev/umbriel/outputs/
 #
 #                            +--------------+
 #                            |              |
@@ -18,6 +31,7 @@
 # +--------------------------+              |
 #                            |              |
 #                            +--------------+
+# ==============================================================================
 
 # Horizontal monitor on the left for coffeelab.
 [output."Samsung Electric Company LS32D70xE HNBY100050"]
@@ -82,10 +96,3 @@ index = 9
 output = "Samsung Electric Company LS32D70xE HNBY100538"
 layout.gap = 10
 
-# Niri enabled only the top-right hot corner on the vertical monitor. Umbriel's
-# hot corners are global (top-left is enabled in config.toml), so this cannot be
-# limited to one monitor. Uncomment to enable top-right on every monitor.
-# [hot_corners.top_right]
-# enabled = true
-# delay_ms = 500
-# action = "overview-open"

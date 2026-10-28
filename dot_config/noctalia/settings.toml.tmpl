@@ -40,6 +40,9 @@ per_monitor_directories = true
 
 [wallpaper.automation]
 enabled = true
-interval_seconds = 600
+interval_seconds = 3600
 
 [include]
+files = [
+  "hosts/{{ .chezmoi.hostname }}.toml",
+]

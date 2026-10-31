@@ -1,0 +1,53 @@
+# -*- mode: toml -*-
+
+# ==============================================================================
+# Applications
+# ==============================================================================
+
+[keybinds]
+
+# Web browser.
+"Mod+W" = "spawn:firefox"
+
+# File manager.
+"Mod+E" = "spawn:nautilus"
+
+# Text editor.
+"Mod+T" = "spawn:emacsclient -c"
+
+# Email client.
+"Mod+M" = "spawn:thunderbird"
+
+# ==============================================================================
+# Monitors
+#
+# +-------------------------+
+# |                         |
+# | LG ULTRAWIDE 0x00041309 |
+# |                         |
+# +-------------------------+
+# |                         |
+# | Dell Inc.               |
+# | DELL S2721DS 44S0R43    |
+# |                         |
+# +----+---------------+----+
+#      | Wacom Tech    |
+#      | Wacom One 13  |
+#      | U32J59X       |
+#      +---------------+
+# ==============================================================================
+
+# Top monitor.
+[output."LG Electronics LG ULTRAWIDE 0x00041309"]
+scale = 1.0
+transform = "180"
+position = [0, -1080]
+layout.scrolling.default_extent_fraction = 0.5
+
+# Bottom monitor.
+[output."Dell Inc. DELL S2721DS 44S0R43"]
+focus_at_startup = true
+scale = 1.0
+transform = "normal"
+position = [0, 0]
+layout.scrolling.default_extent_fraction = 0.9

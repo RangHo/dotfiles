@@ -1,6 +1,3 @@
-README.md
-LICENSE
-
 {{ if ne .chezmoi.os "linux" }}
 # Ignore desktop environment related things on non-Linux systems.
 .config/alacritty

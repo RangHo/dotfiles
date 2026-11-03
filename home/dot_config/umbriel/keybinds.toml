@@ -65,7 +65,7 @@
 "Mod+Grave" = "window-cycle-primary-extent"
 "Mod+Shift+Grave" = "window-cycle-secondary-extent"
 "Mod+Tab" = { action = "overview-toggle", repeat = false }
-"Mod+Return" = "spawn:foot"
+# Mod+Return is defined in the host configuration file to open terminal emulators.
 "Mod+Space" = "window-toggle-floating"
 "Mod+Shift+Space" = "window-focus-switch-floating"
 "Mod+Comma" = "window-consume-from-right"

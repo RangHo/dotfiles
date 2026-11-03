@@ -18,6 +18,9 @@
 # Email client.
 "Mod+M" = "spawn:thunderbird"
 
+# Terminal emulator.
+"Mod+Return" = "spawn:footclient"
+
 # ==============================================================================
 # Monitors
 #

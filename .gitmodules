@@ -1,9 +1,18 @@
 [submodule "emacs/no-littering"]
-	path = dot_config/emacs/lib/no-littering
+	path = home/dot_config/emacs/lib/no-littering
 	url = https://github.com/emacscollective/no-littering
 [submodule "nushell/contrib"]
-	path = dot_config/nushell/contrib
+	path = home/dot_config/nushell/contrib
 	url = https://github.com/nushell/nu_scripts
 [submodule "nushell/opam.nu"]
-	path = dot_config/nushell/extern/opam.nu
+	path = home/dot_config/nushell/extern/opam.nu
+	url = https://github.com/RangHo/opam.nu
+[submodule "home/dot_config/emacs/lib/no-littering"]
+	path = home/dot_config/emacs/lib/no-littering
+	url = https://github.com/emacscollective/no-littering
+[submodule "home/dot_config/nushell/contrib"]
+	path = home/dot_config/nushell/contrib
+	url = https://github.com/nushell/nu_scripts
+[submodule "home/dot_config/nushell/extern/opam.nu"]
+	path = home/dot_config/nushell/extern/opam.nu
 	url = https://github.com/RangHo/opam.nu

@@ -10,5 +10,5 @@ source ./contrib/custom-completions/pnpm/pnpm-completions.nu
 
 # Other packages.
 if (which opam | is-not-empty) {
-  overlay use opam
+# overlay use opam
 }

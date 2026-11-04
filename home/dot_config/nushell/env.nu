@@ -10,7 +10,7 @@ def generate-init [tool: string, command: closure] {
   if (which $tool | is-not-empty) {
     do $command
   } else {
-    "# $tool is not installed."
+    $"# ($tool) is not installed."
   } | save --force ($local_vendor_autoload_dir | path join ($tool + ".nu"))
 }
 

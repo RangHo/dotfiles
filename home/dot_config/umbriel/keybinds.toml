@@ -1,14 +1,14 @@
 [keybinds]
 
 # Session
-"Ctrl+Alt+Delete" = "spawn:noctalia msg panel-toggle session"
+"Ctrl+Alt+Delete" = "spawn noctalia msg panel-toggle session"
 "Ctrl+Alt+BackSpace" = "session-quit"
 
 # Letter shortcuts
 "Mod+Q" = { action = "window-close", repeat = false }
 # Mod+W is defined in the host configuration file to open web browsers.
 # Mod+E is defined in the host configuration file to open file managers.
-"Mod+R" = "spawn:noctalia msg panel-toggle launcher"
+"Mod+R" = "spawn noctalia msg panel-toggle launcher"
 # Mod+T is defined in the host configuration file to open text editors.
 # Mod+Y
 # Mod+U
@@ -16,9 +16,9 @@
 # Mod+O
 # Mod+P
 # Mod+A
-"Mod+S" = "spawn:noctalia msg screenshot-region"
-"Mod+Alt+S" = "spawn:noctalia msg screenshot-annotate"
-"Mod+Shift+S" = "spawn:noctalia msg screenshot-fullscreen"
+"Mod+S" = "spawn noctalia msg screenshot-region"
+"Mod+Alt+S" = "spawn noctalia msg screenshot-annotate"
+"Mod+Shift+S" = "spawn noctalia msg screenshot-fullscreen"
 # Mod+D
 "Mod+F" = "window-toggle-maximize"
 "Mod+Alt+F" = "window-toggle-maximize-to-edges"
@@ -37,31 +37,31 @@
 # Mod+M is defined in the host configuration file to open email clients.
 
 # Number shortcuts
-"Mod+1" = "workspace-switch:1"
-"Mod+Ctrl+1" = "column-move-to-workspace:1"
-"Mod+2" = "workspace-switch:2"
-"Mod+Ctrl+2" = "column-move-to-workspace:2"
-"Mod+3" = "workspace-switch:3"
-"Mod+Ctrl+3" = "column-move-to-workspace:3"
-"Mod+4" = "workspace-switch:4"
-"Mod+Ctrl+4" = "column-move-to-workspace:4"
-"Mod+5" = "workspace-switch:5"
-"Mod+Ctrl+5" = "column-move-to-workspace:5"
-"Mod+6" = "workspace-switch:6"
-"Mod+Ctrl+6" = "column-move-to-workspace:6"
-"Mod+7" = "workspace-switch:7"
-"Mod+Ctrl+7" = "column-move-to-workspace:7"
-"Mod+8" = "workspace-switch:8"
-"Mod+Ctrl+8" = "column-move-to-workspace:8"
-"Mod+9" = "workspace-switch:9"
-"Mod+Ctrl+9" = "column-move-to-workspace:9"
+"Mod+1" = "workspace-switch 1"
+"Mod+Ctrl+1" = "column-move-to-workspace 1"
+"Mod+2" = "workspace-switch 2"
+"Mod+Ctrl+2" = "column-move-to-workspace 2"
+"Mod+3" = "workspace-switch 3"
+"Mod+Ctrl+3" = "column-move-to-workspace 3"
+"Mod+4" = "workspace-switch 4"
+"Mod+Ctrl+4" = "column-move-to-workspace 4"
+"Mod+5" = "workspace-switch 5"
+"Mod+Ctrl+5" = "column-move-to-workspace 5"
+"Mod+6" = "workspace-switch 6"
+"Mod+Ctrl+6" = "column-move-to-workspace 6"
+"Mod+7" = "workspace-switch 7"
+"Mod+Ctrl+7" = "column-move-to-workspace 7"
+"Mod+8" = "workspace-switch 8"
+"Mod+Ctrl+8" = "column-move-to-workspace 8"
+"Mod+9" = "workspace-switch 9"
+"Mod+Ctrl+9" = "column-move-to-workspace 9"
 
 # Function keys and symbols
 "Mod+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true }
-"Mod+Minus" = "window-modify-primary-extent:-0.1"
-"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1"
-"Mod+Equal" = "window-modify-primary-extent:+0.1"
-"Mod+Shift+Equal" = "window-modify-secondary-extent:+0.1"
+"Mod+Minus" = "window-modify-primary-extent -0.1"
+"Mod+Shift+Minus" = "window-modify-secondary-extent -0.1"
+"Mod+Equal" = "window-modify-primary-extent +0.1"
+"Mod+Shift+Equal" = "window-modify-secondary-extent +0.1"
 "Mod+Grave" = "window-cycle-primary-extent"
 "Mod+Shift+Grave" = "window-cycle-secondary-extent"
 "Mod+Tab" = { action = "overview-toggle", repeat = false }
@@ -71,20 +71,20 @@
 "Mod+Comma" = "window-consume-from-right"
 "Mod+Period" = "window-consume-or-expel-right"
 "Mod+Slash" = "cheatsheet-toggle"
-"Print" = "spawn:noctalia msg screenshot-region"
-"Ctrl+Print" = "spawn:noctalia msg screenshot-fullscreen"
+"Print" = "spawn noctalia msg screenshot-region"
+"Ctrl+Print" = "spawn noctalia msg screenshot-fullscreen"
 # Niri's `screenshot-window` has no Umbriel/Noctalia equivalent yet.
 # "Alt+Print" = "..."
 
 # Multimedia keys
-"XF86AudioRaiseVolume" = { action = "spawn:noctalia msg volume-up", allow_when_locked = true }
-"XF86AudioLowerVolume" = { action = "spawn:noctalia msg volume-down", allow_when_locked = true }
-"XF86AudioMute" = { action = "spawn:noctalia msg volume-mute", allow_when_locked = true }
-"XF86AudioMicMute" = { action = "spawn:noctalia msg mic-mute", allow_when_locked = true }
+"XF86AudioRaiseVolume" = { action = "spawn noctalia msg volume-up", allow_when_locked = true }
+"XF86AudioLowerVolume" = { action = "spawn noctalia msg volume-down", allow_when_locked = true }
+"XF86AudioMute" = { action = "spawn noctalia msg volume-mute", allow_when_locked = true }
+"XF86AudioMicMute" = { action = "spawn noctalia msg mic-mute", allow_when_locked = true }
 
 # Brightness keys
-"XF86MonBrightnessUp" = "spawn:noctalia msg brightness-up"
-"XF86MonBrightnessDown" = "spawn:noctalia msg brightness-down"
+"XF86MonBrightnessUp" = "spawn noctalia msg brightness-up"
+"XF86MonBrightnessDown" = "spawn noctalia msg brightness-down"
 
 # Arrow keys
 "Mod+Left" = "window-focus-left"

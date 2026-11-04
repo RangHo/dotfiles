@@ -7,19 +7,19 @@
 [keybinds]
 
 # Web browser.
-"Mod+W" = "spawn:google-chrome-stable"
+"Mod+W" = "spawn google-chrome-stable"
 
 # File manager.
-"Mod+E" = "spawn:nautilus"
+"Mod+E" = "spawn nautilus"
 
 # Text editor.
-"Mod+T" = "spawn:emacsclient -c"
+"Mod+T" = "spawn emacsclient -c"
 
 # Email client.
-"Mod+M" = "spawn:thunderbird"
+"Mod+M" = "spawn thunderbird"
 
 # Terminal emulator.
-"Mod+Return" = "spawn:footclient"
+"Mod+Return" = "spawn footclient"
 
 # ==============================================================================
 # Monitors

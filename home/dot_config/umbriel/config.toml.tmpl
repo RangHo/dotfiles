@@ -89,8 +89,8 @@ corner_radius = 10
 enabled = true
 optimized = true
 passes = 2
-radius = 3
-noise = 0.02
+radius = 5
+noise = 0.1
 brightness = 0.9
 contrast = 0.9
 saturation = 1.1
@@ -255,22 +255,6 @@ default_pinned = true
 # border_width = 0
 # corner_radius = 0
 # shadow = false
-
-# ==============================================================================
-# Layer rules
-# https://docs.noctalia.dev/umbriel/layer-rules/
-[[layer_rule]]
-match.namespace = "^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd|desktop-widget-[^\"]*)$"
-blur = true
-blur_ignore_alpha = 0.5
-blur_popups = true
-
-# Panels, the dock, notifications and OSDs open over windows, so they blur the
-# live content behind them. The bar and desktop widgets sit on the wallpaper and
-# keep the cached wallpaper blur.
-[[layer_rule]]
-match.namespace = "^noctalia-(notification|dock|panel|attached-panel|osd)$"
-blur_optimized = false
 
 # ==============================================================================
 # Overview

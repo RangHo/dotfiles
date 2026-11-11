@@ -1,8 +1,0 @@
-type = process
-command = /usr/bin/wireplumber
-log-type = buffer
-smooth-recovery = true
-env-file = $HOME/.config/environment.d/20-xdg-base-dir.conf
-
-depends-on = pipewire
-before = login.target

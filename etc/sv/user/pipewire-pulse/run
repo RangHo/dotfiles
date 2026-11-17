@@ -1,0 +1,11 @@
+#!/bin/sh
+
+exec 2>&1
+
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export DBUS_SESSION_BUS_ADDRES="unix:path=${XDG_RUNTIME_DIR}/bus"
+
+# Wait for PipeWire socket.
+[ -S "${XDG_RUNTIME_DIR}/pipewire-0" ] || exit 1
+
+exec pipewire-pulse

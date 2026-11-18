@@ -1,6 +1,7 @@
 #!/bin/sh
 exec 2>&1
 
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin"
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
 # If WAYLAND_DISPLAY is not set, use the first one found.

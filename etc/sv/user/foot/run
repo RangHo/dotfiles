@@ -1,0 +1,19 @@
+#!/bin/sh
+exec 2>&1
+
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+
+# If WAYLAND_DISPLAY is not set, use the first one found.
+if [ -z "$WAYLAND_DISPLAY" ]; then
+    for s in "$XDG_RUNTIME_DIR/wayland-*"; do
+        if [ -S "$s" ]; then
+            export WAYLAND_DISPLAY="${s##*/}"
+            break
+        fi
+    done
+fi
+
+# If no compositor is available, wait a bit and try again.
+[ -z "$WAYLAND_DISPLAY" ] || exit 1
+
+exec foot --server

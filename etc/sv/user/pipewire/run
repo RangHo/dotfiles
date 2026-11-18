@@ -1,12 +1,10 @@
 #!/bin/sh
-
 exec 2>&1
 
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-export DBUS_SESSION_BUS_ADDRES="unix:path=${XDG_RUNTIME_DIR}/bus"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
 
-# Wait for XDG runtime directory and D-Bus session bus.
-[ -d "${XDG_RUNTIME_DIR}" ] || exit 1
-[ -S "${XDG_RUNTIME_DIR}/bus" ] || exit 1
+# Wait for the D-Bus session bus.
+[ -S "$XDG_RUNTIME_DIR/bus" ] || exit 1
 
 exec pipewire

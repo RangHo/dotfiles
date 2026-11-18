@@ -45,7 +45,9 @@
 scale = 1.0
 transform = "180"
 position = [0, -1080]
-layout.scrolling.default_extent_fraction = 0.5
+
+[output."LG Electronics LG ULTRAWIDE 0x00041309".layout]
+mode = "dwindle"
 
 # Bottom monitor.
 [output."Dell Inc. DELL S2721DS 44S0R43"]
@@ -53,4 +55,10 @@ focus_at_startup = true
 scale = 1.0
 transform = "normal"
 position = [0, 0]
-layout.scrolling.default_extent_fraction = 0.9
+
+[output."Dell Inc. DELL S2721DS 44S0R43".layout]
+mode = "scrolling"
+
+[output."Dell Inc. DELL S2721DS 44S0R43".layout.scrolling]
+default_extent_fraction = 0.9
+center_focused = "always"

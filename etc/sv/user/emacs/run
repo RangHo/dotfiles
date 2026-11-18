@@ -1,11 +1,8 @@
 #!/bin/bash
 exec 2>&1
 
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin"
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-
-if [ -r "$HOME/.bash_profile" ]; then
-    source "$HOME/.bash_profile"
-fi
 
 [ -d "$XDG_RUNTIME_DIR" ] || exit 1
 

@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# Source common configurations.
 for profile in ~/.config/profile.d/*; do
     . $profile
 done
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
+
+# Source device-specific profile.
+[[ -f ~/.profile ]] && . ~/.profile

@@ -1,7 +1,11 @@
 #!/bin/zsh
 
+# Source common configurations.
 for profile in ~/.config/profile.d/*; do
     . $profile
 done
 
 [[ -f ~/.zshrc ]] && . ~/.zshrc
+
+# Source device-specific profile.
+[[ -f ~/.profile ]] && . ~/.profile

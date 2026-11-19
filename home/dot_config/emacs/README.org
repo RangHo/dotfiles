@@ -277,31 +277,54 @@ There are a bit of things to tweak when using mouse.
 If Emacs is running in a CLI mode, we can enable mouse support for Xterm.
 
 #+begin_src emacs-lisp
-  (unless (display-graphic-p)
+  (use-package xt-mouse
+    :ensure nil
+    :unless (display-graphic-p)
+    :config
     (xterm-mouse-mode +1))
 #+end_src
 
 The default scroll movement is pretty aggressive, so we need to tone it down a bit.
 
 #+begin_src emacs-lisp
-  (setq mouse-wheel-scroll-amount '(3 ((control) . 1) ((shift) . 5)))
-  (setq mouse-wheel-progressive-speed nil)
+  (use-package mwheel
+    :ensure nil
+    :custom
+    (mouse-whell-scroll-amount '(3 ((control) . 1) ((shift). 5)))
+    (mouse-wheel-progressive-speed nil))
 #+end_src
 
 *** History of Buffers and Commands
-Make sure Emacs keeps the history of visited files and executed commands.
+Make sure Emacs keeps the history of visited files...
 
 #+begin_src emacs-lisp
-  (savehist-mode +1)
-  (recentf-mode +1)
+  (use-package recentf
+    :ensure nil
+    :custom
+    (recentf-autosave-interval 600)
+    :config
+    (recentf-mode +1))
+#+end_src
+
+...and commands used in minibuffer.
+
+#+begin_src emacs-lisp
+  (use-package savehist
+    :ensure nil
+    :config
+    (savehist-mode +1))
 #+end_src
 
 *** Revert Files Automatically
 If files are changed in the background, reflect the latest changes.
 
 #+begin_src emacs-lisp
-  (setq auto-revert-interval 1)
-  (global-auto-revert-mode +1)
+  (use-package autorevert
+    :ensure nil
+    :custom
+    (auto-revert-interval 1)
+    :config
+    (global-auto-revert-mode +1))
 #+end_src
 
 *** Electric Modes
@@ -311,8 +334,15 @@ Emacs comes with a few "electric" modes that intervenes and edits text on-the-fl
 - ~electric-indent-mode~ :: Re-indent the line when a possible indent-requiring events fire.
 
 #+begin_src emacs-lisp
-  (electric-indent-mode +1)
-  (electric-pair-mode +1)
+  (use-package electric
+    :ensure nil
+    :config
+    (electric-indent-mode +1))
+
+  (use-package elec-pair
+    :ensure nil
+    :config
+    (electric-pair-mode +1))
 #+end_src
 
 *** Syntax Checking
@@ -320,7 +350,9 @@ There is a syntax version of the spell checker called ~flymake~.
 They collect diagnostic information from multiple sources and display them in a user-friendly way.
 
 #+begin_src emacs-lisp
-  (add-hook 'prog-mode-hook #'flymake-mode)
+  (use-package flymake
+    :ensure nil
+    :hook (prog-mode))
 #+end_src
 
 *** Spell Checking
@@ -333,16 +365,26 @@ There are two sub-modes available for this package:
 - ~flyspell-prog-mode~ :: Check spelling, only within comments and strings.
   
 #+begin_src emacs-lisp
-  (when-let* ((hunspell-program (executable-find "hunspell")))
-    (setq ispell-program-name hunspell-program)
-    (add-hook 'text-mode-hook #'flyspell-mode))
+  (use-package ispell
+    :ensure nil
+    :when (executable-find "hunspell")
+    :custom
+    (ispell-program-name (executable-find "hunspell")))
+
+  (use-package flyspell
+    :ensure nil
+    :when (executable-find "hunspell")
+    :hook (text-mode))
 #+end_src
 
 *** Documentations
 Let's enable Eldoc mode for all buffers.
 
 #+begin_src emacs-lisp
-  (global-eldoc-mode +1)
+  (use-package eldoc
+    :ensure nil
+    :config
+    (global-eldoc-mode +1))
 #+end_src
 
 *** UI Elements
@@ -366,11 +408,10 @@ Starting from Emacs 29, the [[https://tree-sitter.github.io/tree-sitter/][tree-s
 It is usually much faster than Emacs's built-in parsing facility.
 
 #+begin_src emacs-lisp
-  (require 'treesit)
-
-  (defvar treesit-major-mode-remap-alist
-    nil
-    "Association list of major modes to remap to their respective tree-sitter alternatives.")
+  (use-package treesit
+    :ensure nil
+    :custom
+    (treesit-major-mode-remap-alist nil))
 
   (defun treesit-install-all-language-grammars (&optional out-dir)
     "Build and install all tree-sitter language grammar libraries.
@@ -397,7 +438,8 @@ It is usually much faster than Emacs's built-in parsing facility.
 The [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]] allows editor-agonistic programming support by implementing server-client relationship.
 
 #+begin_src emacs-lisp
-  (require 'eglot)
+  (use-package eglot
+    :ensure nil)
 
   (defun rangho--ensure-eglot-if-supported (&optional mode)
     "Enable eglot if it is supported for MODE or the current major mode."

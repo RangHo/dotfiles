@@ -1,0 +1,47 @@
+# -*- mode: toml -*-
+
+# ==============================================================================
+# Applications
+# ==============================================================================
+
+[keybinds]
+
+# Web browser.
+"Mod+W" = "spawn firefox"
+
+# File manager.
+"Mod+E" = "spawn footclient yazi"
+
+# Text editor.
+"Mod+T" = "spawn emacsclient -c"
+
+# Email client.
+"Mod+M" = "spawn thunderbird"
+
+# Terminal emulator.
+"Mod+Return" = "spawn footclient"
+
+# ==============================================================================
+# Inputs
+# ==============================================================================
+
+[input.touchpad]
+natural_scroll = true
+
+# ==============================================================================
+# Outputs
+#
+# +-------------------------+
+# |                         |
+# |          eDP-1          |
+# |                         |
+# |                         |
+# +-------------------------+
+# ==============================================================================
+
+# Main monitor.
+[output."BOE 0xBCA Unknown"]
+focus_at_startup = true
+scale = 1.0
+transform = "normal"
+position = [0, 0]

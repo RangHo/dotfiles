@@ -1,0 +1,139 @@
+# ==============================================================================
+# Wallpaper
+# ==============================================================================
+
+[wallpaper.default]
+path = "/home/rangho/Pictures/Wallpapers/whisky.jpg"
+
+# ==============================================================================
+# Widget
+# ==============================================================================
+
+[widget.audio_visualizer]
+show_when_idle = true
+mirrored = false
+
+[widget.network]
+font_scale = 0.5
+
+[widget.workspaces]
+empty_color = "tertiary"
+
+# ------------------------------------------------------------------------------
+# System Monitors
+# ------------------------------------------------------------------------------
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_pct"
+
+[widget.gpu]
+type = "sysmon"
+stat = "gpu_usage"
+
+[widget.filesystem]
+type = "sysmon"
+stat = "disk_used_pct"
+
+[widget.network_rx]
+type = "sysmon"
+stat = "net_rx"
+network_speed_compact = true
+
+[widget.network_tx]
+type = "sysmon"
+stat = "net_tx"
+network_speed_compact = true
+
+[widget.battery]
+display_mode = "graphic"
+
+
+# ==============================================================================
+# Bar
+# ==============================================================================
+
+[bar]
+order = [ "top", "left", "right" ]
+
+    # --------------------------------------------------------------------------
+    # Top Bar
+    # --------------------------------------------------------------------------
+
+    [bar.top]
+    enabled = false
+    start = [ "group:media_visualizer", "volume", "brightness" ]
+    center = [ "active_window" ]
+    end = [ "tray", "notifications", "group:datetime" ]
+    widget_spacing = 15
+    thickness = 50
+    margin_edge = 25
+    margin_ends = 25
+    scale = 1.25
+    background_opacity = 0.5
+
+        [bar.top.monitor.eDP-1]
+        enabled = true
+
+        [[bar.top.capsule_group]]
+          id = "media_visualizer"
+          members = [ "media", "audio_visualizer" ]
+          padding = 15.0
+          opacity = 0.75
+
+        [[bar.top.capsule_group]]
+          id = "datetime"
+          members = [ "date", "clock" ]
+          padding = 15.0
+          opacity = 0.75
+
+    # --------------------------------------------------------------------------
+    # Left Bar
+    # --------------------------------------------------------------------------
+
+    [bar.left]
+    enabled = false
+    position = "left"
+    start = [ "workspaces" ]
+    center = [ "cpu", "ram", "gpu", "filesystem", "network_rx", "network_tx" ]
+    end = [ "battery" ]
+    smart_auto_hide = true
+    reserve_space = false
+    margin_ends = 100
+    thickness = 100
+    radius = 25
+    scale = 2
+    font_scale = 0.75
+    padding = 40
+    widget_spacing = 15
+    background_opacity = 0.75
+
+        [bar.left.monitor.eDP-1]
+        enabled = true
+
+    # --------------------------------------------------------------------------
+    # Right Bar
+    # --------------------------------------------------------------------------
+
+    [bar.right]
+    enabled = false
+    position = "right"
+    start = [ "launcher", "wallpaper", "settings" ]
+    center = [ "theme_mode", "nightlight", "caffeine", "power_profile" ]
+    end = [ "network", "bluetooth", "session" ]
+    auto_hide = true
+    reserve_space = false
+    margin_ends = 250
+    thickness = 100
+    radius = 25
+    scale = 2.5
+    padding = 40
+    widget_spacing = 25
+    background_opacity = 0.75
+
+        [bar.right.monitor.eDP-1]
+        enabled = true

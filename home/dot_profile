@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Source common configurations.
+for profile in ~/.config/profile.d/*; do
+    [ -r "$profile" ] && . "$profile"
+done

@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Source common configurations.
-for profile in ~/.config/profile.d/*; do
-    . $profile
-done
+[[ -f ~/.profile ]] && source ~/.profile
 
-[[ -f ~/.bashrc ]] && . ~/.bashrc
-
-# Source device-specific profile.
-[[ -f ~/.profile ]] && . ~/.profile
+[[ -f ~/.bashrc ]] && source ~/.bashrc

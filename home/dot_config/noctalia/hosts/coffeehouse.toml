@@ -95,6 +95,6 @@ order = [ "status" ]
 
         [[bar.status.capsule_group]]
           id = "sysmon"
-          members = [ "cpu", "ram", "gpu", "network_rx", "network_tx" ]
+          members = [ "cpu", "ram", "gpu" ]
           padding = 12.0
           opacity = 0.75

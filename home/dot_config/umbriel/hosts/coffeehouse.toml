@@ -8,7 +8,7 @@
 "Mod+W" = "spawn firefox"
 
 # File manager.
-"Mod+E" = "spawn nautilus"
+"Mod+E" = "spawn dolphin"
 
 # Text editor.
 "Mod+T" = "spawn emacsclient -c"
@@ -17,7 +17,7 @@
 "Mod+M" = "spawn thunderbird"
 
 # Terminal emulator.
-"Mod+Return" = "spawn foot"
+"Mod+Return" = "spawn kitty"
 
 # ==============================================================================
 # Outputs
@@ -38,25 +38,64 @@
 #      +---------------+
 # ==============================================================================
 
-# Top monitor.
+# Top monitor: communication, media, and streaming.
 [output."LG Electronics LG ULTRAWIDE 0x00041309"]
 scale = 1.0
 transform = "180"
 position = [0, -1080]
+workspaces = ["media", "chat", "stream"]
 
-[output."LG Electronics LG ULTRAWIDE 0x00041309".layout]
-mode = "dwindle"
-
-# Bottom monitor.
+# Bottom monitor: where the actual work happens.
 [output."Dell Inc. DELL S2721DS 44S0R43"]
 focus_at_startup = true
 scale = 1.0
 transform = "normal"
 position = [0, 0]
+workspaces = ["web", "code", "game"]
 
-[output."Dell Inc. DELL S2721DS 44S0R43".layout]
-mode = "scrolling"
+# ==============================================================================
+# Workspaces
+# ==============================================================================
 
-[output."Dell Inc. DELL S2721DS 44S0R43".layout.scrolling]
-default_extent_fraction = 0.9
-center_focused = "always"
+# ------------------------------------------------------------------------------
+# Top monitor
+# ------------------------------------------------------------------------------
+
+# Media: Spotify and friends, two half-width columns side by side.
+[[workspace]]
+  name = "media"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 0.5
+
+# Chat: Discord, Slack, etc. in two half-width columns.
+[[workspace]]
+  name = "chat"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 0.5
+
+# Streaming: OBS as master, chat and donation list stacked beside it.
+[[workspace]]
+  name = "stream"
+  layout.mode = "master"
+
+# ------------------------------------------------------------------------------
+# Bottom monitor
+# ------------------------------------------------------------------------------
+
+# Browsing: one large window, centered, scroll to the occasional second one.
+[[workspace]]
+  name = "web"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 0.9
+  layout.scrolling.center_focused = "always"
+
+# Coding: editor as master, terminals stacked beside it.
+[[workspace]]
+  name = "code"
+  layout.mode = "master"
+
+# Gaming: one full-width game window, nothing else competing for space.
+[[workspace]]
+  name = "game"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0

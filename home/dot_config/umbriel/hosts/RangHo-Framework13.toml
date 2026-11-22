@@ -58,6 +58,29 @@ lid_open = "umbriel msg output-enable:eDP-1"
 # Workspaces
 # ==============================================================================
 
+# Browsing: one large window, scroll to the occasional second one.
+[[workspace]]
+  name = "web"
+  layout.mode = "scrolling"
+
+# Coding: editor as master, terminals stacked beside it.
 [[workspace]]
   name = "code"
   layout.mode = "master"
+
+# Chat and email: two readable half-width columns at a time.
+[[workspace]]
+  name = "chat"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 0.5
+
+# Media: a single full-width player or viewer.
+[[workspace]]
+  name = "media"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0
+
+# Miscellaneous: let dwindle arrange whatever lands here.
+[[workspace]]
+  name = "misc"
+  layout.mode = "dwindle"

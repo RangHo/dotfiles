@@ -25,19 +25,12 @@ transparency_mode = "glass"
 mode = "auto"
 source = "wallpaper"
 
-[theme.templates]
-builtin_ids = [ "foot", "gtk3", "gtk4", "qt", "umbriel" ]
-community_ids = [ "papirus-icons" ]
-
-[theme.templates.user.emacs]
-input_path = "$XDG_CONFIG_HOME/noctalia/templates/emacs.el"
-output_path = "$XDG_CONFIG_HOME/emacs/etc/themes/noctalia-theme.el"
-post_hook = "emacsclient -e \"(load-theme 'noctalia t)\""
 
 [wallpaper]
 directory = "~/Pictures/Wallpapers"
 
 [include]
 files = [
+  "templates.toml",
   "hosts/{{ .chezmoi.hostname }}.toml",
 ]

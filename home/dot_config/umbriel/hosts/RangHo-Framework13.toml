@@ -1,5 +1,3 @@
-# -*- mode: toml -*-
-
 # ==============================================================================
 # Applications
 # ==============================================================================
@@ -10,7 +8,7 @@
 "Mod+W" = "spawn firefox"
 
 # File manager.
-"Mod+E" = "spawn footclient yazi"
+"Mod+E" = "spawn kitty yazi"
 
 # Text editor.
 "Mod+T" = "spawn emacsclient -c"
@@ -19,7 +17,7 @@
 "Mod+M" = "spawn thunderbird"
 
 # Terminal emulator.
-"Mod+Return" = "spawn footclient"
+"Mod+Return" = "spawn kitty"
 
 # ==============================================================================
 # Inputs
@@ -40,8 +38,26 @@ natural_scroll = true
 # ==============================================================================
 
 # Main monitor.
-[output."BOE 0xBCA Unknown"]
+[output.eDP-1]
 focus_at_startup = true
 scale = 1.0
 transform = "normal"
 position = [0, 0]
+workspaces = ["web", "code", "chat", "media", "misc"]
+
+
+# ==============================================================================
+# Events
+# ==============================================================================
+
+[events]
+lid_close = "umbriel msg output-disable:eDP-1"
+lid_open = "umbriel msg output-enable:eDP-1"
+
+# ==============================================================================
+# Workspaces
+# ==============================================================================
+
+[[workspace]]
+  name = "code"
+  layout.mode = "master"

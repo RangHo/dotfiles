@@ -1,5 +1,33 @@
+# ==============================================================================
+# Window rules
+# ==============================================================================
+
+# Blur every window.
+[[window_rule]]
+  blur = true
+
 # Make sure that Noctalia's setting windows float.
 [[window_rule]]
   match.app_id = "^dev.noctalia.Noctalia$"
   default_floating = true
   default_floating_size_px = { width = 1020, height = 900 }
+
+# Make sure that Umbriel's screen share picker floats.
+[[window_rule]]
+  match.app_id = "^dev.noctalia.UmbrielSharePicker$"
+  default_floating = true
+  default_floating_size_px = { width = 800, height = 600 }
+
+# Float Picture-in-Picture windows at the bottom right corner.
+[[window_rule]]
+  match.title = "^(Picture-in-Picture|Picture in picture)$"
+  default_floating = true
+  default_maximize = false
+  default_position = { x = 20, y = 20, anchor = "bottom_right" }
+
+# Pin notification toasts at the bottom right corner without stealing focus.
+[[window_rule]]
+  match.title = "^notificationtoasts_.+_desktop"
+  default_position = { x = 0, y = 0, anchor = "bottom_right" }
+  default_focused = false
+  default_pinned = true

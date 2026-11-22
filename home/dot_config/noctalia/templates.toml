@@ -1,6 +1,5 @@
 [theme.templates]
-builtin_ids = [ "foot", "gtk3", "gtk4", "qt", "umbriel" ]
-community_ids = [ "papirus-icons" ]
+builtin_ids = [ "gtk3", "gtk4", "kcolorscheme", "kitty", "umbriel" ]
 
 [theme.templates.user.emacs]
 input_path = "$XDG_CONFIG_HOME/noctalia/templates/emacs.el"

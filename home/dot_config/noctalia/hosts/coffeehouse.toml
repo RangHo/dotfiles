@@ -1,0 +1,100 @@
+# ==============================================================================
+# Templates
+#
+# Community templates are host-specific; built-in ones live in templates.toml.
+# ==============================================================================
+
+[theme.templates]
+community_ids = [ "discord", "papirus-icons", "pywalfox", "spicetify" ]
+
+# ==============================================================================
+# Wallpaper
+# ==============================================================================
+
+[wallpaper]
+fill_mode = "span"
+
+[wallpaper.default]
+path = "~/Pictures/Wallpapers/halloween.jpg"
+
+# ==============================================================================
+# Widget
+# ==============================================================================
+
+[widget.media]
+min_length = 200
+max_length = 300
+
+[widget.audio_visualizer]
+show_when_idle = true
+mirrored = false
+
+# ------------------------------------------------------------------------------
+# System Monitors
+# ------------------------------------------------------------------------------
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+visualization = "graph"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_pct"
+visualization = "graph"
+
+[widget.gpu]
+type = "sysmon"
+stat = "gpu_usage"
+visualization = "graph"
+
+# ==============================================================================
+# Bar
+#
+# All bars live on the ultrawide (DP-3). The 2K monitor (DP-1) and the drawing
+# tablet are left bare on purpose: bars are disabled by default and only
+# enabled per monitor below.
+# ==============================================================================
+
+[bar]
+order = [ "status" ]
+
+    # --------------------------------------------------------------------------
+    # Status Bar
+    #
+    # Always visible, on the bottom edge of the ultrawide so that it is a short
+    # glance up from the 2K monitor.
+    # --------------------------------------------------------------------------
+
+    [bar.status]
+    enabled = false
+    position = "bottom"
+    start = [ "group:media_visualizer" ]
+    center = [ "group:datetime" ]
+    end = [ "group:sysmon", "tray", "notifications" ]
+    widget_spacing = 12
+    thickness = 40
+    margin_edge = 12
+    margin_ends = 12
+    background_opacity = 0.5
+
+        [bar.status.monitor.DP-3]
+        enabled = true
+
+        [[bar.status.capsule_group]]
+          id = "media_visualizer"
+          members = [ "media", "audio_visualizer" ]
+          padding = 12.0
+          opacity = 0.75
+
+        [[bar.status.capsule_group]]
+          id = "datetime"
+          members = [ "date", "clock" ]
+          padding = 12.0
+          opacity = 0.75
+
+        [[bar.status.capsule_group]]
+          id = "sysmon"
+          members = [ "cpu", "ram", "gpu", "network_rx", "network_tx" ]
+          padding = 12.0
+          opacity = 0.75

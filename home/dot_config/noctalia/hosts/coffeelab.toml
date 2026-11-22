@@ -1,3 +1,12 @@
+# ==============================================================================
+# Templates
+#
+# Community templates are host-specific; built-in ones live in templates.toml.
+# ==============================================================================
+
+[theme.templates]
+community_ids = [ "papirus-icons" ]
+
 [wallpaper.monitor."Samsung Electric Company LS32D70xE HNBY100050"]
 directory = "/home/rangho/Pictures/Wallpapers/Landscape"
 

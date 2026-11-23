@@ -5,5 +5,11 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
 [ -d "$XDG_RUNTIME_DIR" ] || exit 1
 
+# Without logind/systemd nothing populates the activation environment, so
+# D-Bus-activated services (e.g. xdg-desktop-portal) would miss the login
+# environment, such as Flatpak's XDG_DATA_DIRS. Load it from the profiles.
+[ -r /etc/profile ] && . /etc/profile
+[ -r "$HOME/.profile" ] && . "$HOME/.profile"
+
 exec dbus-daemon --session --nofork --nopidfile \
     --address="unix:path=$XDG_RUNTIME_DIR/bus"

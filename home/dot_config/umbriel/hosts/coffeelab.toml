@@ -40,11 +40,63 @@ focus_at_startup = true
 scale = 1.0
 transform = "normal"
 position = [-3840, 750]
-layout.scrolling.default_extent_fraction = 0.666
+workspaces = ["web", "code", "game"]
 
 # Vertical monitor on the right for coffeelab.
 [output."Samsung Electric Company LS32D70xE HNBY100538"]
 scale = 1.0
 transform = "270"
 position = [0, 0]
-layout.scrolling.default_extent_fraction = 1.0
+workspaces = ["chat", "ref", "fun"]
+
+# ==============================================================================
+# Workspaces
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Horizontal monitor
+# ------------------------------------------------------------------------------
+
+# Browsing: two-thirds width, so a narrower window fits beside it.
+[[workspace]]
+  name = "web"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 0.666
+  layout.scrolling.center_focused = "on_overflow"
+
+# Coding: Emacs as master on the right, next to the inter-monitor border that
+# sits in the middle of my view; shells stack toward the outer (left) edge.
+# A lone Emacs takes the full width for ECA and Proof General splits.
+[[workspace]]
+  name = "code"
+  layout.mode = "master"
+  layout.master.position = "right"
+  layout.master.default_width_fraction = 0.667
+
+# Heavy distractions: one full-width game window.
+[[workspace]]
+  name = "game"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0
+
+# ------------------------------------------------------------------------------
+# Vertical monitor
+# ------------------------------------------------------------------------------
+
+# Lab messages: Slack and Thunderbird stacked in one full-width column.
+[[workspace]]
+  name = "chat"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0
+
+# References: Claude Code and documents, one full-width column each.
+[[workspace]]
+  name = "ref"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0
+
+# Light distractions: Discord and Spotify stacked in one full-width column.
+[[workspace]]
+  name = "fun"
+  layout.mode = "scrolling"
+  layout.scrolling.default_extent_fraction = 1.0

@@ -12,3 +12,176 @@ directory = "/home/rangho/Pictures/Wallpapers/Landscape"
 
 [wallpaper.monitor."Samsung Electric Company LS32D70xE HNBY100538"]
 directory = "/home/rangho/Pictures/Wallpapers/Portrait"
+
+# ==============================================================================
+# Idle
+# ==============================================================================
+
+[idle]
+behavior_order = [ "lock", "screen_off" ]
+
+    [idle.behavior.lock]
+    action = "lock"
+    enabled = true
+    timeout = 900
+
+    [idle.behavior.screen_off]
+    action = "screen_off"
+    enabled = true
+    timeout = 3600
+
+# ==============================================================================
+# Widget
+# ==============================================================================
+
+[widget.media]
+min_length = 200
+max_length = 300
+
+[widget.audio_visualizer]
+show_when_idle = true
+mirrored = false
+
+# Big, labelled pills so the active workspace reads at a glance.
+[widget.workspaces]
+show_labels = true
+label_source = "name"
+max_label_chars = 1
+pill_scale = 1.0
+
+# ------------------------------------------------------------------------------
+# System Monitors
+# ------------------------------------------------------------------------------
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+visualization = "graph"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_pct"
+visualization = "graph"
+
+[widget.gpu]
+type = "sysmon"
+stat = "gpu_usage"
+visualization = "graph"
+
+# ==============================================================================
+# Bar
+#
+# The status bar sits on the bottom edge of the tall monitor: below eye level,
+# and the pointer stops there, so everything clickable lives in it. Workspace
+# indicators hug the two outer edges of the whole desktop and only show up when
+# no window covers them.
+#
+#                         +---------+
+#   +-----------------+   |         |
+#   :                 |   |         :
+#   : HNBY100050      |   |HNBY10053:
+#   :                 |   |    8    :
+#   +-----------------+   |         |
+#                         |=========|
+#                         +---------+
+#
+# Monitors are matched by serial so that swapping cables does not matter.
+# ==============================================================================
+
+[bar]
+order = [ "status", "workspaces_left", "workspaces_right" ]
+
+    # --------------------------------------------------------------------------
+    # Status Bar
+    # --------------------------------------------------------------------------
+
+    [bar.status]
+    enabled = false
+    position = "bottom"
+    start = [ "group:media_visualizer", "volume" ]
+    center = [ "group:sysmon" ]
+    end = [ "tray", "notifications", "group:datetime" ]
+    thickness = 72
+    radius = 36
+    scale = 1.25
+    margin_edge = 12
+    margin_ends = 12
+    widget_spacing = 12
+    background_opacity = 0.7
+
+        [bar.status.monitor.HNBY100538]
+        enabled = true
+
+        [[bar.status.capsule_group]]
+          id = "media_visualizer"
+          members = [ "media", "audio_visualizer" ]
+          padding = 12.0
+          opacity = 0.75
+
+        [[bar.status.capsule_group]]
+          id = "sysmon"
+          members = [ "cpu", "ram", "gpu" ]
+          padding = 12.0
+          opacity = 0.75
+
+        [[bar.status.capsule_group]]
+          id = "datetime"
+          members = [ "date", "clock" ]
+          padding = 12.0
+          opacity = 0.75
+
+    # --------------------------------------------------------------------------
+    # Workspace Bars
+    #
+    # Left edge of the horizontal monitor and right edge of the tall monitor,
+    # i.e. the outermost edges of the desktop. Hidden while windows cover them,
+    # so they act as a dock for the desktop at rest: the left (work) edge
+    # starts things, the right edge holds session-wide toggles.
+    #
+    # Opaque, flush against the edge, with concave corners, so they look like
+    # tabs growing out of the bezel.
+    # --------------------------------------------------------------------------
+
+    [bar.workspaces_left]
+    enabled = false
+    position = "left"
+    start = [ "launcher" ]
+    center = [ "workspaces" ]
+    end = [ "control-center" ]
+    smart_auto_hide = true
+    reserve_space = false
+    thickness = 100
+    scale = 2
+    radius = 50
+    padding = 40
+    widget_spacing = 24
+    concave_edge_corners = true
+    background_opacity = 1.0
+    contact_shadow = false
+    margin_edge = 0
+    margin_ends = 720
+
+        [bar.workspaces_left.monitor.HNBY100050]
+        enabled = true
+
+    [bar.workspaces_right]
+    enabled = false
+    position = "right"
+    start = [ "theme_mode", "nightlight" ]
+    center = [ "workspaces" ]
+    end = [ "caffeine", "wallpaper" ]
+    smart_auto_hide = true
+    reserve_space = false
+    thickness = 100
+    scale = 2
+    radius = 50
+    padding = 40
+    widget_spacing = 24
+    concave_edge_corners = true
+    background_opacity = 1.0
+    contact_shadow = false
+    margin_edge = 0
+    margin_ends = 1480
+
+        [bar.workspaces_right.monitor.HNBY100538]
+        enabled = true

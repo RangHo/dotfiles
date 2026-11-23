@@ -12,10 +12,10 @@ files = [
   "hosts/{{ .chezmoi.hostname }}.toml",
 ]
 
-    [include.optional]
-    files = [
-      "noctalia.toml",
-    ]
+[include.optional]
+files = [
+  "noctalia.toml",
+]
 
 # ==============================================================================
 # General
@@ -41,27 +41,27 @@ prefer_no_csd = true
 border_width = 2
 corner_radius = 15
 
-    # --------------------------------------------------------------------------
-    # Blur
-    # --------------------------------------------------------------------------
-    [appearance.blur]
-    enabled = true
-    optimized = true
-    passes = 2
-    radius = 5
-    noise = 0.0
-    brightness = 0.9
-    contrast = 0.9
-    saturation = 1.1
+# ------------------------------------------------------------------------------
+# Blur
+# ------------------------------------------------------------------------------
+[appearance.blur]
+enabled = true
+optimized = true
+passes = 2
+radius = 5
+noise = 0.0
+brightness = 0.9
+contrast = 0.9
+saturation = 1.1
 
-    # --------------------------------------------------------------------------
-    # Shadow
-    # --------------------------------------------------------------------------
-    [appearance.shadow]
-    enabled = true
-    offset_x = 20
-    offset_y = 20
-    softness = 1
+# ------------------------------------------------------------------------------
+# Shadow
+# ------------------------------------------------------------------------------
+[appearance.shadow]
+enabled = true
+offset_x = 20
+offset_y = 20
+softness = 1
 
 # ==============================================================================
 # Input
@@ -79,16 +79,16 @@ follows_mouse_max_scroll = 0.25
 extent_presets = [0.333, 0.5, 0.667]
 gap = 50
 
-    # --------------------------------------------------------------------------
-    # Scrolling Layout
-    # --------------------------------------------------------------------------
-    [layout.scrolling]
+# ------------------------------------------------------------------------------
+# Scrolling Layout
+# ------------------------------------------------------------------------------
+[layout.scrolling]
 
-    # New windows start at 90% of the screen width.
-    default_extent_fraction = 0.9
+# New windows start at 90% of the screen width.
+default_extent_fraction = 0.9
 
-    # Put the currently focused window at the center on overflow.
-    center_focused = "on_overflow"
+# Put the currently focused window at the center on overflow.
+center_focused = "on_overflow"
 
 # ==============================================================================
 # Overview

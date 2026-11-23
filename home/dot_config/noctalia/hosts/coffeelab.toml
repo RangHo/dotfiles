@@ -20,15 +20,15 @@ directory = "/home/rangho/Pictures/Wallpapers/Portrait"
 [idle]
 behavior_order = [ "lock", "screen_off" ]
 
-    [idle.behavior.lock]
-    action = "lock"
-    enabled = true
-    timeout = 900
+[idle.behavior.lock]
+action = "lock"
+enabled = true
+timeout = 900
 
-    [idle.behavior.screen_off]
-    action = "screen_off"
-    enabled = true
-    timeout = 3600
+[idle.behavior.screen_off]
+action = "screen_off"
+enabled = true
+timeout = 3600
 
 # ==============================================================================
 # Widget
@@ -91,97 +91,97 @@ visualization = "graph"
 [bar]
 order = [ "status", "workspaces_left", "workspaces_right" ]
 
-    # --------------------------------------------------------------------------
-    # Status Bar
-    # --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Status Bar
+# ------------------------------------------------------------------------------
 
-    [bar.status]
-    enabled = false
-    position = "bottom"
-    start = [ "group:media_visualizer", "volume" ]
-    center = [ "group:sysmon" ]
-    end = [ "tray", "notifications", "group:datetime" ]
-    thickness = 72
-    radius = 36
-    scale = 1.25
-    margin_edge = 12
-    margin_ends = 12
-    widget_spacing = 12
-    background_opacity = 0.7
+[bar.status]
+enabled = false
+position = "bottom"
+start = [ "group:media_visualizer", "volume" ]
+center = [ "group:sysmon" ]
+end = [ "tray", "notifications", "group:datetime" ]
+thickness = 72
+radius = 36
+scale = 1.25
+margin_edge = 12
+margin_ends = 12
+widget_spacing = 12
+background_opacity = 0.7
 
-        [bar.status.monitor.HNBY100538]
-        enabled = true
+[bar.status.monitor.HNBY100538]
+enabled = true
 
-        [[bar.status.capsule_group]]
-          id = "media_visualizer"
-          members = [ "media", "audio_visualizer" ]
-          padding = 12.0
-          opacity = 0.75
+[[bar.status.capsule_group]]
+  id = "media_visualizer"
+  members = [ "media", "audio_visualizer" ]
+  padding = 12.0
+  opacity = 0.75
 
-        [[bar.status.capsule_group]]
-          id = "sysmon"
-          members = [ "cpu", "ram", "gpu" ]
-          padding = 12.0
-          opacity = 0.75
+[[bar.status.capsule_group]]
+  id = "sysmon"
+  members = [ "cpu", "ram", "gpu" ]
+  padding = 12.0
+  opacity = 0.75
 
-        [[bar.status.capsule_group]]
-          id = "datetime"
-          members = [ "date", "clock" ]
-          padding = 12.0
-          opacity = 0.75
+[[bar.status.capsule_group]]
+  id = "datetime"
+  members = [ "date", "clock" ]
+  padding = 12.0
+  opacity = 0.75
 
-    # --------------------------------------------------------------------------
-    # Workspace Bars
-    #
-    # Left edge of the horizontal monitor and right edge of the tall monitor,
-    # i.e. the outermost edges of the desktop. Hidden while windows cover them,
-    # so they act as a dock for the desktop at rest: the left (work) edge
-    # starts things, the right edge holds session-wide toggles.
-    #
-    # Opaque, flush against the edge, with concave corners, so they look like
-    # tabs growing out of the bezel.
-    # --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Workspace Bars
+#
+# Left edge of the horizontal monitor and right edge of the tall monitor,
+# i.e. the outermost edges of the desktop. Hidden while windows cover them,
+# so they act as a dock for the desktop at rest: the left (work) edge
+# starts things, the right edge holds session-wide toggles.
+#
+# Opaque, flush against the edge, with concave corners, so they look like
+# tabs growing out of the bezel.
+# ------------------------------------------------------------------------------
 
-    [bar.workspaces_left]
-    enabled = false
-    position = "left"
-    start = [ "launcher" ]
-    center = [ "workspaces" ]
-    end = [ "control-center" ]
-    smart_auto_hide = true
-    reserve_space = false
-    thickness = 100
-    scale = 2
-    radius = 50
-    padding = 40
-    widget_spacing = 24
-    concave_edge_corners = true
-    background_opacity = 1.0
-    contact_shadow = false
-    margin_edge = 0
-    margin_ends = 720
+[bar.workspaces_left]
+enabled = false
+position = "left"
+start = [ "launcher" ]
+center = [ "workspaces" ]
+end = [ "control-center" ]
+smart_auto_hide = true
+reserve_space = false
+thickness = 100
+scale = 2
+radius = 50
+padding = 40
+widget_spacing = 24
+concave_edge_corners = true
+background_opacity = 1.0
+contact_shadow = false
+margin_edge = 0
+margin_ends = 720
 
-        [bar.workspaces_left.monitor.HNBY100050]
-        enabled = true
+[bar.workspaces_left.monitor.HNBY100050]
+enabled = true
 
-    [bar.workspaces_right]
-    enabled = false
-    position = "right"
-    start = [ "theme_mode", "nightlight" ]
-    center = [ "workspaces" ]
-    end = [ "caffeine", "wallpaper" ]
-    smart_auto_hide = true
-    reserve_space = false
-    thickness = 100
-    scale = 2
-    radius = 50
-    padding = 40
-    widget_spacing = 24
-    concave_edge_corners = true
-    background_opacity = 1.0
-    contact_shadow = false
-    margin_edge = 0
-    margin_ends = 1480
+[bar.workspaces_right]
+enabled = false
+position = "right"
+start = [ "theme_mode", "nightlight" ]
+center = [ "workspaces" ]
+end = [ "caffeine", "wallpaper" ]
+smart_auto_hide = true
+reserve_space = false
+thickness = 100
+scale = 2
+radius = 50
+padding = 40
+widget_spacing = 24
+concave_edge_corners = true
+background_opacity = 1.0
+contact_shadow = false
+margin_edge = 0
+margin_ends = 1480
 
-        [bar.workspaces_right.monitor.HNBY100538]
-        enabled = true
+[bar.workspaces_right.monitor.HNBY100538]
+enabled = true

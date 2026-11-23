@@ -17,7 +17,7 @@
 "Mod+M" = "spawn thunderbird"
 
 # Terminal emulator.
-"Mod+Return" = "spawn footclient"
+"Mod+Return" = "spawn kitty"
 
 # ==============================================================================
 # Outputs

@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'faces)
 
 (defgroup rangho-fonts nil
@@ -63,12 +64,9 @@
 
 (defun rangho-fonts--find-font-specs (alist charset)
   "Find a list of font specs for CHARSET in ALIST."
-  (when-let* ((candidates (alist-get charset alist))
-              (found-fonts (cl-loop
-                            for font in candidates
-                            when (rangho-fonts--font-available-p font)
-                            return (if (listp font) font (list font)))))
-    (mapcar (apply-partially #'font-spec :name) found-fonts)))
+  (mapcar (apply-partially #'font-spec :name)
+          (cl-remove-if-not #'rangho-fonts--font-available-p
+                            (alist-get charset alist))))
 
 (defun rangho-fonts--find-first-available-font (alist charset)
   "Find the first available font for CHARSET in ALIST."
@@ -78,8 +76,12 @@
 (defun rangho-fonts--set-fontset-fonts (fontset alist)
   "Set fonts in FONTSET using ALIST."
   (dolist (item alist)
-    (dolist (font (rangho-fonts--find-font-specs alist (car item)))
-      (set-fontset-font fontset (car item) font)))
+    ;; The first font replaces whatever was there; the rest are appended so
+    ;; that Emacs falls through to them for characters the first one lacks.
+    (let ((add nil))
+      (dolist (font (rangho-fonts--find-font-specs alist (car item)))
+        (set-fontset-font fontset (car item) font nil add)
+        (setq add 'append))))
   (dolist (area rangho-fonts--unicode-private-use-areas)
     (set-fontset-font fontset area (car (rangho-fonts--find-font-specs alist 'symbol)))))
 

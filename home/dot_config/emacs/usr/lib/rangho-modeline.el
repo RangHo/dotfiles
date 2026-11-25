@@ -213,16 +213,15 @@
         '(:eval (rangho-modeline--render-mode-line
                  rangho-modeline-lhs-components
                  rangho-modeline-rhs-components)))
-  (add-to-list 'pre-redisplay-functions #'rangho-modeline--set-selected-window)
-  (add-to-list 'window-buffer-change-functions #'rangho-modeline--update-buffer-project))
+  (add-hook 'pre-redisplay-functions #'rangho-modeline--set-selected-window)
+  (add-hook 'window-buffer-change-functions #'rangho-modeline--update-buffer-project))
 
 (defun rangho-modeline--disable ()
   "Disable the custom modeline and restore the previous one."
   (setq-default mode-line-format rangho-modeline--previous-mode-line-format)
   (setq rangho-modeline--previous-mode-line-format nil)
-  (delete #'rangho-modeline--set-selected-window pre-redisplay-functions)
-  (delete #'rangho-modeline--update-buffer-project window-buffer-change-functians)
-  )
+  (remove-hook 'pre-redisplay-functions #'rangho-modeline--set-selected-window)
+  (remove-hook 'window-buffer-change-functions #'rangho-modeline--update-buffer-project))
 
 ;;;###autoload
 (define-minor-mode rangho-modeline-mode

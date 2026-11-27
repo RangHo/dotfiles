@@ -113,6 +113,13 @@
      `(mode-line-emphasis  ((t (:foreground ,.primary :weight bold))))
      `(mode-line-highlight ((t (:foreground ,.primary :box nil))))
 
+     ;; Meow state indicators.
+     `(meow-normal-indicator ((t (:background ,.primary              :foreground ,.on-primary))))
+     `(meow-insert-indicator ((t (:background ,.tertiary             :foreground ,.on-tertiary))))
+     `(meow-motion-indicator ((t (:background ,.surface-container-high :foreground ,.on-surface-variant))))
+     `(meow-keypad-indicator ((t (:background ,.secondary            :foreground ,.on-secondary))))
+     `(meow-beacon-indicator ((t (:background ,.error-container      :foreground ,.on-error-container))))
+
      ;; Org mode.
      `(org-block            ((t (:background ,.surface-container-low                               :extend t :inherit fixed-pitch))))
      `(org-block-begin-line ((t (:background ,.surface-container-low :foreground ,.primary-container :extend t :slant italic :inherit fixed-pitch))))

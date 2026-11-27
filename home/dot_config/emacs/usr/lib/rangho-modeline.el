@@ -164,7 +164,7 @@ taken from VC's cached state, so no Git process is run on every redisplay."
       " "))
    ;; Show the current major mode
    "using "
-   (when-let (icon (assoc major-mode nerd-icons-mode-icon-alist))
+   (when (assoc major-mode nerd-icons-mode-icon-alist)
      (concat
       (nerd-icons-icon-for-mode major-mode :height 0.90 :v-adjust 0.0)
       " "))
@@ -177,23 +177,28 @@ taken from VC's cached state, so no Git process is run on every redisplay."
               'face '(:background "#202124" :foreground "#e8eaed" :box (:color "#202124"))))
 
 (defconst rangho-modeline--meow-state-alist
-  '((normal "NORMAL" :background "#99cc99" :foreground "#394d39")
-    (insert "INSERT" :background "#6699cc" :foreground "#26394d")
-    (motion "MOTION" :background "#d3d0c8" :foreground "#737373")
-    (keypad "KEYPAD" :background "#cc99cc" :foreground "#4d394d")
-    (beacon "BEACON" :background "#ffcc66" :foreground "#806330"))
-  "List of texts and colors that represent the current Meow state.")
+  '((normal "NORMAL" meow-normal-indicator :background "#99cc99" :foreground "#394d39")
+    (insert "INSERT" meow-insert-indicator :background "#6699cc" :foreground "#26394d")
+    (motion "MOTION" meow-motion-indicator :background "#d3d0c8" :foreground "#737373")
+    (keypad "KEYPAD" meow-keypad-indicator :background "#cc99cc" :foreground "#4d394d")
+    (beacon "BEACON" meow-beacon-indicator :background "#ffcc66" :foreground "#806330"))
+  "List of Meow states, their labels, faces and fallback colors.
+Each element is (STATE TEXT FACE . FALLBACK).  FACE is used when the current
+theme gives it a background; otherwise the colors in FALLBACK are used.")
 
 (defun rangho-modeline-meow-state-component ()
   "Modeline component that displays the current state of Meow."
   (when (rangho-modeline--selected-window-active-p (selected-window))
     (when-let* ((current-state (assq (meow--current-state)
-                                     rangho-modeline--meow-state-alist))
-                (state-text (cadr current-state))
-                (state-prop (cddr current-state)))
-      (propertize (concat " " state-text " ")
-                  'face (append state-prop
-                                `(:weight bold :box (:color ,(plist-get state-prop :background))))))))
+                                     rangho-modeline--meow-state-alist)))
+      (pcase-let* ((`(,_ ,state-text ,state-face . ,fallback) current-state)
+                   (themed-background (face-background state-face nil t))
+                   (face (if themed-background
+                             (list `(:weight bold :box (:color ,themed-background))
+                                   state-face)
+                           (append fallback
+                                   `(:weight bold :box (:color ,(plist-get fallback :background)))))))
+        (propertize (concat " " state-text " ") 'face face)))))
 
 (defun rangho-modeline--render-mode-line (lhs rhs)
   "Render the mode line with LHS and RHS components."

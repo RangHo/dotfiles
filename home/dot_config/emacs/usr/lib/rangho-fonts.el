@@ -70,7 +70,7 @@
 
 (defun rangho-fonts--find-first-available-font (alist charset)
   "Find the first available font for CHARSET in ALIST."
-  (when-let ((candidates (alist-get charset alist)))
+  (when-let* ((candidates (alist-get charset alist)))
     (cl-find-if #'rangho-fonts--font-available-p candidates)))
 
 (defun rangho-fonts--set-fontset-fonts (fontset alist)

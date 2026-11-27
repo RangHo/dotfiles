@@ -1,3 +1,4 @@
+
 #+title: Emacs configuration
 
 This document describes and configures my Emacs instance.
@@ -453,6 +454,183 @@ The [[https://microsoft.github.io/language-server-protocol/][Language Server Pro
 * External Packages
 This section contains anything that is not included in vanilla Emacs.
 
+** Modal Editing on Emacs
+Meow is yet another modal editing on Emacs.
+It is based around selection-first, noun-verb approach similar to what Kakoune and Helix editor provides.
+
+*** Enable Meow Globally
+Meow is in MELPA, so ~use-package~ should fetch it out of the box.
+
+#+begin_src emacs-lisp
+  (use-package meow
+    :config
+    (meow-global-mode +1))
+#+end_src
+
+*** Motion State
+Motion state is used in special buffers such as ~*Help*~ or Dired.
+Only vertical movement is overridden here; everything else falls through to the major mode's own keymap.
+
+#+begin_src emacs-lisp
+  (meow-motion-define-key
+   '("j" . meow-next)
+   '("k" . meow-prev)
+   '("<escape>" . ignore))
+#+end_src
+
+*** Leader Keys
+Meow uses ~mode-specific-map~ as its leader keymap, so =SPC <key>= is the same as =C-c <key>=.
+Digit arguments live here because the digit keys in normal state are taken by expansion.
+
+#+begin_src emacs-lisp
+  (meow-leader-define-key
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key)
+   '("?" . meow-cheatsheet))
+#+end_src
+
+*** Window Management
+=SPC w= followed by =h=, =j=, =k= or =l= moves focus to the window in that direction, using the built-in ~windmove~.
+=SPC w s= splits the window horizontally (new window below) and =SPC w v= splits it vertically (new window to the right), as in Vim.
+=SPC w q= deletes the currently focused window, and =SPC w o= deletes windows without focus.
+
+#+begin_src emacs-lisp
+  (meow-leader-define-key
+   '("w h" . windmove-left)
+   '("w j" . windmove-down)
+   '("w k" . windmove-up)
+   '("w l" . windmove-right)
+   '("w s" . split-window-below)
+   '("w v" . split-window-right)
+   '("w q" . delete-window)
+   '("w o" . delete-other-windows)
+   '("w =" . balance-windows))
+#+end_src
+
+*** Expansion
+After a movement or selection, a digit extends it by that many more units.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("1" . meow-expand-1)
+   '("2" . meow-expand-2)
+   '("3" . meow-expand-3)
+   '("4" . meow-expand-4)
+   '("5" . meow-expand-5)
+   '("6" . meow-expand-6)
+   '("7" . meow-expand-7)
+   '("8" . meow-expand-8)
+   '("9" . meow-expand-9)
+   '("0" . meow-expand-0)
+   '("-" . negative-argument))
+#+end_src
+
+*** Character and Line Movement
+Lowercase keys move the cursor; uppercase keys extend the selection in that direction.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("h" . meow-left)
+   '("H" . meow-left-expand)
+   '("j" . meow-next)
+   '("J" . meow-next-expand)
+   '("k" . meow-prev)
+   '("K" . meow-prev-expand)
+   '("l" . meow-right)
+   '("L" . meow-right-expand)
+   '("Q" . meow-goto-line))
+#+end_src
+
+*** Word and Symbol Movement
+Lowercase keys work on words, and uppercase keys on symbols.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("e" . meow-next-word)
+   '("E" . meow-next-symbol))
+#+end_src
+
+*** Searching
+=f= and =t= find a character on the current line, while =/= and =n= search with a regexp.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("f" . meow-find)
+   '("t" . meow-till)
+   '("/" . meow-visit)
+   '("n" . meow-search))
+#+end_src
+
+*** Selection
+These keys select text objects first, so that a command can act on them next.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("w" . meow-mark-word)
+   '("W" . meow-mark-symbol)
+   '("v" . meow-line)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '(";" . meow-reverse)
+   '("g" . meow-cancel-selection)
+   '("z" . meow-pop-selection))
+#+end_src
+
+*** Entering Insert State
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("i" . meow-insert)
+   '("a" . meow-append)
+   '("o" . meow-open-below)
+   '("O" . meow-open-above)
+   '("c" . meow-change))
+#+end_src
+
+*** Editing
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("x" . meow-delete)
+   '("X" . meow-backward-delete)
+   '("d" . meow-kill)
+   '("y" . meow-save)
+   '("p" . meow-yank)
+   '("r" . meow-replace)
+   '("m" . meow-join)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection))
+#+end_src
+
+*** Secondary Selection
+A grabbed region acts as a secondary selection that can be swapped with or synced to the current one.
+
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("G" . meow-grab)
+   '("R" . meow-swap-grab)
+   '("Y" . meow-sync-grab))
+#+end_src
+
+*** Miscellaneous
+#+begin_src emacs-lisp
+  (meow-normal-define-key
+   '("'" . repeat)
+   '("q" . meow-quit)
+   '("<escape>" . ignore))
+#+end_src
+
 ** Enhancements
 *** Rainbow Delimiters
 Colorful parentheses help distinguish which opens and closes which.
@@ -573,43 +751,6 @@ There is a package that shows ~eldoc~ contents within a child frame.
     :hook (prog-mode . eldoc-box-hover-at-point-mode)
     :custom
     (eldoc-echo-area-prefer-doc-buffer t))
-#+end_src
-
-*** Evil Mode
-For text editing and navigation, ~evil~ is still much better than "The Emacs Way".
-
-#+begin_src emacs-lisp
-  (use-package evil
-    :custom
-    (evil-undo-system 'undo-redo)
-    (evil-split-window-below t)
-    (evil-vsplit-window-right t)
-    (evil-want-integration t "Requirement for `evil-collection'.")
-    (evil-want-keybinding nil "Requirement for `evil-collection'.")
-    :config
-    (evil-mode +1))
-
-  (use-package evil-collection
-    :config
-    (evil-collection-init))
-
-  (use-package evil-surround
-    :config
-    (global-evil-surround-mode +1))
-#+end_src
-
-~treemacs~ has ~evil~ integration.
-
-#+begin_src emacs-lisp
-  (use-package treemacs-evil
-    :after (treemacs))
-#+end_src
-
-*** God Mode
-God-mode prevents the "Emacs Pinky" by allowing us to chain keybindings with plain letters.
-
-#+begin_src emacs-lisp
-  (use-package god-mode)
 #+end_src
 
 *** Limiting Text Mode to Fill Column
@@ -857,32 +998,18 @@ I can even outsource typing to AI agents too.
   (use-package eca)
 #+end_src
 
+
 * Local Packages
 There are some packages I developed but couldn't care less to package it properly.
-
-** "Hades" Mode
-When God is Evil, He becomes Hades.
-~hades-mode~ integrates ~evil-mode~ and ~god-mode~ into a single package.
-
-You can enter ~god-mode~ state by pressing =,= in the NORMAL state.
-
-#+begin_src emacs-lisp
-  (use-package hades
-    :ensure nil
-    :after (evil god-mode)
-    :config
-    (evil-define-key 'normal global-map "," #'hades-start-execute-in-hades-state)
-    (evil-define-key 'hades global-map (kbd "<escape>") #'hades-cancel))
-#+end_src
 
 ** Line Numbers
 Display line numbers for computer codes.
 For regular texts, usually they are more of an annoyance.
 
 #+begin_src emacs-lisp
-  (use-package evil-line-numbers
+  (use-package meow-line-numbers
     :ensure nil
-    :after (evil)
+    :after (meow)
     :hook (prog-mode)
     :custom
     (display-line-numbers-width 3))
@@ -980,7 +1107,7 @@ Let's customize that.
     (rangho-modeline-rhs-components
      (list
       #'rangho-modeline-position-component
-      #'rangho-modeline-evil-state-component))
+      #'rangho-modeline-meow-state-component))
     :config
     (rangho-modeline-mode +1))
 #+end_src
@@ -1012,12 +1139,11 @@ In English, this is rare, but in Korean and Japanese, it is a pain in the ass.
 There should be an easy way to insert a *zero-width space* to delimit them.
 (It is the [[https://orgmode.org/manual/Escape-Character.html][preferred way of achieving this]].)
 
+=C-x 8= is Emacs's built-in prefix for inserting special characters (e.g. =C-x 8 SPC= for a no-break space), and =C-x 8 0= is unused, so the zero-width space goes there.
+
 #+begin_src emacs-lisp
-  (with-eval-after-load 'evil
-   (evil-define-key 'insert global-map (kbd "M-SPC")
-    (lambda ()
-      (interactive)
-      (insert (char-from-name "ZERO WIDTH SPACE")))))
+  (with-eval-after-load 'iso-transl
+    (define-key iso-transl-ctl-x-8-map "0" [?​]))
 #+end_src
 
 * Per-language Settings
@@ -1338,8 +1464,8 @@ OCaml is an object-oriented extension of the Caml dialect of ML, mainly used in 
   (use-package org-appear
     :hook (org-mode . (lambda ()
                         (org-appear-mode +1)
-                        (add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start nil t)
-                        (add-hook 'evil-insert-state-exit-hook #'org-appear-manual-stop nil t)))
+                        (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
+                        (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t)))
     :custom
     (org-appear-autoemphasis t)
     (org-appear-autoentities t)

@@ -4,7 +4,7 @@
 
 ;; Author: RangHo Lee <hello@rangho.me>
 ;; URL: https://github.com/RangHo/dotfiles
-;; Package-Requires: ((emacs "30.2") (evil "1.14.2") (nerd-icons "0.1.0") (nyan-mode "1.1.3"))
+;; Package-Requires: ((emacs "30.2") (meow "1.5.0") (nerd-icons "0.1.0") (nyan-mode "1.1.3"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -19,7 +19,7 @@
 
 ;;; Code:
 
-(require 'evil)
+(require 'meow)
 (require 'nerd-icons)
 (require 'nyan-mode)
 (require 'project)
@@ -155,26 +155,24 @@
   (propertize " %4l:%2c "
               'face '(:background "#202124" :foreground "#e8eaed" :box (:color "#202124"))))
 
-(defconst rangho-modeline--evil-state-alist
-  '((emacs "EMACS" :background "#d3d0c8" :foreground "#737373")
-    (normal "NORMAL" :background "#99cc99" :foreground "#394d39")
+(defconst rangho-modeline--meow-state-alist
+  '((normal "NORMAL" :background "#99cc99" :foreground "#394d39")
     (insert "INSERT" :background "#6699cc" :foreground "#26394d")
-    (replace "REPLACE" :background "#f2777a" :foreground "#733939")
-    (visual "VISUAL" :background "#ffcc66" :foreground "#806330")
-    (hades "HADES" :background "#cc99cc" :foreground "#4d394d"))
-  "List of texts and colors that represent the current evil status.")
+    (motion "MOTION" :background "#d3d0c8" :foreground "#737373")
+    (keypad "KEYPAD" :background "#cc99cc" :foreground "#4d394d")
+    (beacon "BEACON" :background "#ffcc66" :foreground "#806330"))
+  "List of texts and colors that represent the current Meow state.")
 
-(defun rangho-modeline-evil-state-component ()
-  "Modeline component that displays the current state of Evil mode."
+(defun rangho-modeline-meow-state-component ()
+  "Modeline component that displays the current state of Meow."
   (when (rangho-modeline--selected-window-active-p (selected-window))
-    (let* ((current-state (assq evil-state
-                                rangho-modeline--evil-state-alist))
-           (state-text (cadr current-state))
-           (state-prop (cddr current-state)))
-      (funcall 'propertize
-               (concat " " state-text " ")
-               'face (append state-prop
-                             `(:weight bold :box (:color ,(plist-get state-prop :background))))))))
+    (when-let* ((current-state (assq (meow--current-state)
+                                     rangho-modeline--meow-state-alist))
+                (state-text (cadr current-state))
+                (state-prop (cddr current-state)))
+      (propertize (concat " " state-text " ")
+                  'face (append state-prop
+                                `(:weight bold :box (:color ,(plist-get state-prop :background))))))))
 
 (defun rangho-modeline--render-mode-line (lhs rhs)
   "Render the mode line with LHS and RHS components."

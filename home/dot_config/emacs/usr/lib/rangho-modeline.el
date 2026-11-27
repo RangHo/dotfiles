@@ -23,6 +23,7 @@
 (require 'nerd-icons)
 (require 'nyan-mode)
 (require 'project)
+(require 'vc-git)
 
 (defgroup rangho-modeline nil
   "Custom modeline for Emacs."
@@ -109,6 +110,26 @@
                               nyan-cat-string)
       nyan-cat-string)))
 
+(defvar-local rangho-modeline--git-branch-cache nil
+  "Cache of the form (VC-MODE . BRANCH) for the current buffer.
+`vc-mode' is replaced with a new string whenever VC refreshes the buffer's
+state, so the cached branch is reused until that happens.")
+
+(defun rangho-modeline--git-branch ()
+  "Return the Git branch of the current buffer's file, or nil.
+On a detached HEAD, return the abbreviated commit hash instead.  The value is
+taken from VC's cached state, so no Git process is run on every redisplay."
+  (when (and vc-mode
+             buffer-file-name
+             (eq (vc-backend buffer-file-name) 'Git))
+    (if (eq (car rangho-modeline--git-branch-cache) vc-mode)
+        (cdr rangho-modeline--git-branch-cache)
+      (let ((branch (or (vc-git--symbolic-ref buffer-file-name)
+                        (when-let* ((rev (vc-working-revision buffer-file-name 'Git)))
+                          (substring rev 0 (min 7 (length rev)))))))
+        (setq rangho-modeline--git-branch-cache (cons vc-mode branch))
+        branch))))
+
 (defun rangho-modeline-buffer-description-component ()
   "Modeline component that shows what file is being edited.
 
@@ -134,7 +155,7 @@
       (file-name-nondirectory (directory-file-name (project-root rangho-modeline--current-buffer-project)))
       " "))
    ;; Show the branch name, if available
-   (when nil
+   (when-let* ((branch-name (rangho-modeline--git-branch)))
      (concat
       "on "
       (nerd-icons-octicon "nf-oct-git_branch" :height 0.90 :v-adjust 0.0)

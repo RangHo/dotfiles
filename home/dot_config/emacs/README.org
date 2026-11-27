@@ -467,6 +467,21 @@ Meow is in MELPA, so ~use-package~ should fetch it out of the box.
     (meow-global-mode +1))
 #+end_src
 
+*** Line Numbers
+Display line numbers for computer codes.
+For regular texts, usually they are more of an annoyance.
+~meow-setup-line-number~ makes them relative outside insert state and absolute inside it.
+
+#+begin_src emacs-lisp
+  (use-package display-line-numbers
+    :ensure nil
+    :hook (prog-mode)
+    :custom
+    (display-line-numbers-width 3)
+    :config
+    (meow-setup-line-number))
+#+end_src
+
 *** Motion State
 Motion state is used in special buffers such as ~*Help*~ or Dired.
 Only vertical movement is overridden here; everything else falls through to the major mode's own keymap.
@@ -1001,19 +1016,6 @@ I can even outsource typing to AI agents too.
 
 * Local Packages
 There are some packages I developed but couldn't care less to package it properly.
-
-** Line Numbers
-Display line numbers for computer codes.
-For regular texts, usually they are more of an annoyance.
-
-#+begin_src emacs-lisp
-  (use-package meow-line-numbers
-    :ensure nil
-    :after (meow)
-    :hook (prog-mode)
-    :custom
-    (display-line-numbers-width 3))
-#+end_src
 
 ** Mixed-pitch Support
 Emacs can display text in a /mixed-pitch/ manner, where both variable-pitch and fixed-pitch fonts can exist in a single buffer.

@@ -135,9 +135,9 @@
 (defun rangho-fonts-unset-default-font ()
   "Unset the default font settings."
   (interactive)
-  (set-face-attribute 'default nil :family unspecified :height unspecified)
-  (set-face-attribute 'fixed-pitch nil :family unspecified :fontset unspecified)
-  (set-face-attribute 'variable-pitch nil :family unspecified :fontset unspecified))
+  (set-face-attribute 'default nil :family 'unspecified :height 'unspecified)
+  (set-face-attribute 'fixed-pitch nil :family 'unspecified :fontset 'unspecified)
+  (set-face-attribute 'variable-pitch nil :family 'unspecified :fontset 'unspecified))
 
 (defun rangho-fonts--disable ()
   "Disable the font settings."

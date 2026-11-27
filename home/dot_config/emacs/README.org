@@ -430,8 +430,7 @@ It is usually much faster than Emacs's built-in parsing facility.
               (treesit-install-language-grammar
                (car grammar)
                (or out-dir
-                   (car treesit--install-language-grammar-out-dir-history
-                        (locate-user-emacs-file "tree-sitter")))))
+                   (locate-user-emacs-file "tree-sitter"))))
             treesit-language-source-alist))
 #+end_src
 
@@ -1322,7 +1321,7 @@ Both of them suck, and Julia performs pretty well.
   case, try installing the language server as well."
     ;; Assume that the existence of the project directory means that the language server is installed.
     (when interactive
-      (rangho=julia-mode-install-server))
+      (rangho-julia-mode-install-server))
     (if (file-exists-p rangho--julia-language-server-project)
         (let (project-directory)
           (cond
